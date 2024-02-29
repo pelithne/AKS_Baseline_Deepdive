@@ -1,0 +1,409 @@
+USE MARKDOWN FILE INSTEAD (notes.md)
+
+
+
+
+
+# Create the resource group for the virtual networks
+az group create --name rg_baseline --location westeurope
+
+# Create the hub virtual network with two subnets
+az network vnet create \
+    --resource-group rg_baseline  \
+    --name hub-vnet \
+    --address-prefixes 10.0.0.0/16 \
+    --subnet-name AzureBastionSubnet \
+    --subnet-prefixes 10.0.1.0/24
+
+az network vnet subnet create \
+    --resource-group rg_baseline  \
+    --vnet-name hub-vnet \
+    --name AzureFirewallSubnet \
+    --address-prefixes 10.0.2.0/24
+
+az network vnet subnet create \
+    --resource-group rg_baseline  \
+    --vnet-name hub-vnet \
+    --name JumpBoxSubnet \
+    --address-prefixes 10.0.3.0/24
+
+# Create the spoke virtual network with one subnet for AKS
+az network vnet create \
+    --resource-group rg_baseline  \
+    --name spoke-vnet \
+    --address-prefixes 10.1.0.0/16 \
+    --subnet-name aks-subnet \
+    --subnet-prefixes 10.1.1.0/24
+
+az network vnet subnet create \
+    --resource-group rg_baseline  \
+    --vnet-name spoke-vnet  \
+    --name endpoints-subnet \
+    --address-prefixes 10.1.2.0/24
+
+az network vnet subnet create \
+    --resource-group rg_baseline  \
+    --vnet-name spoke-vnet \
+    --name loadbalancer-subnet \
+    --address-prefixes 10.1.3.0/24
+
+az network vnet subnet create \
+    --resource-group rg_baseline  \
+    --vnet-name spoke-vnet \
+    --name app-gw-subnet \
+    --address-prefixes 10.1.4.0/24
+
+# Create a peering connection between the hub and spoke virtual networks
+az network vnet peering create \
+    --resource-group rg_baseline  \
+    --name hub-to-spoke \
+    --vnet-name hub-vnet \
+    --remote-vnet spoke-vnet \
+    --allow-vnet-access
+
+# Create a peering connection between the spoke and hub virtual networks
+az network vnet peering create \
+    --resource-group rg_baseline  \
+    --name spoke-to-hub \
+    --vnet-name spoke-vnet \
+    --remote-vnet hub-vnet \
+    --allow-vnet-access
+
+# Create a public IP address for the bastion host
+az network public-ip create \
+    --resource-group rg_baseline  \
+    --name bastion-pip \
+    --sku Standard \
+    --allocation-method Static
+
+# Create a network security group for the bastion subnet
+az network nsg create \
+    --resource-group rg_baseline  \
+    --name bastion-nsg
+
+# Create a network security group rule to allow SSH traffic to the bastion subnet
+az network nsg rule create \
+    --resource-group rg_baseline  \
+    --nsg-name bastion-nsg \
+    --name allow-ssh \
+    --protocol Tcp \
+    --direction Inbound \
+    --source-address-prefixes Internet \
+    --source-port-ranges '*' \
+    --destination-address-prefixes 10.0.1.0/24 \
+    --destination-port-ranges 22 \
+    --access Allow \
+    --priority 100
+
+# Create JumpBox host
+
+az vm create \
+    --resource-group rg_baseline \
+    --name jumpbox-win \
+    --image Win2019Datacenter \
+    --admin-username azureuser \
+    --admin-password Ericsson_2055 \
+    --vnet-name hub-vnet \
+    --subnet JumpBoxSubnet \
+    --size Standard_B2s \
+    --storage-sku Standard_LRS \
+    --os-disk-name jumpbox-win-osdisk \
+    --os-disk-size-gb 128 \
+    --nsg jumpbox-nsg \
+    --public-ip-address "" \
+  
+
+az network nic create \
+    --resource-group rg_baseline \
+    --name jumpbox-win-nic \
+    --vnet-name hub-vnet \
+    --subnet JumpBoxSubnet \
+    --network-security-group jumpbox-nsg \
+    --accelerated-networking true \
+ 
+
+az network nic ip-config create \
+    --resource-group rg_baseline \
+    --nic-name jumpbox-win-nic \
+    --name ipconfig1 \
+    --private-ip-address 10.0.3.4 \
+    --public-ip-address "" \
+
+# Create the bastion host in hub vnet
+
+az network bastion create \
+    --resource-group rg_baseline \
+    --name bastionhost \
+    --public-ip-address bastion-pip \
+    --vnet-name hub-vnet \
+    --location westeurope
+
+# Connect to VM using the portal:
+https://learn.microsoft.com/en-us/azure/bastion/create-host-cli#steps
+
+# Create an Azure Firewall in the azure-firewall-subnet
+az network firewall create \
+    --resource-group rg_baseline \
+    --name azure-firewall \
+    --location westeurope \
+    --vnet-name hub-vnet \
+    --enable-dns-proxy true
+
+az network public-ip create \
+    --name fw-pip \
+    --resource-group rg_baseline \
+    --location westeurope \
+    --allocation-method static \
+    --sku standard
+
+az network firewall ip-config create \
+    --firewall-name azure-firewall \
+    --name FW-config \
+    --public-ip-address fw-pip \
+    --resource-group rg_baseline \
+    --vnet-name hub-vnet
+
+az network firewall update \
+    --name azure-firewall \
+    --resource-group rg_baseline 
+
+# Create Azure firewall network rules    
+az network firewall network-rule create -g rg_baseline -f azure-firewall --collection-name 'aksfwnr' -n 'apiudp' --protocols 'UDP' --source-addresses '*' --destination-addresses "AzureCloud.$LOC" --destination-ports 1194 --action allow --priority 100
+az network firewall network-rule create -g rg_baseline -f azure-firewall --collection-name 'aksfwnr' -n 'apitcp' --protocols 'TCP' --source-addresses '*' --destination-addresses "AzureCloud.$LOC" --destination-ports 9000
+az network firewall network-rule create -g rg_baseline -f azure-firewall --collection-name 'aksfwnr' -n 'time' --protocols 'UDP' --source-addresses '*' --destination-fqdns 'ntp.ubuntu.com' --destination-ports 123
+
+# Create Azure firewall application rules
+az network firewall application-rule create -g rg_baseline -f azure-firewall --collection-name 'aksfwar' -n 'fqdn' --source-addresses '*' --protocols 'http=80' 'https=443' --fqdn-tags "AzureKubernetesService" --action allow --priority 100
+
+
+# Create a route table for the spoke virtual network
+az network route-table create \
+    --resource-group rg_baseline  \
+    --name spoke-rt
+
+
+
+# Create a route to the internet via the Azure Firewall
+az network route-table route create \
+    --resource-group rg_baseline  \
+    --name default-route \
+    --route-table-name spoke-rt \
+    --address-prefix 0.0.0.0/0 \
+    --next-hop-type VirtualAppliance \
+    --next-hop-ip-address 10.0.2.4
+
+# Associate the route table with the aks-subnet
+az network vnet subnet update \
+    --resource-group rg_baseline  \
+    --vnet-name spoke-vnet \
+    --name aks-subnet \
+    --route-table spoke-rt
+ 
+# Create a user-assigned managed identity
+az identity create \
+    --resource-group rg_baseline \
+    --name abui
+
+# Get the id of the user managed identity
+identity_id=$(az identity show \
+    --resource-group rg_baseline \
+    --name abui \
+    --query id \
+    --output tsv)
+
+# Get the principal id of the user managed identity
+principal_id=$(az identity show \
+    --resource-group rg_baseline \
+    --name abui \
+    --query principalId \
+    --output tsv)
+
+# Assign permissions for the user managed identity to the routing table
+az role assignment create \
+    --assignee $principal_id \
+    --scope /subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg_baseline/providers/Microsoft.Network/routeTables/spoke-rt \
+    --role "Network Contributor"
+
+# Create a custom role, with least privilage access for AKS load balancer subnet
+touch aks-net-contributor.json
+add the following information to the json file.
+
+{
+    "properties": {
+        "roleName": "aks-net-contributor",
+        "description": "least privilige access",
+        "assignableScopes": [
+            "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg_baseline/providers/Microsoft.Network/virtualNetworks/spoke-vnet/subnets/loadbalancer-subnet"
+        ],
+        "permissions": [
+            {
+                "actions": [
+                    "Microsoft.Network/loadBalancers/read",
+                    "Microsoft.Network/loadBalancers/write",
+                    "Microsoft.Network/networkSecurityGroups/join/action",
+                    "Microsoft.Network/loadBalancers/delete",
+                    "Microsoft.Network/virtualNetworks/subnets/read",
+                    "Microsoft.Network/virtualNetworks/subnets/write",
+                    "Microsoft.Network/virtualNetworks/subnets/join/action"
+                ],
+                "notActions": [],
+                "dataActions": [],
+                "notDataActions": []
+            }
+        ]
+    }
+}
+
+create a role
+az role definition create --role-definition ./aks-net-contributor.json
+
+assign the custom role to the user assigned managed identity, first identify the service principal ID
+
+principalId=$(az identity show --name abui --resource-group rg_baseline --query principalId --output tsv)
+
+az role assignment create --assignee $principalId --role "aks-net-contributor"
+
+
+# Create the AKS cluster in the aks-subnet
+az aks create --resource-group rg_baseline --node-count 3 --vnet-subnet-id /subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg_baseline/providers/Microsoft.Network/virtualNetworks/spoke-vnet/subnets/aks-subnet  --enable-aad --enable-azure-rbac --name private-aks --enable-private-cluster --outbound-type userDefinedRouting --enable-oidc-issuer --enable-workload-identity --generate-ssh-keys --assign-identity $identity_id
+
+# Link the the hub network to the private DNS zone. 
+
+DNS_ZONE_NAME=$(az network private-dns zone list --resource-group $NODE_GROUP --query "[0].name" -o tsv)
+HUB_VNET_ID=$(az network vnet show -g rg_baseline -n hub-vnet --query id --output tsv)
+az network private-dns link vnet create --name "hubnetdnsconfig" --registration-enabled false --resource-group $NODE_GROUP --virtual-network $HUB_VNET_ID --zone-name $DNS_ZONE_NAME 
+
+# create ACR 
+az acr create \
+    --resource-group rg_baseline \
+    --name acraksbl \
+    --sku Premium \
+    --admin-enabled false \
+    --location westeurope \
+    --allow-trusted-services false
+    --public-network-enabled false
+
+
+# Disable network policies in subnet
+az network vnet subnet update \
+ --name endpoints-subnet \
+ --vnet-name spoke-vnet\
+ --resource-group rg_baseline \
+ --disable-private-endpoint-network-policies
+ 
+#Configure the private DNS zone
+az network private-dns zone create \
+  --resource-group rg_baseline \
+  --name "privatelink.azurecr.io"
+
+# Create a virtual network association link
+ az network private-dns link vnet create \
+  --resource-group rg_baseline \
+  --zone-name "privatelink.azurecr.io" \
+  --name ACRDNSSpokeLink \
+  --virtual-network spoke-vnet \
+  --registration-enabled false
+ 
+  az network private-dns link vnet create \
+  --resource-group rg_baseline \
+  --zone-name "privatelink.azurecr.io" \
+  --name ACRDNSHubLink \
+  --virtual-network hub-vnet \
+  --registration-enabled false
+
+# Create a private registry endpoint 
+REGISTRY_ID=$(az acr show --name acraksbl \
+  --query 'id' --output tsv)
+
+az network private-endpoint create \
+    --name ACRPrivateEndpoint \
+    --resource-group rg_baseline \
+    --vnet-name spoke-vnet \
+    --subnet endpoints-subnet \
+    --private-connection-resource-id $REGISTRY_ID \
+    --group-ids registry \
+    --connection-name PrivateACRConnection
+
+
+## Configure DNS record 
+
+# get endpoint IP configuration
+NETWORK_INTERFACE_ID=$(az network private-endpoint show \
+  --name ACRPrivateEndpoint \
+  --resource-group rg_baseline \
+  --query 'networkInterfaces[0].id' \
+  --output tsv)
+
+# fetch the container registry private IP address
+REGISTRY_PRIVATE_IP=$(az network nic show --ids $NETWORK_INTERFACE_ID --query "ipConfigurations[?privateLinkConnectionProperties.requiredMemberName=='registry'].privateIPAddress" -o tsv)
+
+# fetch the data endpoint IP address of the container registry
+
+DATA_ENDPOINT_PRIVATE_IP=$(az network nic show --ids $NETWORK_INTERFACE_ID --query "ipConfigurations[?privateLinkConnectionProperties.requiredMemberName=='registry_data_westeurope'].privateIPAddress" -o tsv)
+
+# fetch the FQDN associated with the registry and data endpoint
+
+REGISTRY_FQDN=$(az network nic show \
+  --ids $NETWORK_INTERFACE_ID \
+  --query "ipConfigurations[?privateLinkConnectionProperties.requiredMemberName=='registry'].privateLinkConnectionProperties.fqdns" \
+  --output tsv)
+
+DATA_ENDPOINT_FQDN=$(az network nic show \
+  --ids $NETWORK_INTERFACE_ID \
+  --query "ipConfigurations[?privateLinkConnectionProperties.requiredMemberName=='registry_data_westeurope'].privateLinkConnectionProperties.fqdns" \
+  --output tsv)
+
+#Create DNS records in the private zone
+
+az network private-dns record-set a create \
+  --name acraksbl \
+  --zone-name privatelink.azurecr.io \
+  --resource-group rg_baseline
+
+# Specify registry region in data endpoint name
+az network private-dns record-set a create \
+  --name acraksbl.westeurope.data \
+  --zone-name privatelink.azurecr.io \
+  --resource-group rg_baseline
+  
+# create the A records for the registry endpoint and data endpoint
+
+az network private-dns record-set a add-record \
+  --record-set-name acraksbl \
+  --zone-name privatelink.azurecr.io \
+  --resource-group rg_baseline \
+  --ipv4-address $REGISTRY_PRIVATE_IP
+
+# Specify registry region in data endpoint name
+az network private-dns record-set a add-record \
+  --record-set-name acraksbl.westeurope.data \
+  --zone-name privatelink.azurecr.io \
+  --resource-group rg_baseline \
+  --ipv4-address $DATA_ENDPOINT_PRIVATE_IP
+
+## Create Application Gateway
+
+# Create public IP address with a domain name associated to the PIP resource
+az network public-ip create -g rg_baseline -n AGPublicIPAddress --dns-name mvcnstudent01 --allocation-method Static --sku Standard --location westeurope
+
+# Create WAF policy 
+az network application-gateway waf-policy create --name ApplicationGatewayWAFPolicy --resource-group rg_baseline
+
+# Create application Gateway 
+
+  az network application-gateway create \
+  --name AppGateway \
+  --location westeurope \
+  --resource-group rg_baseline \
+  --vnet-name spoke-vnet \
+  --subnet app-gw-subnet \
+  --capacity 1 \
+  --sku WAF_v2 \
+  --http-settings-cookie-based-affinity Disabled \
+  --frontend-port 443 \
+  --http-settings-port 80 \
+  --http-settings-protocol Http \
+  --priority "1" \
+  --public-ip-address AGPublicIPAddress \
+  --cert-file appgwcert.pfx \
+  --waf-policy ApplicationGatewayWAFPolicy
