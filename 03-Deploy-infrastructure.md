@@ -30,7 +30,7 @@ ACR_NAME=<NAME OF THE AZURE CONTAINER REGISTRY>
 STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
 ````
 
-### 3.1.2 Create the Resource group for the hub and spoke.
+### 3.1.2 Create the Resource Group for the Hub and Spoke.
 
 ````bash
 az group create --name $HUB_RG --location $LOCATION
@@ -288,7 +288,7 @@ You have successfully configured the network for your spoke virtual network. You
 
 ![Screenshot](/images/hubandspokeonly.jpg)
 
-### 3.1.5 Create Vnet peering between hub and spoke
+### 3.1.5 Create Vnet Peering Between Hub and Spoke
 
 The next step is to create a virtual network peering between the hub and spoke VNets. This will enable the communication between the VNets and allow the AKS cluster to route traffic to the Firewall.
 
