@@ -427,7 +427,7 @@ To secure your AKS outbound traffic, you need to follow these steps for a basic 
 1) Create Azure Firewall, and deploy it to it to firewall subnet in hub vnet.
 ````bash
 az network firewall create \
-    --resource-group $RG \
+    --resource-group $HUB_RG \
     --name $FW_NAME \
     --location $LOCATION \
     --vnet-name $HUB_VNET_NAME \
@@ -439,7 +439,7 @@ az network firewall create \
 ````bash
 az network public-ip create \
     --name fw-pip \
-    --resource-group $RG \
+    --resource-group $HUB_RG \
     --location $LOCATION \
     --allocation-method static \
     --sku standard
@@ -453,7 +453,7 @@ az network firewall ip-config create \
     --firewall-name $FW_NAME \
     --name FW-config \
     --public-ip-address fw-pip \
-    --resource-group $RG \
+    --resource-group $HUB_RG \
     --vnet-name $HUB_VNET_NAME
 
 ````
@@ -462,33 +462,33 @@ az network firewall ip-config create \
 ````bash
 az network firewall update \
     --name $FW_NAME \
-    --resource-group $RG 
+    --resource-group $HUB_RG 
 ````
 5) Create Network rules in Azure Firewall
  
-The following network rules allows outbound traffic from any source address to certain destinations and ports. If the required destionation is not specified the AKS cluster will fail to deploy.
+The following network rules allows outbound traffic from any source address to certain destinations and ports. If the required destination is not specified the AKS cluster will fail to deploy.
 
 ````bash
-az network firewall network-rule create -g $RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apiudp' --protocols 'UDP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 1194 --action allow --priority 100
+az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apiudp' --protocols 'UDP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 1194 --action allow --priority 100
 ````
 ````bash
-az network firewall network-rule create -g $RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apitcp' --protocols 'TCP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 9000
+az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apitcp' --protocols 'TCP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 9000
 ````
 ````bash
-az network firewall network-rule create -g $RG -f $FW_NAME --collection-name 'aksfwnr' -n 'time' --protocols 'UDP' --source-addresses '*' --destination-fqdns 'ntp.ubuntu.com' --destination-ports 123
+az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'time' --protocols 'UDP' --source-addresses '*' --destination-fqdns 'ntp.ubuntu.com' --destination-ports 123
 ````
 6) Create Azure Firewall application rule
 
 This rules specifies the FQDN's which are required by AKS, **AzureKubernetesService** tag which include all the FQDNs listed in Outbound network and FQDN rules for AKS clusters.
 
 ````bash
-az network firewall application-rule create -g $RG -f $FW_NAME --collection-name 'aksfwar' -n 'fqdn' --source-addresses '*' --protocols 'http=80' 'https=443' --fqdn-tags "AzureKubernetesService" --action allow --priority 100
+az network firewall application-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwar' -n 'fqdn' --source-addresses '*' --protocols 'http=80' 'https=443' --fqdn-tags "AzureKubernetesService" --action allow --priority 100
 ````
 
-7) Create a route table
+7) Create a route table in the spoke.
 ````bash
 az network route-table create \
-    --resource-group $RG  \
+    --resource-group $SPOKE_RG  \
     --name $ROUTE_TABLE_NAME
 
 ````
@@ -498,23 +498,23 @@ az network route-table create \
 In order to create the route we need to obtain the private IP address of the Firewall.To get the private IP address of the Firewall, you need to run the following command:
 
 ````bash
-az network firewall show --resource-group $RG --name $FW_NAME |grep  privateIPAddress
+az network firewall show --resource-group $HUB_RG --name $FW_NAME |grep  privateIPAddress
 ````
 
 Then store the output (the ip address) in an environment variable:
 ````bash
-fw_private_ip=<IP Address from previous command>
+FW_PRIVATE_IP=<IP Address from previous command>
 ````
 
 To get the private IP address of the Firewall, you need to run the following command and store the output in an environment variable.
 ````bash
 az network route-table route create \
-    --resource-group $RG  \
+    --resource-group $SPOKE_RG  \
     --name default-route \
     --route-table-name $ROUTE_TABLE_NAME \
     --address-prefix 0.0.0.0/0 \
     --next-hop-type VirtualAppliance \
-    --next-hop-ip-address $fw_private_ip
+    --next-hop-ip-address $FW_PRIVATE_IP
 
 ````
 > **_! Note:_** The route will direct all traffic (0.0.0.0/0) to the next hop type of VirtualAppliance, which is the firewall instance. The next hop IP address is the private IP address of the firewall, which is stored in the environment variable $FW_PRIVATE_IP. This way, the traffic from the AKS subnet will be routed to the firewall instance on its private endpoint. This will allow you to perform inspection on outbound traffic.
@@ -523,15 +523,48 @@ az network route-table route create \
 
 ````bash
 az network vnet subnet update \
-    --resource-group $RG  \
+    --resource-group $SPOKE_RG  \
     --vnet-name $SPOKE_VNET_NAME \
     --name $AKS_SUBNET_NAME \
     --route-table $ROUTE_TABLE_NAME
 ````
-You have successfully configured the firewall in hub vnet.
+You have successfully configured the firewall in the hub VNet, set up network and application rules, and created a route table associated with the AKS subnet to direct all internet-bound traffic through the Azure Firewall.
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewall.jpg)
 ![Screenshot](/images/OutboundTraffic.jpg)
+
+Validate your deployment in the Azure portal.
+
+10) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+
+11) Once logged in, locate and select your resource group called **rg-hub** where the hub vnet is deployed.
+
+12) Select your firewall called **azure-firewall**.
+
+13) In the left-hand side menu, under the **Settings** section, select **Rules**.
+
+14) Click on  **Network rule collection**
+
+15) Verify that you have a network rule collection called **aksfwnr** which should contain 3 rules. Inspect the rules.
+
+![Screenshot](/images/azfwnr.jpg)
+
+16) Click on **Application rule collection**.
+
+17) Verify that you have an application rule collection called **aksfwar** which should contain 1 rule. Inspect the rule.
+
+![Screenshot](/images/azfwar.jpg)
+
+18) Lets validate the routing between AKS subnet and Azure Firewall, in the Azure portal, in the top menu select Resource Groups 
+19) Select resource group **rg-spoke**
+
+20) Select routing table called **spoke-rt**
+
+21) Ensure that the default route has a prefix of **0.0.0.0/0** and the next hop is set to the **virtual appliance** with the **IP** address of the Azure Firewall. Also, make sure that the routing table is associated with the AKS subnet called **aks-subnet**.
+
+![Screenshot](/images/spokert.jpg)
+
+
 
 ### 3.1.6 Deploy Azure Kubernetes Service
 
