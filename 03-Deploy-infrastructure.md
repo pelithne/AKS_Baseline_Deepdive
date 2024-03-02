@@ -555,10 +555,10 @@ Validate your deployment in the Azure portal.
 
 ![Screenshot](/images/azfwar.jpg)
 
-18) Lets validate the routing between AKS subnet and Azure Firewall, in the Azure portal, in the top menu select Resource Groups 
-19) Select resource group **rg-spoke**
+18) Lets validate the routing between AKS subnet and Azure Firewall, in the Azure portal, in the top menu select **Resource Groups**. 
+19) Select resource group **rg-spoke**.
 
-20) Select routing table called **spoke-rt**
+20) Select routing table called **spoke-rt**.
 
 21) Ensure that the default route has a prefix of **0.0.0.0/0** and the next hop is set to the **virtual appliance** with the **IP** address of the Azure Firewall. Also, make sure that the routing table is associated with the AKS subnet called **aks-subnet**.
 
