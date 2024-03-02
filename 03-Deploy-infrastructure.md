@@ -288,18 +288,41 @@ You have successfully configured the network for your spoke virtual network. You
 
 ![Screenshot](/images/hubandspokeonly.jpg)
 
+Validate your deployment in the Azure portal.
+
+10) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+
+11) Once logged in, locate and select your resource group called **rg-spoke** where the hub vnet is deployed.
+
+12) Select your vnet called **Spoke_VNET**.
+
+13) In the left-hand side menu, under the **Settings** section, select **Subnets**.
+14) Make sure that your subnets have the appropriate IP range and that Network Security Groups (NSGs) are correctly associated with their respective subnets as depicted below.
+
+![Screenshot](images/spokevnet.jpg)
+
 ### 3.1.5 Create Vnet Peering Between Hub and Spoke
 
 The next step is to create a virtual network peering between the hub and spoke VNets. This will enable the communication between the VNets and allow the AKS cluster to route traffic to the Firewall.
+
+1) Before we can do a Vnet peering we need to obtain the full resource id of the Spoke_VNET and Hub_VNET as they resides in different resource group.
+
+````bash
+SPOKE_VNET_ID=$(az network vnet show --resource-group $SPOKE_RG --name $SPOKE_VNET_NAME --query id --output tsv)
+````
+
+````bash
+HUB_VNET_ID=$(az network vnet show --resource-group $HUB_RG --name $HUB_VNET_NAME --query id --output tsv)
+````
 
 1) Create a peering connection from the hub to spoke virtual networks.
 
 ````bash
 az network vnet peering create \
-    --resource-group $RG  \
+    --resource-group $HUB_RG  \
     --name hub-to-spoke \
     --vnet-name $HUB_VNET_NAME \
-    --remote-vnet $SPOKE_VNET_NAME \
+    --remote-vnet $SPOKE_VNET_ID \
     --allow-vnet-access
 ````
 
@@ -307,15 +330,30 @@ az network vnet peering create \
 
 ````bash
 az network vnet peering create \
-    --resource-group $RG  \
+    --resource-group $SPOKE_RG  \
     --name spoke-to-hub \
     --vnet-name $SPOKE_VNET_NAME \
-    --remote-vnet $HUB_VNET_NAME \
+    --remote-vnet $HUB_VNET_ID \
     --allow-vnet-access
 ````
 Peering should be established and the high level design should now look like this.
 
 ![Screenshot](/images/hubandspokewithpeering.jpg)
+
+Validate your deployment in the Azure portal.
+
+3) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+
+4) Once logged in, locate and select your resource group called **rg-spoke** where the hub vnet is deployed.
+
+5) Select your vnet called **Spoke_VNET**.
+
+6) In the left-hand side menu, under the **Settings** section, select **peerings**.
+7) Ensure that the peering status is set to **Connected**
+
+8) Repeat step 4 - 7 but for Hub_VNET.
+
+![Screenshot](/images/vnetpeeringconnected.jpg)
 
 ### 3.1.6 Create Azure Bastion and Jumpbox VM
 
@@ -323,7 +361,7 @@ Peering should be established and the high level design should now look like thi
 
 ````bash
 az network public-ip create \
-    --resource-group $RG  \
+    --resource-group $HUB_RG  \
     --name Bastion-PIP \
     --sku Standard \
     --allocation-method Static
@@ -334,7 +372,7 @@ az network public-ip create \
 
 ````bash
 az vm create \
-    --resource-group $RG \
+    --resource-group $HUB_RG \
     --name $JUMPBOX_VM_NAME \
     --image Ubuntu2204 \
     --admin-username azureuser \
@@ -347,14 +385,8 @@ az vm create \
     --os-disk-size-gb 128 \
     --public-ip-address "" \
     --nsg ""  
-  
-#````
-#3) The following script (located in this repository) will deploy Azure CLI, Docker and kubelet onto the Virtual machine.
-#
-#````bash
-#az vm extension set --resource-group $RG --vm-name $JUMPBOX_VM_NAME --name customScript --publisher Microsoft.Azure.Extensions --version 2.0 --settings "{\"fileUris\": 
-# [\"https://raw.githubusercontent.com/pelithne/AKS_security_workshop/main/install.sh\"]}" --protected-settings "{\"commandToExecute\": \"sh install.sh\"}"
-#````
+  ````
+
 
 
 4) Create the bastion host in hub vnet and associate it to the public IP.
@@ -362,7 +394,7 @@ az vm create \
 
 ````bash
 az network bastion create \
-    --resource-group $RG \
+    --resource-group $HUB_RG \
     --name bastionhost \
     --public-ip-address Bastion-PIP \
     --vnet-name $HUB_VNET_NAME \
@@ -372,19 +404,19 @@ az network bastion create \
 
 Upon successful installation of the Jumpbox Virtual Machine (VM), the next step is to validate the connectivity between the Bastion and Jumpbox host. Here are the steps to follow:
 
-1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+6) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-2) Once logged in, locate and select your **resource group** where the Jumpbox has been deployed.
+7) Once logged in, locate and select your **rg-hub** where the Jumpbox has been deployed.
 
-3) Within your resource group, find and click on the **Jumpbox VM**.
+8) Within your resource group, find and click on the **Jumpbox VM**.
 
-4) In the left-hand side menu, under the **Operations** section, select ‘Bastion’.
+9) In the left-hand side menu, under the **Operations** section, select ‘Bastion’.
 
-5) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully. 
+10) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully. 
 
 For additional information on accessing VMs through Bastion, please refer to this [Microsoft Azure Bastion tutorial](https://learn.microsoft.com/en-us/azure/bastion/create-host-cli#steps)
 
-After completed these steps, The high-level targeted architecture now matches the following diagram:
+After completing these steps, The high-level targeted architecture now matches the following diagram:
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpbox.jpg)
 
