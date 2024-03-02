@@ -18,4 +18,3 @@
 - [ ] enable Defender for cloud, Scanning of container registry, identify vulnerabilities in AKS
 - [ ] Defender for cloud Auto remediation
 - [ ] Azure Policy, prevent root container from running in the AKS cluster
-- [ ] Upgrade management  

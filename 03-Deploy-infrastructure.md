@@ -11,8 +11,9 @@ This configuration sets up environment variables for the names and locations of 
 > **_! Note:_** Since the Azure container registry has a globally unique FQDN name, you need to assign a distinct value to the **ACR_NAME** environment variable, else the ACR deployment will fail. 
 
 ````bash
-RG=AKS_Security_RG
-LOCATION=westeurope 
+HUB_RG=rg-hub
+SPOKE_RG=rg-spoke
+LOCATION=eastus 
 BASTION_NSG_NAME=Bastion_NSG
 JUMPBOX_NSG_NAME=Jumpbox_NSG
 AKS_NSG_NAME=Aks_NSG
@@ -29,10 +30,11 @@ ACR_NAME=<NAME OF THE AZURE CONTAINER REGISTRY>
 STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
 ````
 
-### 3.1.2 Create the Resource group for the resources
+### 3.1.2 Create the Resource group for the hub and spoke.
 
 ````bash
-az group create --name $RG --location $LOCATION
+az group create --name $HUB_RG --location $LOCATION
+az group create --name $SPOKE_RG --location $LOCATION
 ````
 
 ### 3.1.3 Create Network Security Groups (NSG) and Virtual Network (Vnet) for the Hub.
@@ -43,7 +45,7 @@ For Azure Bastion, we are establishing security rules to permit both the control
 1) Lets Create the NSG for AzureBastionSubnet.
 ````bash
 az network nsg create \
-    --resource-group $RG \
+    --resource-group $HUB_RG \
     --name $BASTION_NSG_NAME \
     --location $LOCATION
 ````
@@ -51,7 +53,7 @@ az network nsg create \
 2) Associate the required **inbound** security rules to the NSG.
 ````bash
     az network nsg rule create --name AllowHttpsInbound \
-    --nsg-name $BASTION_NSG_NAME --priority 120 --resource-group $RG\
+    --nsg-name $BASTION_NSG_NAME --priority 120 --resource-group $HUB_RG\
     --access Allow --protocol TCP --direction Inbound \
     --source-address-prefixes "Internet" \
     --source-port-ranges "*" \
@@ -59,7 +61,7 @@ az network nsg create \
     --destination-port-ranges "443"
 	
    	az network nsg rule create --name AllowGatewayManagerInbound \
-    --nsg-name $BASTION_NSG_NAME --priority 130 --resource-group $RG\
+    --nsg-name $BASTION_NSG_NAME --priority 130 --resource-group $HUB_RG\
     --access Allow --protocol TCP --direction Inbound \
     --source-address-prefixes "GatewayManager" \
     --source-port-ranges "*" \
@@ -67,7 +69,7 @@ az network nsg create \
     --destination-port-ranges "443"
 	
 	az network nsg rule create --name AllowAzureLoadBalancerInbound \
-    --nsg-name $BASTION_NSG_NAME --priority 140 --resource-group $RG\
+    --nsg-name $BASTION_NSG_NAME --priority 140 --resource-group $HUB_RG\
     --access Allow --protocol TCP --direction Inbound \
     --source-address-prefixes "AzureLoadBalancer" \
     --source-port-ranges "*" \
@@ -76,7 +78,7 @@ az network nsg create \
 	
 	
 	az network nsg rule create --name AllowBastionHostCommunication \
-    --nsg-name $BASTION_NSG_NAME --priority 150 --resource-group $RG\
+    --nsg-name $BASTION_NSG_NAME --priority 150 --resource-group $HUB_RG\
     --access Allow --protocol TCP --direction Inbound \
     --source-address-prefixes "VirtualNetwork" \
     --source-port-ranges "*" \
@@ -88,7 +90,7 @@ az network nsg create \
 
 ````bash
     az network nsg rule create --name AllowSshRdpOutbound \
-    --nsg-name $BASTION_NSG_NAME --priority 100 --resource-group $RG\
+    --nsg-name $BASTION_NSG_NAME --priority 100 --resource-group $HUB_RG\
     --access Allow --protocol "*" --direction outbound \
     --source-address-prefixes "*" \
     --source-port-ranges "*" \
@@ -96,7 +98,7 @@ az network nsg create \
     --destination-port-ranges 22 3389
 	
     az network nsg rule create --name AllowAzureCloudOutbound \
-    --nsg-name $BASTION_NSG_NAME --priority 110 --resource-group $RG\
+    --nsg-name $BASTION_NSG_NAME --priority 110 --resource-group $HUB_RG\
     --access Allow --protocol Tcp --direction outbound \
     --source-address-prefixes "*" \
     --source-port-ranges "*" \
@@ -104,7 +106,7 @@ az network nsg create \
     --destination-port-ranges 443
 	
 	az network nsg rule create --name AllowBastionCommunication \
-    --nsg-name $BASTION_NSG_NAME --priority 120 --resource-group $RG\
+    --nsg-name $BASTION_NSG_NAME --priority 120 --resource-group $HUB_RG\
     --access Allow --protocol "*" --direction outbound \
     --source-address-prefixes "VirtualNetwork" \
     --source-port-ranges "*" \
@@ -112,7 +114,7 @@ az network nsg create \
     --destination-port-ranges 8080 5701
 	
 	az network nsg rule create --name AllowHttpOutbound \
-    --nsg-name $BASTION_NSG_NAME --priority 130 --resource-group $RG\
+    --nsg-name $BASTION_NSG_NAME --priority 130 --resource-group $HUB_RG\
     --access Allow --protocol "*" --direction outbound \
     --source-address-prefixes "*" \
     --source-port-ranges "*" \
@@ -124,7 +126,7 @@ az network nsg create \
 
 ````bash
 az network nsg create \
-    --resource-group $RG \
+    --resource-group $HUB_RG \
     --name $JUMPBOX_NSG_NAME \
     --location $LOCATION
 ````
@@ -132,7 +134,7 @@ az network nsg create \
 
 ````bash
 az network vnet create \
-    --resource-group $RG  \
+    --resource-group $HUB_RG  \
     --name $HUB_VNET_NAME \
     --address-prefixes $HUB_VNET_PREFIX \
     --subnet-name $BASTION_SUBNET_NAME \
@@ -144,7 +146,7 @@ az network vnet create \
 
 ````bash
 az network vnet subnet create \
-    --resource-group $RG  \
+    --resource-group $HUB_RG  \
     --vnet-name $HUB_VNET_NAME \
     --name $FW_SUBNET_NAME \
     --address-prefixes $FW_SUBNET_PREFIX
@@ -154,7 +156,7 @@ az network vnet subnet create \
 
 ````bash
 az network vnet subnet create \
-    --resource-group $RG  \
+    --resource-group $HUB_RG  \
     --vnet-name $HUB_VNET_NAME \
     --name $JUMPBOX_SUBNET_NAME \
     --address-prefixes $JUMPBOX_SUBNET_PREFIX \
@@ -164,27 +166,40 @@ You have successfully configured the network for your hub virtual network.You ha
 
 ![Screenshot](images/HubVnetandNsgOnly.jpg)
 
+Validate your deployment in the Azure portal.
+
+8) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+
+9) Once logged in, locate and select your resource group called **rg-hub** where the hub vnet is deployed.
+
+10) Select your vnet called **HUB_VNET**.
+
+11) In the left-hand side menu, under the **Settings** section, select **Subnets**.
+12) Make sure that your subnets have the appropriate IP range and that Network Security Groups (NSGs) are correctly associated with their respective subnets as depicted below.
+
+![Screenshot](images/hubandspokevnet.jpg)
+
 ### 3.1.4 Create Network Security Groups and Virtual Network for the Spoke.
 We will now start to setup the spoke vnet, subnets and their respective NSGs,
 
 1) Create the NSG for AKS subnet.
 ````bash
 az network nsg create \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --name $AKS_NSG_NAME \
     --location $LOCATION
 ````
 2) Create the NSG for endpoints subnet, were the endpoints will reside.
 ````bash
 az network nsg create \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --name $ENDPOINTS_NSG_NAME \
     --location $LOCATION
 ````
 3) Create the NSG for load balancer subnet, were the internal load balancer will reside.
 ````bash
 az network nsg create \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --name $LOADBALANCER_NSG_NAME \
     --location $LOCATION
 ````
@@ -193,7 +208,7 @@ az network nsg create \
 Inbound rules: The **Internet service tag** needs access to port **65200-65535** for the backend health API. Your application traffic needs access to TCP port **80 and/or 443**. for futher information refer to [Required security rules for Application Gateway](https://learn.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure#required-security-rules) for more information.
 ````bash
 az network nsg create \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --name $APPGW_NSG \
     --location $LOCATION
 ````
@@ -202,7 +217,7 @@ az network nsg create \
 ````bash
 # Allow Internet Client request on Port 443 and 80
 az network nsg rule create \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --nsg-name $APPGW_NSG \
     --name Allow-Internet-Inbound-HTTP-HTTPS \
     --priority 100 \
@@ -216,7 +231,7 @@ az network nsg rule create \
 ````bash
 # Infrastructure ports
 az network nsg rule create \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --nsg-name $APPGW_NSG \
     --name Allow-GatewayManager-Inbound \
     --priority 110 \
@@ -230,7 +245,7 @@ az network nsg rule create \
 
 ````bash
 az network vnet create \
-    --resource-group $RG  \
+    --resource-group $SPOKE_RG  \
     --name $SPOKE_VNET_NAME \
     --address-prefixes $SPOKE_VNET_PREFIX \
     --subnet-name $AKS_SUBNET_NAME \
@@ -242,7 +257,7 @@ az network vnet create \
 
 ````bash
 az network vnet subnet create \
-    --resource-group $RG  \
+    --resource-group $SPOKE_RG  \
     --vnet-name $SPOKE_VNET_NAME  \
     --name $ENDPOINTS_SUBNET_NAME \
     --address-prefixes $ENDPOINTS_SUBNET_PREFIX \
@@ -252,7 +267,7 @@ az network vnet subnet create \
 
 ````bash
 az network vnet subnet create \
-    --resource-group $RG  \
+    --resource-group $SPOKE_RG  \
     --vnet-name $SPOKE_VNET_NAME \
     --name $LOADBALANCER_SUBNET_NAME \
     --address-prefixes $LOADBALANCER_SUBNET_PREFIX \
@@ -263,7 +278,7 @@ az network vnet subnet create \
 
 ````bash
 az network vnet subnet create \
-    --resource-group $RG  \
+    --resource-group $SPOKE_RG  \
     --vnet-name $SPOKE_VNET_NAME \
     --name $APPGW_SUBNET_NAME \
     --address-prefixes $APPGW_SUBNET_PREFIX \
