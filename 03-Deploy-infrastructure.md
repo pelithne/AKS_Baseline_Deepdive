@@ -568,55 +568,57 @@ Validate your deployment in the Azure portal.
 
 ### 3.1.6 Deploy Azure Kubernetes Service
 
-In this chapter, we will learn how to deploy AKS and configure its outbound traffic to use the user-defined routing table that we created in the previous chapter. By doing this, we will ensure that all outbound traffic from the AKS subnet will pass through the Azure Firewall for inspection and filtering. Since we are deploying AKS into an existing virtual network, we need to assign an identity to the cluster that has the necessary permissions to modify the routing table. This identity is called a user assigned identity and it is a type of managed identity in Azure. we will also need to assign the user managed identity to the load balancer subnet, as AKS will need permissions to update load balancer with rules. We will see how to create and assign this identity in the following steps.
+This chapter covers deploying AKS with outbound traffic configured to use a user-defined routing table, ensuring traffic passes through the Azure Firewall. A private DNS zone is also created when deploying a private AKS cluster. A user-assigned identity with necessary permissions is assigned to the cluster and load balancer subnet. This identity is a type of managed identity in Azure.
 
-1) Create a user-assigned managed identity
+1) Create a user-assigned managed identity.
+
 ````bash
 az identity create \
-    --resource-group $RG \
-    --name $AKS_IDENTITY_NAME
+    --resource-group $SPOKE_RG \
+    --name $AKS_IDENTITY_NAME-${STUDENT_NAME}
 ````
-2) Get the id of the user managed identity
+2) Get the id of the user managed identity.
+
 ````bash
- identity_id=$(az identity show \
-    --resource-group $RG \
-    --name $AKS_IDENTITY_NAME \
+ IDENTITY_ID=$(az identity show \
+    --resource-group $SPOKE_RG \
+    --name $AKS_IDENTITY_NAME-${STUDENT_NAME} \
     --query id \
     --output tsv)
 ````
-3) Get the principal id of the user managed identity
+3) Get the principal id of the user managed identity.
 
 ````bash
-principal_id=$(az identity show \
-    --resource-group $RG \
-    --name $AKS_IDENTITY_NAME \
+PRINCIPAL_ID=$(az identity show \
+    --resource-group $SPOKE_RG \
+    --name $AKS_IDENTITY_NAME-${STUDENT_NAME} \
     --query principalId \
     --output tsv)
 ````
 
-4) Get the scope of the routing table
+4) Get the scope of the routing table.
 
 ````bash
-rt_scope=$(az network route-table show \
-    --resource-group $RG \
+RT_SCOPE=$(az network route-table show \
+    --resource-group $SPOKE_RG \
     --name $ROUTE_TABLE_NAME  \
     --query id \
     --output tsv)
 ````
-5) Assign permissions for the AKS user defined managed identity to the routing table
+5) Assign permissions for the AKS user defined managed identity to the routing table.
 
 ````bash
 az role assignment create \
-    --assignee $principal_id \
-    --scope $rt_scope \
+    --assignee $PRINCIPAL_ID\
+    --scope $RT_SCOPE \
     --role "Network Contributor"
 ````
 
 6) Assign permission for the AKS user defined managed identity to the load balancer subnet
 
 ````bash
-lb_subnet_scope=$(az network vnet subnet list \
-    --resource-group $RG \
+LB_SUBNET_SCOPE=$(az network vnet subnet list \
+    --resource-group $SPOKE_RG \
     --vnet-name $SPOKE_VNET_NAME \
     --query "[?name=='$LOADBALANCER_SUBNET_NAME'].id" \
     --output tsv)
@@ -624,72 +626,103 @@ lb_subnet_scope=$(az network vnet subnet list \
 
 ````bash
 az role assignment create \
-    --assignee $principal_id \
-    --scope $lb_subnet_scope \
+    --assignee $PRINCIPAL_ID \
+    --scope $LB_SUBNET_SCOPE \
     --role "Network Contributor"
 
 ````
 > **_! Note:_**
-In the context of Azure Kubernetes Service (AKS), granting the Network Contributor role to the load balancer subnet could potentially result in over-privileged access. To adhere to the principle of least privilege access, it is recommended to only provide AKS with the necessary permissions it needs to function effectively. This approach minimizes potential security risks by limiting the access rights of AKS to the bare minimum required for it to perform its tasks. For more information refer to [Creating Azure custom role](./docs/customrole.md)
+Granting the Network Contributor role to the load balancer subnet in AKS could result in over-privileged access. To minimize security risks, it is recommended to only provide AKS with the necessary permissions to function effectively, adhering to the principle of least privilege access. For more information refer to [Creating Azure custom role](./docs/customrole.md)
 
 7) Retrieve the scope of AKS subnet, were AKS shall be deployed.
 
 ````bash
-aks_subnet_scope=$(az network vnet subnet list \
-    --resource-group $RG \
+AKS_SUBNET_SCOPE=$(az network vnet subnet list \
+    --resource-group $SPOKE_RG \
     --vnet-name $SPOKE_VNET_NAME \
     --query "[?name=='$AKS_SUBNET_NAME'].id" \
     --output tsv)
 ````
-8) Deploy a Private AKS cluster.
+8) Deploy a Highly Available Private AKS Cluster
+
+To deploy a highly available private AKS cluster, you can use the following command:
+
+This command creates an AKS cluster with two system nodes, using the specified VNet subnet ID and cluster name. It is configured as a private cluster with user-defined routing and OIDC issuer and workload identity enabled. The network plugin and policy are set to Azure, and the public FQDN is disabled. The cluster is deployed across availability zones 1, 2, and 3
 
 ````bash
-az aks create --resource-group $RG --node-count 2 --vnet-subnet-id $aks_subnet_scope --name $AKS_CLUSTER_NAME --enable-private-cluster --outbound-type userDefinedRouting --enable-oidc-issuer --enable-workload-identity --generate-ssh-keys --assign-identity $identity_id --network-plugin azure --network-policy azure --disable-public-fqdn
+az aks create --resource-group $SPOKE_RG --node-count 2 --vnet-subnet-id $AKS_SUBNET_SCOPE --name $AKS_CLUSTER_NAME-${STUDENT_NAME} --enable-private-cluster --outbound-type userDefinedRouting --enable-oidc-issuer --enable-workload-identity --generate-ssh-keys --assign-identity $IDENTITY_ID --network-plugin azure --network-policy azure --disable-public-fqdn --zones 1 2 3
 ````
 
-> **_! Note:_** A private AKS cluster is a type of AKS cluster that has its Kubernetes API endpoint isolated from public access. This means that you can only access the API endpoint if you are within the same virtual network as the cluster. However, in our scenario, we have our jumpbox in a different virtual network than the cluster. Therefore, we need to create a virtual network link between the two networks to enable DNS resolution across them. This will allow us to use the jumpbox to communicate with the private AKS cluster. We will see how to create and configure this link in the next section.
+> **_! Note:_** A private AKS cluster has its Kubernetes API endpoint isolated from public access, allowing access only within the same virtual network. To communicate with the private AKS cluster from a jumpbox in a different virtual network, a virtual network link must be created between the two networks for DNS resolution. This will be covered in the next section.
 
-9) Create an additional nodepool for hosting user workloads.
+9) An additional nodepool will be created to host user workloads. Auto-scaling is enabled to allow for automatic scaling out and scaling in based on demand. The worker nodes will be distributed across three different zones to ensure higher availability
+
 ````bash
-az aks nodepool add --resource-group $RG --cluster-name $AKS_CLUSTER_NAME --name nodepool2 --node-count 3 --mode user
+az aks nodepool add --resource-group $SPOKE_RG --cluster-name $AKS_CLUSTER_NAME-${STUDENT_NAME} --name userpool --node-count 3 --mode user --zones 1 2 3 --enable-cluster-autoscaler --min-count 1 --max-count 5
 ````
 
 10) Create a virtual network link to resolve AKS private endpoint from HUB vnet.
 
 Fetch the node group of the AKS cluster, and save it in an environment variable.
 ````bash
-NODE_GROUP=$(az aks show --resource-group $RG --name $AKS_CLUSTER_NAME --query nodeResourceGroup -o tsv)
+NODE_GROUP=$(az aks show --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME} --query nodeResourceGroup -o tsv)
 ````
 Fetch the AKS DNS zone name.
+
 ````bash
 DNS_ZONE_NAME=$(az network private-dns zone list --resource-group $NODE_GROUP --query "[0].name" -o tsv)
 
 ````
 Fetch the ID of the HUB virtual network.
+
 ````bash
-HUB_VNET_ID=$(az network vnet show -g $RG -n $HUB_VNET_NAME --query id --output tsv)
+HUB_VNET_ID=$(az network vnet show -g $HUB_RG -n $HUB_VNET_NAME --query id --output tsv)
 ````
-Create a virtual network link between the hub virtual network and the AKS private DNS zone.
-that was created for the AKS cluster.
+Create a virtual network link between the hub virtual network and the AKS private DNS zone, that was created for the AKS cluster.
+
 ````bash
 az network private-dns link vnet create --name "hubnetdnsconfig" --registration-enabled false --resource-group $NODE_GROUP --virtual-network $HUB_VNET_ID --zone-name $DNS_ZONE_NAME 
 ````
 
-11) Verify AKS control plane connectivity
+Validate your deployment in the Azure portal.
+
+11) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+
+12) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should have 3 RGs which you have created,**MC_rg-spoke_private-aks-xxxx_eastus**, **rg-hub** and **rg-spoke** 
+
+> **_! Note:_** MC_rg-spoke_private-aks-xxxx_eastus is a resource group automatically created when deploying an AKS cluster. It is used by Azure to manage resources for the cluster, this particular resource group is also known as Node group.
+
+![Screenshot](images/resourcegroups.jpg)
+
+13) Verify that a virtual network link exists between the Hub and spoke to enable the jumpbox to resolve the AKS domain name and access the cluster. Select the node group called **MC_rg-spoke_private-aks-xxxxx_eastus**
+
+14) Select the **Private DNS zone**.
+15) On your left hand side menu, under **Settings** click on **Virtual network links**.
+
+16) Validate that there is a link name called **hubnetdnsconfig** and the link status is set to **Completed** and the virtual network is set to **Hub_VNET**.
+
+![Screenshot](images/virtualnetworklinks.jpg)
+
+17) On the top menu click **Resource groups** and choose **rg-spoke** from the resource group list.
+
+18) Click on the AKS resource called private-aks-<YOUR STUDENT NAME>. Verify that the Private cluster is set to Enabled. 
+
+![Screenshot](images/aksoverviewprivatecluster.jpg)
+
+19) Verify AKS control plane connectivity.
 
 In this section we will verify that we are able to connect to the AKS cluster from the jumpbox, firstly we need to connect to the cluster successfully and secondly we need to verify that the kubernetes client is able to communicate with the AKS control plane from the jumpbox. 
 
-1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com)and enter your login credentials.
+20) Select resource group **rg-hub** where the Jumpbox has been deployed.
 
-2) Once logged in, locate and select your **resource group** where the Jumpbox has been deployed.
+21) Within your resource group, find and click on the virtual machine called **Jumpbox VM**.
 
-3) Within your resource group, find and click on the **Jumpbox VM**.
+22) In the left-hand side menu, under  **Connect** section, select **Bastion**.
 
-4) In the left-hand side menu, under the **Operations** section, select ‘Bastion’.
+23) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
 
-5) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
+24) Once successfully logged in to the jumbox you need to install a few tools
 
-6) Once successfully logged in to the jumbox you need to install a few tools
 ````bash
 #!/bin/bash
 # Update apt repo
