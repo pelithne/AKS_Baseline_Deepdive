@@ -746,10 +746,18 @@ az account set --subscription <SUBSCRIPTION ID>
 To check the current subscription, run the command: **az account show**
 To change the subscription, run the command: **az account set --subscription <SUBSCRIPTION ID>, where <SUBSCRIPTION ID>** the ID of the desired subscription. You can find the subscription ID by running the command: **az account list --output table**
 
+8) Add your Environment variables to the jumpbox bash shell.
+
+````bash
+SPOKE_RG=rg-spoke
+AKS_CLUSTER_NAME=private-aks
+STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
+````
+
 8) Download the AKS credentials onto the jumpbox.
 
 ````bash
-az aks get-credentials --resource-group $RG --name $AKS_CLUSTER_NAME
+az aks get-credentials --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
 9) Ensure you can list resources in AKS.
 
@@ -760,11 +768,11 @@ kubectl get nodes
 The following output shows the result of running the command kubectl get nodes on with kubectl CLI.
 
 ````bash
-azureuser@Jumpbox-VM:~$ sudo kubectl get nodes
+azureuser@Jumpbox-VM:~$ kubectl get nodes
 NAME                                STATUS   ROLES   AGE   VERSION
-aks-nodepool1-33590162-vmss000000   Ready    agent   11h   v1.26.6
-aks-nodepool1-33590162-vmss000001   Ready    agent   11h   v1.26.6
-aks-nodepool1-33590162-vmss000002   Ready    agent   11h   v1.26.6
+aks-nodepool1-12240482-vmss000000   Ready    agent   89m   v1.27.9
+aks-nodepool1-12240482-vmss000001   Ready    agent   89m   v1.27.9
+aks-userpool-16991029-vmss000000    Ready    agent   78m   v1.27.9
 ````
 10) log out from the Jumpbox host.
 
