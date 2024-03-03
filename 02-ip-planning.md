@@ -1,4 +1,4 @@
-# 2 IP Planning
+# 2.0 IP Planning
 
 ## 2.1 Overview
 
