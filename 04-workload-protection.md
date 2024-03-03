@@ -4,9 +4,9 @@
 
 - [4.0 Workload Protection](#40-workload-protection)
   - [4.1 Deployment](#41-deployment)
-    - [4.1.1 Prepare Environment Variables for infrastructure](#411-prepare-environment-variables-for-infrastructure)
-    - [4.1.2 Update AKS cluster with OIDC issuer](#412-update-aks-cluster-with-oidc-issuer)
-    - [4.1.3 Create Azure Keyvault](#413-create-azure-keyvault)
+    - [4.1.1 Prepare Environment Variables for Infrastructure](#411-prepare-environment-variables-for-infrastructure)
+    - [4.1.2 Update AKS Cluster with OIDC Issuer](#412-update-aks-cluster-with-oidc-issuer)
+    - [4.1.3 Create Azure KeyVault](#413-create-azure-keyvault)
     - [4.1.4 Add a Secret to Azure KeyVault](#414-add-a-secret-to-azure-keyvault)
     - [4.1.5 Add the KeyVault URL to the Environment Variable *KEYVAULT\_URL*](#415-add-the-keyvault-url-to-the-environment-variable-keyvault_url)
     - [4.1.6 Create a managed identity and grant permissions to access the secret](#416-create-a-managed-identity-and-grant-permissions-to-access-the-secret)
@@ -26,7 +26,7 @@ The objective of this chapter is to provide a concise guide on how to implement 
 First, create some environment variables, to make life easier.
 
 
-### 4.1.1 Prepare Environment Variables for infrastructure
+### 4.1.1 Prepare Environment Variables for Infrastructure
 
 
 > [!Note]
@@ -43,7 +43,7 @@ KEYVAULT_NAME="<DEFINE A KEYVAULT NAME HERE>"
 KEYVAULT_SECRET_NAME="redissecret"
 ````
 
-### 4.1.2 Update AKS cluster with OIDC issuer
+### 4.1.2 Update AKS Cluster with OIDC Issuer
 
 Enable the existing cluster to use OpenID connect (OIDC) as an authentication protocol for Kubernetes API server (unless already done). This allows the cluster to integrate with Microsoft Entra ID and other identity providers that support OIDC.
 
@@ -60,7 +60,7 @@ AKS_OIDC_ISSUER="$(az aks show -n $AKS_CLUSTER_NAME-${STUDENT_NAME} -g $SPOKE_RG
 The variable should contain the Issuer URL similar to the following:
  ````https://eastus.oic.prod-aks.azure.com/9e08065f-6106-4526-9b01-d6c64753fe02/9a518161-4400-4e57-9913-d8d82344b504/````
 
-### 4.1.3 Create Azure Keyvault
+### 4.1.3 Create Azure KeyVault
 
 Create the Azure Keyvault instance. When creating the Keyvault, use "deny as a default" action for the network access policy, which means that only the specified IP addresses or virtual networks can access the key vault.
 
