@@ -733,6 +733,8 @@ sudo apt install docker.io -y
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 # Install AKS CLI (kubectl)
 sudo az aks install-cli
+# Add user to Docker group
+sudo usermod -aG docker $USER
 ````
 
   
@@ -993,15 +995,21 @@ List your ACR in your subscription and note down the ACR name.
 ````bash
 az acr list -o table
 ````
+example output:
+
+````bash
+azureuser@Jumpbox-VM:~$ az acr list -o table
+NAME        RESOURCE GROUP    LOCATION    SKU      LOGIN SERVER           CREATION DATE         ADMIN ENABLED
+----------  ----------------  ----------  -------  ---------------------  --------------------  ---------------
+alibaksacr  rg-spoke          eastus      Premium  alibaksacr.azurecr.io  2024-03-03T07:56:00Z  False
+````
+
 ````bash
 dig <REGISTRY NAME>.azurecr.io
 ````
 Example output shows the registry's private IP address in the address space of the subnet:
 ````dns
-azureuser@Jumpbox-VM:~$ az acr list -o table
-NAME        RESOURCE GROUP    LOCATION    SKU      LOGIN SERVER           CREATION DATE         ADMIN ENABLED
-----------  ----------------  ----------  -------  ---------------------  --------------------  ---------------
-alibaksacr  rg-spoke          eastus      Premium  alibaksacr.azurecr.io  2024-03-03T07:56:00Z  False
+
 azureuser@Jumpbox-VM:~$ dig alibaksacr.azurecr.io
 
 ; <<>> DiG 9.18.18-0ubuntu0.22.04.2-Ubuntu <<>> alibaksacr.azurecr.io
@@ -1038,11 +1046,11 @@ EXPOSE 80
 Build the Docker image
 
 ````bash
-sudo docker build --tag nginx .
+docker build --tag nginx .
 ````
 Example out:
 ````bash
-azureuser@Jumpbox-VM:~$ sudo docker build --tag nginx .
+azureuser@Jumpbox-VM:~$  docker build --tag nginx .
 
 Sending build context to Docker daemon  222.7kB
 Step 1/3 : FROM nginx
@@ -1070,20 +1078,21 @@ Successfully tagged nginx:latest
 ````
 Create an alias of the image
 ````bash
-sudo docker tag nginx <CONTAINER REGISTRY NAME>.azurecr.io/nginx
+docker tag nginx <CONTAINER REGISTRY NAME>.azurecr.io/nginx
 ````
-Authenticate to ACR. Use "--expose-token" to access token instead of automatically logging in through Docker CLI.
+Authenticate to ACR with your AD user.
+
 ````bash
-az acr login --name <CONTAINER REGISTRY NAME> --expose-token
+az acr login --name <CONTAINER REGISTRY NAME> 
 ````
 Upload the docker image to the ACR repository.
 ````bash
-sudo docker push <CONTAINER REGISTRY NAME>.azurecr.io/nginx
+docker push <CONTAINER REGISTRY NAME>.azurecr.io/nginx
 ````
 Example output:
 
 ````bash
-azureuser@Jumpbox-VM:~$ sudo docker push acraksbl.azurecr.io/nginx
+azureuser@Jumpbox-VM:~$ docker push acraksbl.azurecr.io/nginx
 Using default tag: latest
 The push refers to repository [acraksbl.azurecr.io/nginx]
 d26d4f0eb474: Pushed 
@@ -1100,8 +1109,8 @@ latest: digest: sha256:3dc6726adf74039f21eccf8f3b5de773080f8183545de5a235726132f
 
 ````bash
 az aks update \
-    --resource-group $RG \
-    --name $AKS_CLUSTER_NAME \
+    --resource-group $SPOKE_RG \
+    --name $AKS_CLUSTER_NAME-${STUDENT_NAME} \
     --attach-acr $ACR_NAME
 ````
 10) Validate AKS is able to pull images from ACR.
@@ -1112,7 +1121,15 @@ On the Jumpbox VM create a yaml file.
 touch test-pod.yaml
 vim test-pod.yaml
 ````
+when you copy to vim, prevent Vim from auto-indenting the text you paste.
+
+````bash
+:set paste
+````
+Press enter.
+
 Paste in the following manifest file which creates a Pod named **internal-test-app** which fetches the docker images from our internal container registry, created in previous step. 
+
 ````yaml
 apiVersion: v1
 kind: Pod
@@ -1128,6 +1145,7 @@ spec:
     - containerPort: 80
 ````
 Create the pod.
+
 ````yaml
 kubectl create -f test-pod.yaml
 ````
@@ -1135,12 +1153,12 @@ kubectl create -f test-pod.yaml
 Verify that the Pod is in running state.
 
 ````bash
-sudo kubectl get po --show-labels
+kubectl get po --show-labels
 ````
 Example output
 
 ````bash
-azureuser@Jumpbox-VM:~$ sudo kubectl get po 
+azureuser@Jumpbox-VM:~$ kubectl get po 
 NAME                READY   STATUS    RESTARTS   AGE
 internal-test-app   1/1     Running   0          8s
 ````
@@ -1151,6 +1169,13 @@ Our next step is to set up an internal load balancer that will direct the traffi
 touch internal-app-service.yaml
 vim internal-app-service.yaml
 ````
+````bash
+:set paste
+````
+Press enter.
+
+Copy the following manifest to expose the pod to the internet. Replace **<LOADBALANCER SUBNET>** with your subnet name stored in your local shell environment variable **$LOADBALANCER_SUBNET_NAME**
+
 ````yaml
 apiVersion: v1
 kind: Service
@@ -1158,7 +1183,7 @@ metadata:
   name: internal-test-app-service
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "<LOADBALANCER SUBNET>"
+    service.beta.kubernetes.io/azure-load-balancer-internal-subnet: "<LOADBALANCER SUBNET NAME>"
 spec:
   type: LoadBalancer
   ports:
@@ -1169,7 +1194,7 @@ spec:
 Deploy the service object in AKS.
 
 ````bash
-sudo kubectl create -f internal-app-service.yaml
+kubectl create -f internal-app-service.yaml
 ````
 Verify that your service object is created and associated with the Pod that you have created, also ensure that you have recieved an external IP, which should be a private IP address range from the load balancer subnet.
 
@@ -1179,15 +1204,47 @@ sudo kubectl get svc -o wide
 Example output:
 
 ````bash
-azureuser@Jumpbox-VM:~$ sudo kubectl get svc -o wide
-NAME                        TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE   SELECTOR
-internal-test-app-service   LoadBalancer   10.0.252.53   10.1.3.4      80:30161/TCP   39s   app=internal-test-app
-kubernetes                  ClusterIP      10.0.0.1      <none>        443/TCP        43h   <none>
-azureuser@Jumpbox-VM:~$ 
+azureuser@Jumpbox-VM:~$ kubectl get svc -o wide
+NAME                        TYPE           CLUSTER-IP   EXTERNAL-IP   PORT(S)        AGE    SELECTOR
+internal-test-app-service   LoadBalancer   10.0.22.55   10.1.1.4      80:31644/TCP   112s   app=internal-test-app
+kubernetes                  ClusterIP      10.0.0.1     <none>        443/TCP        13h    <none>
 ````
-> **_! Note:_** Note down the EXTERNAL-IP (Private IP of the load balancer), as this will be used for creating the application gateway.  
 
-You have completed the steps to deploy a private Azure Container Registry, which is accessible from the jumpbox host.
+> **_! Note:_** Note down the EXTERNAL-IP (Private IP of the load balancer), as this will be used for creating the application gateway. 
+
+Verify that you are able to access the exposed Nginx pod from your jumpbox VM.
+````bash
+azureuser@Jumpbox-VM:~$ curl <EXTERNAL-IP>
+````
+example output:
+
+````bash
+azureuser@Jumpbox-VM:~$ curl 10.1.1.4
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+````
+You have successfully deployed a private Azure Container Registry that is accessible from the jumpbox host. You also built and deployed the nginx image, which is only exposed over the private network.
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlinkandacrandinternalloadbalancer.jpg)
 
