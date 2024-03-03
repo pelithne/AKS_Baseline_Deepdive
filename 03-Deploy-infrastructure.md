@@ -227,7 +227,7 @@ az network nsg rule create \
     --protocol Tcp \
     --description "Allow inbound traffic to port 80 and 443 to Application Gateway from client requests originating from the Internet"
 ````
-5) Create the NSG rule to allow application traffic, on port 443 and 80.
+6) Create the NSG rule to allow application traffic, on port range 65200-65535.
 ````bash
 # Infrastructure ports
 az network nsg rule create \
@@ -241,7 +241,7 @@ az network nsg rule create \
     --protocol Tcp \
     --description "Allow inbound traffic to ports 65200-65535 from GatewayManager service tag"
 ````
-6) Create the spoke VNET with one subnet for **AKS Subnet** and associate it to the AKS NSG.
+7) Create the spoke VNET with one subnet for **AKS Subnet** and associate it to the AKS NSG.
 
 ````bash
 az network vnet create \
@@ -253,7 +253,7 @@ az network vnet create \
 	--network-security-group $AKS_NSG_NAME
 ````
 
-7) Create the subnet for **Endpoints** and associate it to the endpoints NSG.
+8) Create the subnet for **Endpoints** and associate it to the endpoints NSG.
 
 ````bash
 az network vnet subnet create \
@@ -263,7 +263,7 @@ az network vnet subnet create \
     --address-prefixes $ENDPOINTS_SUBNET_PREFIX \
 	--network-security-group $ENDPOINTS_NSG_NAME
 ````
-8) Create subnet for the **load balancer** that will be used for ingress traffic and associate it to the loadbalancer NSG.
+9) Create subnet for the **load balancer** that will be used for ingress traffic and associate it to the loadbalancer NSG.
 
 ````bash
 az network vnet subnet create \
@@ -274,7 +274,7 @@ az network vnet subnet create \
 	--network-security-group $LOADBALANCER_NSG_NAME
 ````
 
-9) Create subnet for the **Application Gateway** and associate it to the Application Gateway NSG.
+10) Create subnet for the **Application Gateway** and associate it to the Application Gateway NSG.
 
 ````bash
 az network vnet subnet create \
@@ -290,14 +290,14 @@ You have successfully configured the network for your spoke virtual network. You
 
 Validate your deployment in the Azure portal.
 
-10) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+11) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-11) Once logged in, locate and select your resource group called **rg-spoke** where the hub vnet is deployed.
+12) Once logged in, locate and select your resource group called **rg-spoke** where the hub vnet is deployed.
 
-12) Select your vnet called **Spoke_VNET**.
+13) Select your vnet called **Spoke_VNET**.
 
-13) In the left-hand side menu, under the **Settings** section, select **Subnets**.
-14) Make sure that your subnets have the appropriate IP range and that Network Security Groups (NSGs) are correctly associated with their respective subnets as depicted below.
+14) In the left-hand side menu, under the **Settings** section, select **Subnets**.
+15) Make sure that your subnets have the appropriate IP range and that Network Security Groups (NSGs) are correctly associated with their respective subnets as depicted below.
 
 ![Screenshot](images/spokevnet.jpg)
 
