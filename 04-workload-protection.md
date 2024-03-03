@@ -58,7 +58,8 @@ First, create some environment variables, to make life easier.
 ### 4.2.1 Prepare Environment Variables for infrastructure
 
 
-> **_! Note:_** The Azure keyvault name is a global name that must be unique
+> [!Note]
+>The Azure keyvault name is a global name that must be unique
 
 ````
 FRONTEND_NAMESPACE="frontend"
