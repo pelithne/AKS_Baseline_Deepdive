@@ -32,10 +32,10 @@ hands on exercises that will be covered:
 
  - Build an application and store it in Azure Container Registry
  - Activate OpenID Connect (OIDC) issuer on an Azure Kubernetes Service (AKS)cluster (or create a new cluster with OIDC activated)
-- Create a secret and store it in Azure Key Vault
+- Create a secret and store it in Azure KeyVault
 - Create an Azure Active Directory (Azure AD) managed identity
 - Connect the managed identity to a Kubernetes service account with token federation
-- Deploy a workload and verify secure authentication to Azure Key Vault with the workload identity
+- Deploy a workload and verify secure authentication to Azure KeyVault with the workload identity
 - Configure network policies in AKS to control traffic between pods.
 
 ### 4.1.1 Workload Identity
@@ -158,7 +158,7 @@ Once logged in, locate and select your **resource group** where the Jumpbox has 
 In the left-hand side menu, under the **Operations** section, select ‘Bastion’. Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
 
 
-Once successfully logged in to the jumpbox **login to Azure** if you have not already done so in previous steps.
+Once successfully logged in to the Jumpbox **login to Azure** if you have not already done so in previous steps.
 
 
 In the command line type the following command and ensure it returns the **private ip address of the private endpoint**.
@@ -200,7 +200,7 @@ Now, you should have an infrastucture that looks like this:
  ### 4.2.4 Add a Secret to Azure Keyvault
 
 > [!IMPORTANT]
-> Because the keyvault is isolated in a VNET, you need to access it from the jumphost. Please log in to the jump host, and set a few environment variables (or load all environment variables you stored in a file):
+> Because the Azure KeyVault is isolated in a VNET, you need to access it from the Jumpbox VM. Please log in to the Jumpbox VM, and set a few environment variables (or load all environment variables you stored in a file):
 
  ````
 RG=AKS_Security_RG
@@ -216,7 +216,7 @@ KEYVAULT_SECRET_NAME="redissecret"
 AKS_CLUSTER_NAME=private-aks
  ````
 
-Now create a secret in the keyvault. This is the secret that will be used by the frontend application to connect to the (redis) backend.
+Now create a secret in the Azure KeyVault. This is the secret that will be used by the frontend application to connect to the (redis) backend.
 
  ````
  az keyvault secret set --vault-name $KEYVAULT_NAME --name $KEYVAULT_SECRET_NAME --value 'redispassword'
@@ -466,7 +466,7 @@ EOF
 
 ### 4.2.12 Validate the Application
 
-To test if the application is working, you can navigate to the URL used before to reach the nginx test application. This time the request will be redirected to the Azure Vote frontend instead. If that works, it means that the Azure Vote frontend pod was able to fetch the secret from Azure Keyvault, and use it when connecting to the backend (Redis) service/pod.
+To test if the application is working, you can navigate to the URL used before to reach the nginx test application. This time the request will be redirected to the Azure Vote frontend instead. If that works, it means that the Azure Vote frontend pod was able to fetch the secret from Azure KeyVault, and use it when connecting to the backend (Redis) service/pod.
 
 You can also verify in the application logs that the frontend was able to connect to the backend.
 
