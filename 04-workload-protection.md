@@ -3,59 +3,30 @@
 **In This Article:**
 
 - [4.0 Workload Protection](#40-workload-protection)
-  - [4.1 Introduction](#41-introduction)
-    - [4.1.1 Workload Identity](#411-workload-identity)
-    - [4.1.2 Network Policy](#412-network-policy)
-  - [4.2 Deployment](#42-deployment)
-    - [4.2.1 Prepare Environment Variables for infrastructure](#421-prepare-environment-variables-for-infrastructure)
-    - [4.2.2 Update AKS cluster with OIDC issuer](#422-update-aks-cluster-with-oidc-issuer)
-    - [4.2.3 Create Azure Keyvault](#423-create-azure-keyvault)
-    - [4.2.4 Add a Secret to Azure Keyvault](#424-add-a-secret-to-azure-keyvault)
-    - [4.2.5 Add the KeyVault URL to the Environment Variable *KEYVAULT\_URL*](#425-add-the-keyvault-url-to-the-environment-variable-keyvault_url)
-    - [4.2.6 Create a managed identity and grant permissions to access the secret](#426-create-a-managed-identity-and-grant-permissions-to-access-the-secret)
-    - [4.2.7 Create Kubernetes Service Account](#427-create-kubernetes-service-account)
-    - [4.2.8 Create Service Account](#428-create-service-account)
-    - [4.2.9 Establish Federated Identity Credential](#429-establish-federated-identity-credential)
-    - [4.2.10 Build the Application](#4210-build-the-application)
-    - [4.2.11 Deploy the Application](#4211-deploy-the-application)
-    - [4.2.12 Validate the Application](#4212-validate-the-application)
-    - [4.2.13 Workload Network Policy](#4213-workload-network-policy)
+  - [4.1 Deployment](#41-deployment)
+    - [4.1.1 Prepare Environment Variables for infrastructure](#411-prepare-environment-variables-for-infrastructure)
+    - [4.1.2 Update AKS cluster with OIDC issuer](#412-update-aks-cluster-with-oidc-issuer)
+    - [4.1.3 Create Azure Keyvault](#413-create-azure-keyvault)
+    - [4.1.4 Add a Secret to Azure Keyvault](#414-add-a-secret-to-azure-keyvault)
+    - [4.1.5 Add the KeyVault URL to the Environment Variable *KEYVAULT\_URL*](#415-add-the-keyvault-url-to-the-environment-variable-keyvault_url)
+    - [4.1.6 Create a managed identity and grant permissions to access the secret](#416-create-a-managed-identity-and-grant-permissions-to-access-the-secret)
+    - [4.1.7 Connect to the Cluster](#417-connect-to-the-cluster)
+    - [4.1.8 Create Service Account](#418-create-service-account)
+    - [4.1.9 Establish Federated Identity Credential](#419-establish-federated-identity-credential)
+    - [4.1.10 Build the Application](#4110-build-the-application)
+    - [4.1.11 Deploy the Application](#4111-deploy-the-application)
+    - [4.1.12 Validate the Application](#4112-validate-the-application)
+    - [4.1.13 Workload Network Policy](#4113-workload-network-policy)
 
 
-
-## 4.1 Introduction
-In this section we will focus on:
-- Workload Identity
-- Network Policy
-
-hands on exercises that will be covered:
-
- - Build an application and store it in Azure Container Registry
- - Activate OpenID Connect (OIDC) issuer on an Azure Kubernetes Service (AKS)cluster (or create a new cluster with OIDC activated)
-- Create a secret and store it in Azure KeyVault
-- Create an Azure Active Directory (Azure AD) managed identity
-- Connect the managed identity to a Kubernetes service account with token federation
-- Deploy a workload and verify secure authentication to Azure KeyVault with the workload identity
-- Configure network policies in AKS to control traffic between pods.
-
-### 4.1.1 Workload Identity
-Workload identity allows you to securely access Azure resources from your Kubernetes applications using Azure AD identities. This way, you can avoid storing and managing credentials in your cluster, and instead rely on the native Kubernetes mechanisms to federate with external identity providers.
-
-Workload identity replaces the deprecated pod identity feature, and is the recommended way to manage identity for workloads. 
-
-more information about workload identity can be found here: [Use Azure AD workload identity with Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview?tabs=dotnet)
-
-### 4.1.2 Network Policy
-
-Network policy controls traffic flow between groups of pods and other network endpoints using rules, providing an additional layer of security. In this section, you will learn how to configure network policies to control traffic between pods
+The objective of this chapter is to provide a concise guide on how to implement workload identity and network policy in AKS. These features enable secure access to Azure KeyVault and control traffic flow between pods, providing an additional layer of security for your AKS cluster. By following the steps in this chapter, you will learn how to configure workload identity, network policy in AKS and Azure KeyVault.
 
 
-
-## 4.2 Deployment
+## 4.1 Deployment
 First, create some environment variables, to make life easier.
 
 
-### 4.2.1 Prepare Environment Variables for infrastructure
+### 4.1.1 Prepare Environment Variables for infrastructure
 
 
 > [!Note]
@@ -72,7 +43,7 @@ KEYVAULT_NAME="<DEFINE A KEYVAULT NAME HERE>"
 KEYVAULT_SECRET_NAME="redissecret"
 ````
 
-### 4.2.2 Update AKS cluster with OIDC issuer
+### 4.1.2 Update AKS cluster with OIDC issuer
 
 Enable the existing cluster to use OpenID connect (OIDC) as an authentication protocol for Kubernetes API server (unless already done). This allows the cluster to integrate with Azure Active Directory (Microsoft Entra ID) and other identity providers that support OIDC.
 
@@ -90,7 +61,7 @@ AKS_OIDC_ISSUER="$(az aks show -n $AKS_CLUSTER_NAME -g $RG  --query "oidcIssuerP
 The variable should contain the Issuer URL similar to the following:
  ````https://eastus.oic.prod-aks.azure.com/9e08065f-6106-4526-9b01-d6c64753fe02/9a518161-4400-4e57-9913-d8d82344b504/````
 
-### 4.2.3 Create Azure Keyvault
+### 4.1.3 Create Azure Keyvault
 
 Create the Azure Keyvault instance. When creating the Keyvault, use "deny as a default" action for the network access policy, which means that only the specified IP addresses or virtual networks can access the key vault.
 
@@ -197,7 +168,7 @@ Now, you should have an infrastucture that looks like this:
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlinkandacrandinternalloadbalancerandapplicationgwandkeyvault.jpg)
 
- ### 4.2.4 Add a Secret to Azure Keyvault
+ ### 4.1.4 Add a Secret to Azure Keyvault
 
 > [!IMPORTANT]
 > Because the Azure KeyVault is isolated in a VNET, you need to access it from the Jumpbox VM. Please log in to the Jumpbox VM, and set a few environment variables (or load all environment variables you stored in a file):
@@ -222,13 +193,13 @@ Now create a secret in the Azure KeyVault. This is the secret that will be used 
  az keyvault secret set --vault-name $KEYVAULT_NAME --name $KEYVAULT_SECRET_NAME --value 'redispassword'
  ````
 
-### 4.2.5 Add the KeyVault URL to the Environment Variable *KEYVAULT_URL*
+### 4.1.5 Add the KeyVault URL to the Environment Variable *KEYVAULT_URL*
 
  ````
  export KEYVAULT_URL="$(az keyvault show -g $RG  -n $KEYVAULT_NAME --query properties.vaultUri -o tsv)"
  ````
 
- ### 4.2.6 Create a managed identity and grant permissions to access the secret
+ ### 4.1.6 Create a managed identity and grant permissions to access the secret
 
 Create a User Managed Identity. We will give this identity *GET access* to the keyvault, and later associate it with a Kubernetes service account. 
 
@@ -247,7 +218,7 @@ Create a User Managed Identity. We will give this identity *GET access* to the k
  ````
 
 
- ### 4.2.7 Create Kubernetes Service Account
+ ### 4.1.7 Connect to the Cluster
 
 First, connect to the cluster if not already connected
  
@@ -255,12 +226,12 @@ First, connect to the cluster if not already connected
  az aks get-credentials -n $AKS_CLUSTER_NAME -g $RG
  ````
 
-### 4.2.8 Create Service Account
+### 4.1.8 Create Service Account
 
 The service account should exist in the frontend namespace, because it's the frontend service that will use that service account to get the credentials to connect to the (redis) backend service.
 
 > [!Note]
-> Instead of creating kubenetes manifest files, we will create them on the commandline like below. I a real life case, you would create manifest files and store them in a version control system, like git.
+> Instead of creating kubenetes manifest files, we will create them on the command line like below. I a real life case, you would create manifest files and store them in a version control system, like git.
 
 
 First create the frontend namespace
@@ -290,7 +261,7 @@ EOF
 ````
 
 
-### 4.2.9 Establish Federated Identity Credential
+### 4.1.9 Establish Federated Identity Credential
 
 In this step we connect the Kubernetes service account with the user defined managed identity in Azure, using a federated credential.
 
@@ -298,7 +269,7 @@ In this step we connect the Kubernetes service account with the user defined man
   az identity federated-credential create --name $FEDERATED_IDENTITY_CREDENTIAL_NAME --identity-name $USER_ASSIGNED_IDENTITY_NAME --resource-group $RG --issuer $AKS_OIDC_ISSUER --subject system:serviceaccount:$FRONTEND_NAMESPACE:$SERVICE_ACCOUNT_NAME
 ````
 
-### 4.2.10 Build the Application
+### 4.1.10 Build the Application
 
 Now its time to build the application. In order to do so, first clone the applications repository:
 
@@ -324,7 +295,7 @@ sudo docker push $ACR_NAME.azurecr.io/azure-vote-front:v1
 The string after ````:```` is the image tag. This can be used to manage versions of your app, but in this case we will only have one version. 
 
 
-### 4.2.11 Deploy the Application
+### 4.1.11 Deploy the Application
 
 We want to create some separation between the frontend and backend, by deploying them into different namespaces. Later we will add more separation by introducing network policies in the cluster to allow/disallow traffic between specific namespaces.
 
@@ -464,7 +435,7 @@ spec:
 EOF
 ````
 
-### 4.2.12 Validate the Application
+### 4.1.12 Validate the Application
 
 To test if the application is working, you can navigate to the URL used before to reach the nginx test application. This time the request will be redirected to the Azure Vote frontend instead. If that works, it means that the Azure Vote frontend pod was able to fetch the secret from Azure KeyVault, and use it when connecting to the backend (Redis) service/pod.
 
@@ -496,7 +467,7 @@ Connected to Redis!
 
 
 
-### 4.2.13 Workload Network Policy
+### 4.1.13 Workload Network Policy
 
 The cluster is deployed with Azure network policies. The Network policies can be used to control traffic between resources in Kubernetes.
 
