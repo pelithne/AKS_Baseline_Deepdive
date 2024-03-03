@@ -788,7 +788,7 @@ In this chapter, we will learn how to deploy a private Azure container registry 
 
 ````bash
 az acr create \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --name $ACR_NAME \
     --sku Premium \
     --admin-enabled false \
@@ -806,39 +806,44 @@ Ensure you have a global unique name for your ACR, else the deployment will fail
 az network vnet subnet update \
  --name $ENDPOINTS_SUBNET_NAME \
  --vnet-name $SPOKE_VNET_NAME\
- --resource-group $RG \
+ --resource-group $SPOKE_RG \
  --disable-private-endpoint-network-policies
 ````
-3) Configure the private DNS zone for ACR
+
+3) Configure the private DNS zone for ACR.
 
 ````bash
 az network private-dns zone create \
-  --resource-group $RG \
+  --resource-group $SPOKE_RG \
   --name "privatelink.azurecr.io"
 ````
 
  
-4) Create a virtual network link to the spoke network
+4) Create a virtual network link to the spoke network.
 ````bash
 az network private-dns link vnet create \
-  --resource-group $RG \
+  --resource-group $SPOKE_RG \
   --zone-name "privatelink.azurecr.io" \
   --name ACRDNSSpokeLink \
   --virtual-network $SPOKE_VNET_NAME \
   --registration-enabled false
 ````
-5) Creates a virtual network link to the hub network
-````bash
+5) Creates a virtual network link to the hub network.
 
+> **_! Note:_** The $HUB_VNET_ID variable specifies the full path to the virtual network in another resource group, allowing the command to correctly link to it.
+
+````bash
 az network private-dns link vnet create \
-  --resource-group $RG \
+  --resource-group $SPOKE_RG \
   --zone-name "privatelink.azurecr.io" \
   --name ACRDNSHubLink \
-  --virtual-network $HUB_VNET_NAME \
+  --virtual-network $HUB_VNET_ID \
   --registration-enabled false
 ````
 
 6) Create ACR private endpoint 
+
+To create a private endpoint for an Azure Container Registry (ACR), you need to obtain the resource ID of the container registry. This resource ID is used to specify the target resource when creating the private endpoint.
 
 ````bash
 REGISTRY_ID=$(az acr show --name $ACR_NAME \
@@ -849,7 +854,7 @@ REGISTRY_ID=$(az acr show --name $ACR_NAME \
 ````bash
 az network private-endpoint create \
     --name ACRPrivateEndpoint \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --vnet-name $SPOKE_VNET_NAME \
     --subnet $ENDPOINTS_SUBNET_NAME \
     --private-connection-resource-id $REGISTRY_ID \
@@ -857,20 +862,23 @@ az network private-endpoint create \
     --connection-name PrivateACRConnection
 ````
 7) Configure DNS record for ACR
-before we can configure the DNS record we need to obtain the private IP address for of the ACR, both the control and dataplane.
+
+In this section we will configure DNS records for an Azure Container Registry (ACR) using Azure Private Link.This is to ensure that the ACR can be accessed over a private network connection, enhancing security by eliminating exposure to the public internet.
+
+Before we can configure the DNS record we need to obtain the private IP address  of the ACR, both the control and dataplane.
 
 Get endpoint IP configuration:
+
 ````bash
 NETWORK_INTERFACE_ID=$(az network private-endpoint show \
   --name ACRPrivateEndpoint \
-  --resource-group $RG \
+  --resource-group $SPOKE_RG \
   --query 'networkInterfaces[0].id' \
   --output tsv)
  ```` 
 
-Fetch the container registry private IP address
+Fetch the private IP address associated with the ACR, these IP addresses are used for data and control of the container registry.
 
-Find the private IP addresses used for data and control of the Container Registry
 ````bash
 az network nic show --ids $NETWORK_INTERFACE_ID |grep azurecr.io -B 7
 ````
@@ -895,56 +903,77 @@ In the output you should see two IP addresses, and their associated FQDNS. It sh
         "fqdns": [
           "acrforakssecurity.azurecr.io"
 ````
-The **privateIPAddress** and **fqdns** will be used in a later step (when creating DNS zones).
+Note down the **privateIPAddress** and **fqdns** as it will be used in a later step (when creating DNS zones).
 
 
-8) Create DNS records in the private DNS zone
+8) Create a new 'A' record set for control in the private DNZ zone.
 
 ````bash
 az network private-dns record-set a create \
   --name $ACR_NAME \
   --zone-name privatelink.azurecr.io \
-  --resource-group $RG
+  --resource-group $SPOKE_RG
 ````
 
-9) Specify registry region in data endpoint name
+9) Create a new 'A' record set for data in the private DNZ zone.
 
 ````bash
 az network private-dns record-set a create \
   --name $ACR_NAME.$LOCATION.data \
   --zone-name privatelink.azurecr.io \
-  --resource-group $RG
+  --resource-group $SPOKE_RG
 ````
-10) Create the A records for the registry endpoint and data endpoint
+10) Update the 'A' record to contain the control IP address of the ACR.
 
 ````bash
 az network private-dns record-set a add-record \
   --record-set-name $ACR_NAME \
   --zone-name privatelink.azurecr.io \
-  --resource-group $RG \
+  --resource-group $SPOKE_RG \
   --ipv4-address <IP address associated with FQDN "$ACR_NAME.azurecr.io">
 
 ````
 
-11) Specify registry region in data endpoint name
+11) Update the 'A' record to contain the data IP address of the ACR.
 
 ````bash
 az network private-dns record-set a add-record \
   --record-set-name $ACR_NAME.$LOCATION.data \
   --zone-name privatelink.azurecr.io \
-  --resource-group $RG \
+  --resource-group $SPOKE_RG \
   --ipv4-address <IP address assicoated with FQDN "$ACR_NAME.$LOCATION.data.azurecr.io">
 ````
-12) Test the connection to ACR from the Jumpbox
+
+Validate your deployment in the Azure portal.
+
+12) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+
+13) log in and select the **rg-spoke** resource group. Verify that you have a **container registry** and a private endpoint named **ACRPrivateEndpoint** deployed in your resource group, as well as a network card named **ACRPrivateEndpoint.nic.xxxxx**
+
+![Screenshot](images/acrresourcegroup.jpg)
+
+14) Select the private DNS zone named **privatelink.azurecr.io**. Ensure that you have two ‘A’ records, one for control and one for data, and that the correct IP addresses are configured.
+
+![Screenshot](images/acrprivatednszonearecord.jpg)
+
+15) In the left-hand side menu, under **Settings** section, select **Virtual Network links**. Ensure you have the link status set to completed for both hub and spoke.
+
+![Screenshot](images/virtualnetworklinksacr.jpg)
+
+
+16) Test the connection to ACR from the Jumpbox
 
 In this section, you will learn how to check if you can access your private Azure Container Registry (ACR) and push Docker images to it. You will need to have the Azure CLI installed and logged in to your Azure account. You will also need to have Docker installed and running on your Jumpbox. Here are the steps to follow:
 
-1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
-2) Once logged in, locate and select your **resource group** where the Jumpbox has been deployed.
-3) Within your resource group, find and click on the **Jumpbox VM**.
-4) In the left-hand side menu, under the **Operations** section, select ‘Bastion’.
-5) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
-6) Once successfully logged in to the jumpbox **login to Azure** if you have not already done so in previous steps.
+17) Select resource group **rg-hub** where the Jumpbox has been deployed.
+
+18) Within your resource group, find and click on the **Jumpbox VM**.
+
+19) In the left-hand side menu, under the **Operations** section, select ‘Bastion’.
+
+20) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
+
+21) Once successfully logged in to the jumpbox **login to Azure** if you have not already done so in previous steps.
 
 ````bash
 sudo az login
@@ -958,7 +987,7 @@ Set your subscription id to be the default subscription.
 ````bash
 sudo az account set --subscription <SUBSCRIPTION ID>
 ````
-7) Validate private link connection 
+22) Validate private link connection 
 
 List your ACR in your subscription and note down the ACR name.
 ````bash
@@ -969,27 +998,31 @@ dig <REGISTRY NAME>.azurecr.io
 ````
 Example output shows the registry's private IP address in the address space of the subnet:
 ````dns
-azureuser@Jumpbox-VM:~$ dig acraksbl.azurecr.io
+azureuser@Jumpbox-VM:~$ az acr list -o table
+NAME        RESOURCE GROUP    LOCATION    SKU      LOGIN SERVER           CREATION DATE         ADMIN ENABLED
+----------  ----------------  ----------  -------  ---------------------  --------------------  ---------------
+alibaksacr  rg-spoke          eastus      Premium  alibaksacr.azurecr.io  2024-03-03T07:56:00Z  False
+azureuser@Jumpbox-VM:~$ dig alibaksacr.azurecr.io
 
-; <<>> DiG 9.18.12-0ubuntu0.22.04.3-Ubuntu <<>> acraksbl.azurecr.io
+; <<>> DiG 9.18.18-0ubuntu0.22.04.2-Ubuntu <<>> alibaksacr.azurecr.io
 ;; global options: +cmd
 ;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 39202
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 3738
 ;; flags: qr rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
 
 ;; OPT PSEUDOSECTION:
 ; EDNS: version: 0, flags:; udp: 65494
 ;; QUESTION SECTION:
-;acraksbl.azurecr.io.INA
+;alibaksacr.azurecr.io.         IN      A
 
 ;; ANSWER SECTION:
-acraksbl.azurecr.io.60INCNAMEacraksbl.privatelink.azurecr.io.
-acraksbl.privatelink.azurecr.io. 1800 IN A10.1.2.5
+alibaksacr.azurecr.io.  60      IN      CNAME   alibaksacr.privatelink.azurecr.io.
+alibaksacr.privatelink.azurecr.io. 1800 IN A    10.1.1.21
 
 ;; Query time: 8 msec
 ;; SERVER: 127.0.0.53#53(127.0.0.53) (UDP)
-;; WHEN: Mon Oct 02 07:51:55 UTC 2023
-;; MSG SIZE  rcvd: 99
+;; WHEN: Sun Mar 03 09:04:31 UTC 2024
+;; MSG SIZE  rcvd: 103
 ````
 8. Create a Dockerfile, build the docker image, authenticate towards ACR and push the image to the container registry.
 
