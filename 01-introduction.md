@@ -1,24 +1,10 @@
 # 1.0 Introduction
 
-**There are 9 hands-on exercises that you will go through during the workshop:**
+**In This Article:**
+- [1.0 Introduction](#10-introduction)
+  - [1.1 Welcome](#11-welcome)
+  - [1.2 Target Architecture](#12-target-architecture)
 
-1: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/01-introduction.md">Introduction</a>
-
-2: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/02-ip-planning.md">IP Planning</a>
-
-3: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/03-Deploy-infrastructure.md">Deploy Infrastructure</a>
-
-4: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/04-workload-protection.md">Workload Protection</a>
-
-5: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/05-access-management.md">Access Management</a>
-
-6: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/06-governance.md">Governance</a>
-
-7: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/07-vulnerability-management.md">Vulnerability Management</a>
-
-8: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/08-monitoring.md">Monitoring</a>
-
-9: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/09-automation.md">Automation</a>
 
 
 ## 1.1 Welcome
