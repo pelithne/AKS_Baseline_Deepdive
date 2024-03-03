@@ -1,5 +1,17 @@
 # 5.0 Access management
 
+**In This Article:**
+- [5.0 Access management](#50-access-management)
+  - [5.1 Introduction](#51-introduction)
+  - [5.2 Deployment](#52-deployment)
+    - [5.2.1 Prepare Environment Variables](#521-prepare-environment-variables)
+    - [5.2.2 Create Microsoft Entra ID Security Groups](#522-create-microsoft-entra-id-security-groups)
+    - [5.2.3 Integrate AKS with Microsoft Entra ID](#523-integrate-aks-with-microsoft-entra-id)
+    - [5.2.4 Scope and Role Assignment for Security Groups](#524-scope-and-role-assignment-for-security-groups)
+    - [5.2.5 Create Users and Assign them to Security Groups.](#525-create-users-and-assign-them-to-security-groups)
+    - [5.2.5 Validate the Access for the Different Users.](#525-validate-the-access-for-the-different-users)
+
+
 Azure Kubernetes Service (AKS) supports Azure Active Directory (AAD) integration, which allows you to control access to your cluster resources using Azure role-based access control (RBAC). In this tutorial, you will learn how to integrate AKS with AAD and assign different roles and permissions to three types of users:
 
 An admin user, who will have full access to the AKS cluster and its resources.
@@ -45,7 +57,7 @@ AAD_ADMIN_UPN='clusteradmin'${STUDENT_NAME}'@MngEnvMCAP148390.onmicrosoft.com'
 AAD_ADMIN_PW=<ENTER USER PASSWORD>
 AAD_ADMIN_DISPLAY_NAME='Admin-'${STUDENT_NAME}
 ````
-### 5.2.2 Create Microsoft Entra ID security groups 
+### 5.2.2 Create Microsoft Entra ID Security Groups 
 
 We will now start by creating 3 security groups for respective team.
 
@@ -71,7 +83,7 @@ az ad group create --display-name $OPS_BE_GROUP --mail-nickname $OPS_BE_GROUP
 ````bash
 az aks update -g $RG -n $AKS_CLUSTER_NAME --enable-azure-rbac --enable-aad --disable-local-accounts
 ````
-### 5.2.4 Scope and role assignment for security groups
+### 5.2.4 Scope and Role Assignment for Security Groups
 This chapter will explain how to create the scope for the operation teams to perform their daily tasks. The scope is based on the AKS resource ID and a fixed path in AKS, which is **/namespaces/<NAMESPACE>**. The scope will assign the **Application Operations Frontend Team** to the **frontend namespace** and the **Application Operation Backend Team** to the **backend namespace**.
 
 
@@ -121,7 +133,7 @@ az role assignment create --assignee $be_group_object_id --role "Azure Kubernete
 az role assignment create --assignee $admin_group_object_id --role "Azure Kubernetes Service RBAC Cluster Admin" --scope ${AKS_RESOURCE_ID}
  ````
 
-### 5.2.5 Create Users and assign them to security groups.
+### 5.2.5 Create Users and Assign them to Security Groups.
 This exercise will guide you through the steps of creating three users and adding them to their corresponding security groups.
 
 1) Create the Admin user.
@@ -175,7 +187,7 @@ Assign the user to the backend security group.
 ````bash
 az ad group member add --group $OPS_BE_GROUP --member-id $be_user_object_id
 ````
-### 5.2.5 Validate the access for the different users.
+### 5.2.5 Validate the Access for the Different Users.
 
 This section will demonstrate how to connect to the AKS cluster from the jumpbox using the user account defined in Microsoft Entra ID. We will check two things: first, that we can successfully connect to the cluster; and second, that the Operations teams have access only to their own namespaces, while the Admin has full access to the cluster.
 
