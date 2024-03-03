@@ -1250,7 +1250,7 @@ You have successfully deployed a private Azure Container Registry that is access
 
 ### 3.1.8 Deploy Azure Application Gateway.
 
-In this chapter, you will set up an application gateway that can terminate TLS connections at its own level. You will also learn how to perform these tasks: create an application gateway and upload a certificate to it, configure AKS as a backend pool for routing traffic to its internal load balancer, create a health probe to check the health of the AKS backend pool, and set up a WAF (web application firewall) to defend against common web attacks.
+In this chapter, you will set up an application gateway that can terminate TLS connections at its own level. You will also learn how to perform these tasks: create an application gateway and upload a certificate to it, configure AKS as a backend pool for routing traffic to its internal load balancer, create a health probe to check the health of the AKS backend pool, and set up a WAF (Web Application Firewall) to defend against common web attacks.
 
 1) Create public IP address with a domain name associated to the PIP resource
 
@@ -1258,23 +1258,23 @@ In this chapter, you will set up an application gateway that can terminate TLS c
 
 
 ````bash
-az network public-ip create -g $RG -n AGPublicIPAddress --dns-name $STUDENT_NAME --allocation-method Static --sku Standard --location $LOCATION
+az network public-ip create -g $SPOKE_RG -n AGPublicIPAddress --dns-name $STUDENT_NAME --allocation-method Static --sku Standard --location $LOCATION
 ````
 2) Create WAF policy 
 
 
 ````bash
-az network application-gateway waf-policy create --name ApplicationGatewayWAFPolicy --resource-group $RG
+az network application-gateway waf-policy create --name ApplicationGatewayWAFPolicy --resource-group $SPOKE_RG
 ````
 3) Create Application Gateway.
 
-> **_! Note:_** Your workshop instructor will provide you a **password** for the certificate. Before executing this command ensure the certificate is in **your working directory**.
+> **_! Note:_** Your workshop instructor will provide you with a **password** for the certificate and instructions on how to retrieve it. Before executing the command, make sure the certificate is located in **your working directory**. Replace **<CERTIFICATE PASSWORD>** with the password provided by the instructor and **<LOAD BALANCER PRIVATE IP>** with the private IP of the load balancer.
 
 ````bash
 az network application-gateway create \
   --name AppGateway \
   --location $LOCATION \
-  --resource-group $RG \
+  --resource-group $SPOKE_RG \
   --vnet-name $SPOKE_VNET_NAME \
   --subnet $APPGW_SUBNET_NAME \
   --capacity 1 \
@@ -1285,7 +1285,7 @@ az network application-gateway create \
   --http-settings-protocol Http \
   --priority "1" \
   --public-ip-address AGPublicIPAddress \
-  --cert-file appgwcert.pfx \
+  --cert-file certificate.pfx \
   --cert-password "<CERTIFICATE PASSWORD>" \
   --waf-policy ApplicationGatewayWAFPolicy \
   --servers <LOAD BALANCER PRIVATE IP>
@@ -1295,7 +1295,7 @@ az network application-gateway create \
 ````bash
  az network application-gateway probe create \
     --gateway-name $APPGW_NAME \
-    --resource-group $RG \
+    --resource-group $SPOKE_RG \
     --name health-probe \
     --protocol Http \
     --path / \
@@ -1306,12 +1306,45 @@ az network application-gateway create \
 ````
 5) Associate the health probe to the backend pool.
 ````bash
-az network application-gateway http-settings update -g $RG --gateway-name $APPGW_NAME -n appGatewayBackendHttpSettings --probe health-probe
+az network application-gateway http-settings update -g $SPOKE_RG --gateway-name $APPGW_NAME -n appGatewayBackendHttpSettings --probe health-probe
 ````
 
-We have successfully completed the deployment and configuration of our network and cluster resources. The following diagram shows the high-level architecture of our solution. As you can see, we have a test pod running in AKS that can receive traffic from the internet through the Azure Application Gateway and the Azure Internal Load Balancer. We can also access the private API server of the AKS cluster and the private container registry from the jumpbox using the private endpoints and links. We have also enabled outbound traffic from the AKS subnet to go through the Azure Firewall for inspection and filtering. In the next chapter, we will validate if we can access our test Pod.
+Validate your deployment in the Azure portal.
+
+6) select your resource group called **rg-spoke** where the application gateway is deployed.
+
+10) Select your Azure Application Gateway called **AppGateway**. Ensure you have a **Public IP address** and Tier set to **WAF v2**.
+
+![Screenshot](images/appgwoverview.jpg)
+
+11) In the left-hand side menu, under the **Settings** section, select **Backend pools** and choose from the list  **appGatewayBackendPool**.
+
+12) Ensure the target type is set to **IP address or FQDN** and target is set to the IP address of your **internal load balancer**.
+
+![Screenshot](images/appGatewayBackendPool.jpg)
+
+13) On the top menu click on **AppGateway | Backend pools**.
+
+14) Lets verify the backend settings of Application Gateway, in the left-hand side menu choose ***Backend settings**.
+
+15) From the list click on **appGatewayBackendHttpSettings** validate that the backend port is configured for port 80, and that health probe called **health-probe** is associated to the backend.
+
+![Screenshot](images/backendsettings.jpg)
+
+
+16) Press **Cancel** 
+
+17) Verify that we have Web application rules configured. In the left-hand side menu choose ***Web Application Firewall**.
+
+18) Click on **ApplicationGatewayWAFPolicy** In the left-hand side menu choose ***Managed rules**.
+
+![Screenshot](images/managedruleswaf.jpg)
+
+We have successfully completed the deployment and configuration of our network and cluster resources. The following diagram shows the high-level architecture of our solution. As you can see, we have a test pod running in AKS that can receive traffic from the internet through the Azure Application Gateway and the Azure Internal Load Balancer. We can also access the private API server of the AKS cluster and the private container registry from the jumpbox using the private endpoints and links. We have also enabled outbound traffic from the AKS subnet to go through the Azure Firewall for inspection and filtering. In the next chapter, we will validate if we can access our test Pod securely from the Internet.
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlinkandacrandinternalloadbalancerandapplicationgw.jpg)
+
+
 
 
 ### 3.1.9 Validate ingress connection.
