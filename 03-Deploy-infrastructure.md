@@ -9,9 +9,6 @@ The objective of this chapter is to guide you through the process of deploying t
 This configuration sets up environment variables for the names and locations of various network and security resources, such as resource group, virtual network, subnets, network security groups, firewall, application gateway, route table, identity, virtual machine, AKS cluster, and ACR registry.
 
 > [!Note]
-> Application Gateway has two versions of the WAF sku: Application Gateway WAF_v1 and Application Gateway WAF_v2. WAF policy associations are only supported for the Application Gateway WAF_v2 sku.
-
-> [!Note]
 > Since the Azure container registry has a globally unique FQDN name, you need to assign a distinct value to the **ACR_NAME** environment variable, else the ACR deployment will fail. 
 
 ````bash
@@ -372,7 +369,8 @@ az network public-ip create \
 ````
 2) Create JumpBox Virtual Machine.
 
-> **_! Note:_**  Ensure you specify a **password** for the admin user called **azureuser**.
+> [!Note]
+> Ensure you specify a **password** for the admin user called **azureuser**.
 
 ````bash
 az vm create \
@@ -394,7 +392,8 @@ az vm create \
 
 
 4) Create the bastion host in hub vnet and associate it to the public IP.
-> **_! Note:_**  Azure Bastion service requires a dedicated subnet named **AzureBastionSubnet** to provide secure and seamless RDP/SSH connectivity to your virtual machines. When you deploy Azure Bastion service, it will automatically create this subnet for you, if it does not exist in the target virtual network. However, if the subnet already exists, it must meet the minimum size of **/26** or larger, otherwise the deployment will fail.
+> [!Note]
+> Azure Bastion service requires a dedicated subnet named **AzureBastionSubnet** to provide secure and seamless RDP/SSH connectivity to your virtual machines. When you deploy Azure Bastion service, it will automatically create this subnet for you, if it does not exist in the target virtual network. However, if the subnet already exists, it must meet the minimum size of **/26** or larger, otherwise the deployment will fail.
 
 ````bash
 az network bastion create \
@@ -521,7 +520,8 @@ az network route-table route create \
     --next-hop-ip-address $FW_PRIVATE_IP
 
 ````
-> **_! Note:_** The route will direct all traffic (0.0.0.0/0) to the next hop type of VirtualAppliance, which is the firewall instance. The next hop IP address is the private IP address of the firewall, which is stored in the environment variable $FW_PRIVATE_IP. This way, the traffic from the AKS subnet will be routed to the firewall instance on its private endpoint. This will allow you to perform inspection on outbound traffic.
+> [!Note]
+> The route will direct all traffic (0.0.0.0/0) to the next hop type of VirtualAppliance, which is the firewall instance. The next hop IP address is the private IP address of the firewall, which is stored in the environment variable $FW_PRIVATE_IP. This way, the traffic from the AKS subnet will be routed to the firewall instance on its private endpoint. This will allow you to perform inspection on outbound traffic.
 
 9) Associate the route table with the AKS subnet.
 
@@ -635,8 +635,8 @@ az role assignment create \
     --role "Network Contributor"
 
 ````
-> **_! Note:_**
-Granting the Network Contributor role to the load balancer subnet in AKS could result in over-privileged access. To minimize security risks, it is recommended to only provide AKS with the necessary permissions to function effectively, adhering to the principle of least privilege access. For more information refer to [Creating Azure custom role](./docs/customrole.md)
+> [!Note]
+> Granting the Network Contributor role to the load balancer subnet in AKS could result in over-privileged access. To minimize security risks, it is recommended to only provide AKS with the necessary permissions to function effectively, adhering to the principle of least privilege access. For more information refer to [Creating Azure custom role](./docs/customrole.md)
 
 7) Retrieve the scope of AKS subnet, were AKS shall be deployed.
 
@@ -657,7 +657,8 @@ This command creates an AKS cluster with two system nodes, using the specified V
 az aks create --resource-group $SPOKE_RG --node-count 2 --vnet-subnet-id $AKS_SUBNET_SCOPE --name $AKS_CLUSTER_NAME-${STUDENT_NAME} --enable-private-cluster --outbound-type userDefinedRouting --enable-oidc-issuer --enable-workload-identity --generate-ssh-keys --assign-identity $IDENTITY_ID --network-plugin azure --network-policy azure --disable-public-fqdn --zones 1 2 3
 ````
 
-> **_! Note:_** A private AKS cluster has its Kubernetes API endpoint isolated from public access, allowing access only within the same virtual network. To communicate with the private AKS cluster from a jumpbox in a different virtual network, a virtual network link must be created between the two networks for DNS resolution. This will be covered in the next section.
+> [!Note]
+> A private AKS cluster has its Kubernetes API endpoint isolated from public access, allowing access only within the same virtual network. To communicate with the private AKS cluster from a jumpbox in a different virtual network, a virtual network link must be created between the two networks for DNS resolution. This will be covered in the next section.
 
 9) An additional nodepool will be created to host user workloads. Auto-scaling is enabled to allow for automatic scaling out and scaling in based on demand. The worker nodes will be distributed across three different zones to ensure higher availability
 
@@ -694,7 +695,8 @@ Validate your deployment in the Azure portal.
 
 12) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should have 3 RGs which you have created,**MC_rg-spoke_private-aks-xxxx_eastus**, **rg-hub** and **rg-spoke** 
 
-> **_! Note:_** MC_rg-spoke_private-aks-xxxx_eastus is a resource group automatically created when deploying an AKS cluster. It is used by Azure to manage resources for the cluster, this particular resource group is also known as Node group.
+> [!Note]
+> MC_rg-spoke_private-aks-xxxx_eastus is a resource group automatically created when deploying an AKS cluster. It is used by Azure to manage resources for the cluster, this particular resource group is also known as Node group.
 
 ![Screenshot](images/resourcegroups.jpg)
 
@@ -748,8 +750,8 @@ sudo usermod -aG docker $USER
 az login
 az account set --subscription <SUBSCRIPTION ID>
 ````
-> **_! Note:_**
-To check the current subscription, run the command: **az account show**
+> [!Note]
+> To check the current subscription, run the command: **az account show**
 To change the subscription, run the command: **az account set --subscription <SUBSCRIPTION ID>, where <SUBSCRIPTION ID>** the ID of the desired subscription. You can find the subscription ID by running the command: **az account list --output table**
 
 8) Add your Environment variables to the jumpbox bash shell.
@@ -802,8 +804,8 @@ az acr create \
     --allow-trusted-services false \
     --public-network-enabled false
 ````
-> **_! Note:_**
-Ensure you have a global unique name for your ACR, else the deployment will fail.
+> [!IMPORTANT]
+> Ensure you have a global unique name for your ACR, else the deployment will fail.
 
 
 2) Disable endpoint network policies.
@@ -836,7 +838,8 @@ az network private-dns link vnet create \
 ````
 5) Creates a virtual network link to the hub network.
 
-> **_! Note:_** The $HUB_VNET_ID variable specifies the full path to the virtual network in another resource group, allowing the command to correctly link to it.
+> [!Note]
+> The $HUB_VNET_ID variable specifies the full path to the virtual network in another resource group, allowing the command to correctly link to it.
 
 ````bash
 az network private-dns link vnet create \
@@ -1214,7 +1217,8 @@ internal-test-app-service   LoadBalancer   10.0.22.55   10.1.1.4      80:31644/T
 kubernetes                  ClusterIP      10.0.0.1     <none>        443/TCP        13h    <none>
 ````
 
-> **_! Note:_** Note down the EXTERNAL-IP (Private IP of the load balancer), as this will be used for creating the application gateway. 
+> [!Note]
+> Note down the EXTERNAL-IP (Private IP of the load balancer), as this will be used for creating the application gateway. 
 
 Verify that you are able to access the exposed Nginx pod from your jumpbox VM.
 ````bash
@@ -1258,7 +1262,8 @@ In this chapter, you will set up an application gateway that can terminate TLS c
 
 1) Create public IP address with a domain name associated to the PIP resource
 
-> **_! Note:_** Your workshop instructor will provide you a student name for your domain name.  
+> [!Note]
+> Your workshop instructor will provide you a student name for your domain name.  
 
 
 ````bash
@@ -1272,7 +1277,8 @@ az network application-gateway waf-policy create --name ApplicationGatewayWAFPol
 ````
 3) Create Application Gateway.
 
-> **_! Note:_** Your workshop instructor will provide you with a **password** for the certificate and instructions on how to retrieve it. Before executing the command, make sure the certificate is located in **your working directory**. Replace **<CERTIFICATE PASSWORD>** with the password provided by the instructor and **<LOAD BALANCER PRIVATE IP>** with the private IP of the load balancer.
+> [!Note]
+> Your workshop instructor will provide you with a **password** for the certificate and instructions on how to retrieve it. Before executing the command, make sure the certificate is located in **your working directory**. Replace **<CERTIFICATE PASSWORD>** with the password provided by the instructor and **<LOAD BALANCER PRIVATE IP>** with the private IP of the load balancer.
 
 ````bash
 az network application-gateway create \
