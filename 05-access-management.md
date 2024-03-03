@@ -12,7 +12,7 @@
     - [5.2.5 Validate the Access for the Different Users.](#525-validate-the-access-for-the-different-users)
 
 
-Azure Kubernetes Service (AKS) supports Azure Active Directory (AAD) integration, which allows you to control access to your cluster resources using Azure role-based access control (RBAC). In this tutorial, you will learn how to integrate AKS with AAD and assign different roles and permissions to three types of users:
+Azure Kubernetes Service (AKS) supports Microsoft Entra ID integration, which allows you to control access to your cluster resources using Azure role-based access control (RBAC). In this tutorial, you will learn how to integrate AKS with Microsoft Entra ID and assign different roles and permissions to three types of users:
 
 An admin user, who will have full access to the AKS cluster and its resources.
 A backend ops team, who will be responsible for managing the backend application deployed in the AKS cluster. They will only have access to the backend namespace and the resources within it.
@@ -24,11 +24,11 @@ By following this tutorial, you will be able to implement the least privilege ac
 In this section, you will learn how to:
 
 - Harden your AKS cluster.
-- Update an existing AKS cluster to support AAD integration enabled.
-- Create an AAD admin group and assign it the Azure Kubernetes Service Cluster Admin Role.
- - Create an AAD backend ops group and assign it the Azure Kubernetes Service Cluster User Role.
-- Create an AAD frontend ops group and assign it the Azure Kubernetes Service Cluster User Role.
-- Create Users in AAD
+- Update an existing AKS cluster to support Microsoft Entra ID integration enabled.
+- Create a Microsoft Entra ID admin group and assign it the Azure Kubernetes Service Cluster Admin Role.
+ - Create a Microsoft Entra ID backend ops group and assign it the Azure Kubernetes Service Cluster User Role.
+- Create a Microsoft Entra ID frontend ops group and assign it the Azure Kubernetes Service Cluster User Role.
+- Create Users in Microsoft Entra ID
 - Create role bindings to grant access to the backend ops group and the frontend ops group to their respective namespaces.
 - Test the access of each user type by logging in with different credentials and running kubectl commands.
 
@@ -37,7 +37,8 @@ In this section, you will learn how to:
 ### 5.2.1 Prepare Environment Variables
 This code defines the environment variables for the resources that you will create later in the tutorial.
 
-> **_! Note:_** Ensure environment variable **$STUDENT_NAME** is set before adding the code below.
+> [!Note]
+> Ensure environment variable **$STUDENT_NAME** is set before adding the code below.
 
 ````bash
 ADMIN_GROUP='ClusterAdminGroup-'${STUDENT_NAME}
@@ -210,12 +211,14 @@ sudo rm -R .kube/
 
 7) **login to Azure** with the Frontend username and password.
 
->**_! Note:_** The username is stored in this variable **AAD_OPS_FE_UPN** and password is stored in **AAD_OPS_FE_PW**. Simple run an echo on the environment variables to retrieve the username and password.
+> [!Note]
+> The username is stored in this variable **AAD_OPS_FE_UPN** and password is stored in **AAD_OPS_FE_PW**. Simple run an echo on the environment variables to retrieve the username and password.
 
 ````bash
 sudo az login
 ````
->**_! Note:_** If prompted to pick an account then choose **Use another account** and supply the username in the **AAD_OPS_FE_UPN** variable.
+> [!Note]
+> If prompted to pick an account then choose **Use another account** and supply the username in the **AAD_OPS_FE_UPN** variable.
 
 8) Download Cluster credential.
 
@@ -230,7 +233,8 @@ azureuser@Jumpbox-VM:~$
 ````
 9) You should be able to list all pods in namespace frontend.
 
->**_! Note:_** You will now be prompted to authenticate your user again, as this time it will validate your permissions within the AKS cluster.
+> [!Note]
+> You will now be prompted to authenticate your user again, as this time it will validate your permissions within the AKS cluster.
 
 ````bash
 sudo kubectl get po -n frontend
