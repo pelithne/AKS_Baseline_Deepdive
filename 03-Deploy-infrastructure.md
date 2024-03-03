@@ -1,5 +1,21 @@
 # 3.0 Deploy Infrastructure
 
+- [3.0 Deploy Infrastructure](#30-deploy-infrastructure)
+  - [3.1 Deployment](#31-deployment)
+    - [3.1.1 Prepare Environment Variables for infrastructure](#311-prepare-environment-variables-for-infrastructure)
+    - [3.1.2 Create the Resource Groups for the Hub and Spoke.](#312-create-the-resource-groups-for-the-hub-and-spoke)
+    - [3.1.3 Create Network Security Groups (NSG) and Virtual Network (Vnet) for the Hub.](#313-create-network-security-groups-nsg-and-virtual-network-vnet-for-the-hub)
+    - [3.1.4 Create Network Security Groups and Virtual Network for the Spoke.](#314-create-network-security-groups-and-virtual-network-for-the-spoke)
+    - [3.1.5 Create Vnet Peering Between Hub and Spoke](#315-create-vnet-peering-between-hub-and-spoke)
+    - [3.1.6 Create Azure Bastion and Jumpbox VM](#316-create-azure-bastion-and-jumpbox-vm)
+    - [3.1.7 Create an Azure Firewall and setup a UDR](#317-create-an-azure-firewall-and-setup-a-udr)
+    - [3.1.6 Deploy Azure Kubernetes Service](#316-deploy-azure-kubernetes-service)
+    - [3.1.7 Deploy Azure Container Registry](#317-deploy-azure-container-registry)
+    - [3.1.8 Deploy Azure Application Gateway.](#318-deploy-azure-application-gateway)
+    - [3.1.9 Validate Ingress Connection.](#319-validate-ingress-connection)
+    - [3.1.10 Clean Up Resources in AKS](#3110-clean-up-resources-in-aks)
+
+
 The objective of this chapter is to guide you through the process of deploying the AKS baseline infrastructure. This infrastructure consists of the essential components and configurations that are required for running a secure and scalable AKS cluster. By following the steps in this chapter, you will be able to set up the AKS baseline infrastructure.
 
 ## 3.1 Deployment
@@ -1357,13 +1373,13 @@ We have successfully completed the deployment and configuration of our network a
 
 
 
-### 3.1.9 Validate ingress connection.
+### 3.1.9 Validate Ingress Connection.
 Open your web browser and access your domain: **STUDENT NAME.akssecurity.se**
 you should see a similar output as to the one below.
 
 ![Screenshot](/images/splashscreen.jpg)
 
-### 3.1.10 Clean up resources in AKS
+### 3.1.10 Clean Up Resources in AKS
 Once you have verified that everything works as depicted earlier. from the jumpbox host delete the resources.
 
 ````bash
