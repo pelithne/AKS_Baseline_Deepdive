@@ -1,5 +1,15 @@
 # 2.0 IP Planning
 
+ **In This Article:**
+
+- [2.0 IP Planning](#20-ip-planning)
+  - [2.1 Overview](#21-overview)
+  - [2.2 IP Plan](#22-ip-plan)
+    - [2.2.1 Hub VNET](#221-hub-vnet)
+    - [2.2.2 Spoke VNET](#222-spoke-vnet)
+    - [2.2.3 Prepare Environment Variables for HUB VNET and SPOKE VNET](#223-prepare-environment-variables-for-hub-vnet-and-spoke-vnet)
+
+
 ## 2.1 Overview
 
 The AKS baseline is a reference architecture that provides a set of best practices and recommendations for deploying a secure and scalable Azure Kubernetes Service (AKS) cluster. One of the key components of the AKS baseline is the network design, which is divided into several subnets and virtual networks (VNets) to isolate and protect the cluster resources from external and internal threats. In this article, we will describe the purpose and configuration of each subnet and VNet in the AKS baseline, and how they work together to provide a robust network infrastructure for your AKS cluster.
@@ -13,8 +23,8 @@ This is the proposed IP design that we will adhere to throughout the documentati
 
 ![Screenshot](images/aks-baseline_network_ip_planning.jpg)
 
-> **_! Note:_**
-IP planning is a crucial step that requires careful consideration of the number and size of subnets for your current solution, as well as the potential for future expansion. You should avoid using excessively large IP ranges, and instead be economical with IP and allocate only what you need for the present and the future.
+> [!Note]
+> IP planning is a crucial step that requires careful consideration of the number and size of subnets for your current solution, as well as the potential for future expansion. You should avoid using excessively large IP ranges, and instead be economical with IP and allocate only what you need for the present and the future.
 
 Each subnet in AKS baseline has a specific purpose and configuration, further information can be found below.
 
