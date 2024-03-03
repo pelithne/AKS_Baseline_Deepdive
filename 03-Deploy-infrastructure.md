@@ -1,5 +1,6 @@
 # 3.0 Deploy Infrastructure
 
+ **In This Article:**
 - [3.0 Deploy Infrastructure](#30-deploy-infrastructure)
   - [3.1 Deployment](#31-deployment)
     - [3.1.1 Prepare Environment Variables for infrastructure](#311-prepare-environment-variables-for-infrastructure)
