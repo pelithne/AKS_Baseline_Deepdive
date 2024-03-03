@@ -59,7 +59,7 @@ First, create some environment variables, to make life easier.
 
 
 > [!Note]
->The Azure keyvault name is a global name that must be unique
+>The Azure KeyVault name is a global name that must be unique.
 
 ````
 FRONTEND_NAMESPACE="frontend"
