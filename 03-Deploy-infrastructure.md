@@ -9,7 +9,7 @@
     - [3.1.4 Create Network Security Groups and Virtual Network for the Spoke.](#314-create-network-security-groups-and-virtual-network-for-the-spoke)
     - [3.1.5 Create Vnet Peering Between Hub and Spoke](#315-create-vnet-peering-between-hub-and-spoke)
     - [3.1.6 Create Azure Bastion and Jumpbox VM](#316-create-azure-bastion-and-jumpbox-vm)
-    - [3.1.7 Create an Azure Firewall and setup a UDR](#317-create-an-azure-firewall-and-setup-a-udr)
+    - [3.1.7 Create an Azure Firewall and Setup a UDR](#317-create-an-azure-firewall-and-setup-a-udr)
     - [3.1.6 Deploy Azure Kubernetes Service](#316-deploy-azure-kubernetes-service)
     - [3.1.7 Deploy Azure Container Registry](#317-deploy-azure-container-registry)
     - [3.1.8 Deploy Azure Application Gateway.](#318-deploy-azure-application-gateway)
@@ -440,7 +440,7 @@ After completing these steps, The high-level targeted architecture now matches t
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpbox.jpg)
 
-### 3.1.7 Create an Azure Firewall and setup a UDR
+### 3.1.7 Create an Azure Firewall and Setup a UDR
 
 To secure your AKS outbound traffic, you need to follow these steps for a basic cluster deployment. These steps will help you restrict the outbound access and to certain FQDNs that are needed by the cluster. further information can be found here: [Control egress traffic using Azure Firewall in Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/limit-egress-traffic)
 
