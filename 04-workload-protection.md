@@ -1,21 +1,54 @@
-# 4.0 Deploy app with Workload Identity
+# 4.0 Workload Protection
+
+**In This Article:**
+
+- [4.0 Workload Protection](#40-workload-protection)
+  - [4.1 Introduction](#41-introduction)
+    - [4.1.1 Workload Identity](#411-workload-identity)
+    - [4.1.2 Network Policy](#412-network-policy)
+  - [4.2 Deployment](#42-deployment)
+    - [4.2.1 Prepare Environment Variables for infrastructure](#421-prepare-environment-variables-for-infrastructure)
+    - [4.2.2 Update AKS cluster with OIDC issuer](#422-update-aks-cluster-with-oidc-issuer)
+    - [4.2.3 Create Azure Keyvault](#423-create-azure-keyvault)
+    - [4.2.4 Add a Secret to Azure Keyvault](#424-add-a-secret-to-azure-keyvault)
+    - [4.2.5 Add the KeyVault URL to the Environment Variable *KEYVAULT\_URL*](#425-add-the-keyvault-url-to-the-environment-variable-keyvault_url)
+    - [4.2.6 Create a managed identity and grant permissions to access the secret](#426-create-a-managed-identity-and-grant-permissions-to-access-the-secret)
+    - [4.2.7 Create Kubernetes Service Account](#427-create-kubernetes-service-account)
+    - [4.2.8 Create Service Account](#428-create-service-account)
+    - [4.2.9 Establish Federated Identity Credential](#429-establish-federated-identity-credential)
+    - [4.2.10 Build the Application](#4210-build-the-application)
+    - [4.2.11 Deploy the Application](#4211-deploy-the-application)
+    - [4.2.12 Validate the Application](#4212-validate-the-application)
+    - [4.2.13 Workload Network Policy](#4213-workload-network-policy)
+
+
 
 ## 4.1 Introduction
+In this section we will focus on:
+- Workload Identity
+- Network Policy
+
+hands on exercises that will be covered:
+
+ - Build an application and store it in Azure Container Registry
+ - Activate OpenID Connect (OIDC) issuer on an Azure Kubernetes Service (AKS)cluster (or create a new cluster with OIDC activated)
+- Create a secret and store it in Azure Key Vault
+- Create an Azure Active Directory (Azure AD) managed identity
+- Connect the managed identity to a Kubernetes service account with token federation
+- Deploy a workload and verify secure authentication to Azure Key Vault with the workload identity
+- Configure network policies in AKS to control traffic between pods.
+
+### 4.1.1 Workload Identity
 Workload identity allows you to securely access Azure resources from your Kubernetes applications using Azure AD identities. This way, you can avoid storing and managing credentials in your cluster, and instead rely on the native Kubernetes mechanisms to federate with external identity providers.
 
 Workload identity replaces the deprecated pod identity feature, and is the recommended way to manage identity for workloads. 
 
 more information about workload identity can be found here: [Use Azure AD workload identity with Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/workload-identity-overview?tabs=dotnet)
 
+### 4.1.2 Network Policy
 
-In this section, you will learn how to:
+Network policy controls traffic flow between groups of pods and other network endpoints using rules, providing an additional layer of security. In this section, you will learn how to configure network policies to control traffic between pods
 
-- Build an application and store it in Azure Container Registry
-- Activate OpenID Connect (OIDC) issuer on Azure Kubernetes Service (AKS) cluster (or create a new cluster with OIDC activated)
-- Create a secret and store it in Azure Key Vault
-- Create an Azure Active Directory (Azure AD) managed identity
-- Connect the managed identity to a Kubernetes service account with token federation
-- Deploy a workload and verify authentication to Key Vault with the workload identity
 
 
 ## 4.2 Deployment
@@ -163,9 +196,10 @@ Now, you should have an infrastucture that looks like this:
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlinkandacrandinternalloadbalancerandapplicationgwandkeyvault.jpg)
 
- ### Add a secret to Azure Keyvault
+ ### 4.2.4 Add a Secret to Azure Keyvault
 
- ### NOTE: Because the keyvault is isolated in a VNET, you need to access it from the jumphost. Please log in to the jump host, and set a few environment variables (or load all environment variables you stored in a file):
+> [!IMPORTANT]
+> Because the keyvault is isolated in a VNET, you need to access it from the jumphost. Please log in to the jump host, and set a few environment variables (or load all environment variables you stored in a file):
 
  ````
 RG=AKS_Security_RG
@@ -187,12 +221,13 @@ Now create a secret in the keyvault. This is the secret that will be used by the
  az keyvault secret set --vault-name $KEYVAULT_NAME --name $KEYVAULT_SECRET_NAME --value 'redispassword'
  ````
 
-### Add the Key Vault URL to the environment variable *KEYVAULT_URL*
+### 4.2.5 Add the KeyVault URL to the Environment Variable *KEYVAULT_URL*
+
  ````
  export KEYVAULT_URL="$(az keyvault show -g $RG  -n $KEYVAULT_NAME --query properties.vaultUri -o tsv)"
  ````
 
- ### Create a managed identity and grant permissions to access the secret
+ ### 4.2.6 Create a managed identity and grant permissions to access the secret
 
 Create a User Managed Identity. We will give this identity *GET access* to the keyvault, and later associate it with a Kubernetes service account. 
 
@@ -211,7 +246,7 @@ Create a User Managed Identity. We will give this identity *GET access* to the k
  ````
 
 
- ### Create Kubernetes service account
+ ### 4.2.7 Create Kubernetes Service Account
 
 First, connect to the cluster if not already connected
  
@@ -219,11 +254,12 @@ First, connect to the cluster if not already connected
  az aks get-credentials -n $AKS_CLUSTER_NAME -g $RG
  ````
 
-#### Create service account
+### 4.2.8 Create Service Account
 
 The service account should exist in the frontend namespace, because it's the frontend service that will use that service account to get the credentials to connect to the (redis) backend service.
 
-> **_! Note:_** Instead of creating kubenetes manifest files, we will create them on the commandline like below. I a real life case, you would create manifest files and store them in a version control system, like git.
+> [!Note]
+> Instead of creating kubenetes manifest files, we will create them on the commandline like below. I a real life case, you would create manifest files and store them in a version control system, like git.
 
 
 First create the frontend namespace
@@ -253,7 +289,7 @@ EOF
 ````
 
 
-### Establish federated identity credential
+### 4.2.9 Establish Federated Identity Credential
 
 In this step we connect the Kubernetes service account with the user defined managed identity in Azure, using a federated credential.
 
@@ -261,7 +297,7 @@ In this step we connect the Kubernetes service account with the user defined man
   az identity federated-credential create --name $FEDERATED_IDENTITY_CREDENTIAL_NAME --identity-name $USER_ASSIGNED_IDENTITY_NAME --resource-group $RG --issuer $AKS_OIDC_ISSUER --subject system:serviceaccount:$FRONTEND_NAMESPACE:$SERVICE_ACCOUNT_NAME
 ````
 
-### Build the application
+### 4.2.10 Build the Application
 
 Now its time to build the application. In order to do so, first clone the applications repository:
 
@@ -287,16 +323,17 @@ sudo docker push $ACR_NAME.azurecr.io/azure-vote-front:v1
 The string after ````:```` is the image tag. This can be used to manage versions of your app, but in this case we will only have one version. 
 
 
-### Deploy the application
+### 4.2.11 Deploy the Application
 
 We want to create some separation between the frontend and backend, by deploying them into different namespaces. Later we will add more separation by introducing network policies in the cluster to allow/disallow traffic between specific namespaces.
 
 
 First, create the backend namespace
 
-#### NOTE: instead of creating kubernetes manifest, we put them inline for convenience. Feel free to create yaml-manifests instead if you like
+> [!Note]
+> Instead of creating kubernetes manifest, we put them inline for convenience. Feel free to create yaml-manifests instead if you like.
 
-````
+````bash
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
@@ -309,8 +346,9 @@ EOF
 
 
 
-The create the Backend application, which is a Redis store which we will use as a "database". Notice how we inject a password to Redis using an environment variable (not best practice obviously, but for simplicity).
-````
+Then create the Backend application, which is a Redis store which we will use as a "database". Notice how we inject a password to Redis using an environment variable (not best practice obviously, but for simplicity).
+
+````bash
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
@@ -354,19 +392,15 @@ EOF
 
 
 Then create the frontend. We already created the frontend namespace in an earlier step, so ju go ahead and create the frontend app in the frontend namespace.
-
-A few things worh noting:
-
+> [!Note]
+> A few things worh noting:
 ````azure.workload.identity/use: "true"```` - This is a label that tells AKS that workload identity should be used
-
 ````serviceAccountName: $SERVICE_ACCOUNT_NAME```` - Specifies that this resource is connected to the service account created earlier
-
 ````image: $ACR_NAME.azurecr.io/azure-vote:v1```` - The image with the application built in a previous step.
-
 ````service.beta.kubernetes.io/azure-load-balancer-ipv4: $ILB_EXT_IP```` - This "hard codes" the IP address of the internal LB to match what was previously configured in App GW as backend.
 
 
-````
+````bash
 cat <<EOF | kubectl apply -f -
 apiVersion: apps/v1
 kind: Deployment
@@ -429,43 +463,45 @@ spec:
 EOF
 ````
 
-### Validate the application
+### 4.2.12 Validate the Application
+
 To test if the application is working, you can navigate to the URL used before to reach the nginx test application. This time the request will be redirected to the Azure Vote frontend instead. If that works, it means that the Azure Vote frontend pod was able to fetch the secret from Azure Keyvault, and use it when connecting to the backend (Redis) service/pod.
 
 You can also verify in the application logs that the frontend was able to connect to the backend.
 
 To do that, you need to find the name of the pod:
-````
+````bash
 kubectl get pods ---namespace frontend
 ````
 This should give a result timilar to this
-````
+````bash
 NAME                                READY   STATUS    RESTARTS        AGE
 azure-vote-front-85d6c66c4d-pgtw9   1/1     Running   29 (7m3s ago)   3h13m
 ````
 
 Now you can read the logs of the application by running this command (but with YOUR pod name)
-````
+````bash
 kubectl logs azure-vote-front-85d6c66c4d-pgtw9 --namespace frontend
 ````
 
 You should be able to find a line like this:
-````
+````bash
 Connecting to Redis... azure-vote-back.backend
 ````
 And then a little later:
-````
+````bash
 Connected to Redis!
 ````
 
 
 
-### Network policies
+### 4.2.13 Workload Network Policy
+
 The cluster is deployed with Azure network policies. The Network policies can be used to control traffic between resources in Kubernetes.
 
 This first policy will prevent all traffic to the backend namespace. 
 
-````
+````bash
 cat <<EOF | kubectl apply -f -
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -485,23 +521,23 @@ EOF
 Network policies are applied on new TCP connections, and because the frontend application has already created a persistent TCP connection with the backend it might have to be redeployed for the policy to hit. One way to do that is to simply delete the pod and let it recreate itself:
 
 First find the pod name
-````
+````bash
 kubectl get pods --namespace frontend
 ````
 This should give a result timilar to this
-````
+````bash
 NAME                                READY   STATUS    RESTARTS        AGE
 azure-vote-front-85d6c66c4d-pgtw9   1/1     Running   29 (7m3s ago)   3h13m
 ````
 
 Now delete the pod with the following command (but with YOUR pod name)
 
-````
+````bash
 kubectl delete pod --namespace frontend azure-vote-front-85d6c66c4d-pgtw9
 ````
 
 After the deletion has finished you should be able to se that the "AGE" of the pod has been reset.
-````
+````bash
 kubectl get pods --namespace frontend
 
 NAME                                READY   STATUS    RESTARTS        AGE
@@ -513,7 +549,7 @@ You should also find that the frontend can no longer communicate with the backen
 
 Now apply a new policy that allows traffic into the backend namespace from pods that have the label ````app: azure-vote-front````
 
-````
+````bash
 cat <<EOF | kubectl apply -f -
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -539,13 +575,13 @@ Once again you have to recreate the pod, so that it can establish a connection t
 
 
 First find the pod name
-````
+````bash
 kubectl get pods --namespace frontend
 ````
 
 Then delete the pod (using the name of your pod)
 
-````
+````bash
 kubectl delete pod --namespace frontend azure-vote-front-85d6c66c4d-pgtw9
 ````
 
