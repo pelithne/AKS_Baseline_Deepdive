@@ -7,7 +7,7 @@
     - [4.1.1 Prepare Environment Variables for infrastructure](#411-prepare-environment-variables-for-infrastructure)
     - [4.1.2 Update AKS cluster with OIDC issuer](#412-update-aks-cluster-with-oidc-issuer)
     - [4.1.3 Create Azure Keyvault](#413-create-azure-keyvault)
-    - [4.1.4 Add a Secret to Azure Keyvault](#414-add-a-secret-to-azure-keyvault)
+    - [4.1.4 Add a Secret to Azure KeyVault](#414-add-a-secret-to-azure-keyvault)
     - [4.1.5 Add the KeyVault URL to the Environment Variable *KEYVAULT\_URL*](#415-add-the-keyvault-url-to-the-environment-variable-keyvault_url)
     - [4.1.6 Create a managed identity and grant permissions to access the secret](#416-create-a-managed-identity-and-grant-permissions-to-access-the-secret)
     - [4.1.7 Connect to the Cluster](#417-connect-to-the-cluster)
@@ -45,17 +45,16 @@ KEYVAULT_SECRET_NAME="redissecret"
 
 ### 4.1.2 Update AKS cluster with OIDC issuer
 
-Enable the existing cluster to use OpenID connect (OIDC) as an authentication protocol for Kubernetes API server (unless already done). This allows the cluster to integrate with Azure Active Directory (Microsoft Entra ID) and other identity providers that support OIDC.
+Enable the existing cluster to use OpenID connect (OIDC) as an authentication protocol for Kubernetes API server (unless already done). This allows the cluster to integrate with Microsoft Entra ID and other identity providers that support OIDC.
 
 ````bash
-az aks update -g $RG -n $AKS_CLUSTER_NAME  --enable-oidc-issuer 
-
+az aks update -g $SPOKE_RG -n $AKS_CLUSTER_NAME-${STUDENT_NAME}   --enable-oidc-issuer 
 ````
 
 Get the OICD issuer URL. Query the AKS cluster for the OICD issuer URL with the following command, which stores the reult in an environment variable.
 
 ````bash
-AKS_OIDC_ISSUER="$(az aks show -n $AKS_CLUSTER_NAME -g $RG  --query "oidcIssuerProfile.issuerUrl" -otsv)"
+AKS_OIDC_ISSUER="$(az aks show -n $AKS_CLUSTER_NAME-${STUDENT_NAME} -g $SPOKE_RG  --query "oidcIssuerProfile.issuerUrl" -otsv)"
 ````
 
 The variable should contain the Issuer URL similar to the following:
@@ -68,27 +67,26 @@ Create the Azure Keyvault instance. When creating the Keyvault, use "deny as a d
 Your bastion host will be allowed, so use that one when you interact with Keyvault later.
 
 ````bash
-az keyvault create -n $KEYVAULT_NAME -g $RG -l $LOCATION --default-action deny
+az keyvault create -n $KEYVAULT_NAME -g $SPOKE_RG -l $LOCATION --default-action deny
 ````
 
 Create a private DNS zone for the Azure Keyvault.
 
 ````bash
-az network private-dns zone create --resource-group $RG --name privatelink.vaultcore.azure.net
+az network private-dns zone create --resource-group $SPOKE_RG --name privatelink.vaultcore.azure.net
 ````
 
 Link the Private DNS Zone to the HUB and SPOKE Virtual Network
 
 ````bash
-az network private-dns link vnet create --resource-group $RG --virtual-network $HUB_VNET_NAME --zone-name privatelink.vaultcore.azure.net --name hubvnetkvdnsconfig --registration-enabled false
+az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $HUB_VNET_ID --zone-name privatelink.vaultcore.azure.net --name hubvnetkvdnsconfig --registration-enabled false
 
-
-az network private-dns link vnet create --resource-group $RG --virtual-network $SPOKE_VNET_NAME --zone-name privatelink.vaultcore.azure.net --name spokevnetkvdnsconfig --registration-enabled false
+az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $SPOKE_VNET_NAME --zone-name privatelink.vaultcore.azure.net --name spokevnetkvdnsconfig --registration-enabled false
 ````
 
 Create a private endpoint for the Keyvault
 
-First we need to obtain the Keyvault ID in order to deploy the private endpoint.
+First we need to obtain the KeyVault ID in order to deploy the private endpoint.
 
 ````bash
 KEYVAULT_ID=$(az keyvault show --name $KEYVAULT_NAME \
@@ -97,15 +95,20 @@ KEYVAULT_ID=$(az keyvault show --name $KEYVAULT_NAME \
 Create the private endpoint in endpoint subnet.
 
 ````bash
-az network private-endpoint create --resource-group $RG --vnet-name $SPOKE_VNET_NAME --subnet $ENDPOINTS_SUBNET_NAME --name KVPrivateEndpoint --private-connection-resource-id $KEYVAULT_ID --group-ids vault --connection-name PrivateKVConnection --location $LOCATION
+az network private-endpoint create --resource-group $SPOKE_RG --vnet-name $SPOKE_VNET_NAME --subnet $ENDPOINTS_SUBNET_NAME --name KVPrivateEndpoint --private-connection-resource-id $KEYVAULT_ID --group-ids vault --connection-name PrivateKVConnection --location $LOCATION
 ````
 
 Fetch IP of the private endpoint and create an *A record* in the private DNS zone.
 
 Obtain the IP address of the private endpoint NIC card.
  ````bash
-KV_PRIVATE_IP=$(az network private-endpoint show -g $RG -n KVPrivateEndpoint \
+KV_PRIVATE_IP=$(az network private-endpoint show -g $SPOKE_RG -n KVPrivateEndpoint \
   --query 'customDnsConfigs[0].ipAddresses[0]' --output tsv)
+ ````
+Note the private IP address down.
+
+  ````bash
+echo $KV_PRIVATE_IP
  ````
 
 Create the A record in DNS zone and point it to the private endpoint IP of the Keyvault.
@@ -114,25 +117,41 @@ Create the A record in DNS zone and point it to the private endpoint IP of the K
   az network private-dns record-set a create \
   --name $KEYVAULT_NAME \
   --zone-name privatelink.vaultcore.azure.net \
-  --resource-group $RG
+  --resource-group $SPOKE_RG
 ````
 Point the A record to the private endpoint IP of the Keyvault.
 ````bash
- az network private-dns record-set a add-record -g $RG -z "privatelink.vaultcore.azure.net" -n $KEYVAULT_NAME -a $KV_PRIVATE_IP
+ az network private-dns record-set a add-record -g $SPOKE_RG -z "privatelink.vaultcore.azure.net" -n $KEYVAULT_NAME -a $KV_PRIVATE_IP
  ````
 
-Now, Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-Once logged in, locate and select your **resource group** where the Jumpbox has been deployed. Within your resource group, find and click on the **Jumpbox VM**.
-
-
-In the left-hand side menu, under the **Operations** section, select ‘Bastion’. Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
+Validate your deployment in the Azure portal.
 
 
-Once successfully logged in to the Jumpbox **login to Azure** if you have not already done so in previous steps.
+1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
+2) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should have 3 RGs which you have created,**MC_rg-spoke_private-aks-xxxx_eastus**, **rg-hub** and **rg-spoke**, select **rg-spoke**
 
-In the command line type the following command and ensure it returns the **private ip address of the private endpoint**.
+![Screenshot](images/resourcegroups.jpg)
+
+3)  Verify that the following resources exists: an **Azure KeyVault instance**, **KeyVault private endpoint**, **Private endpoint Network interface**, and a private DNS zone called **privatelink.vaultcore.azure.net**. 
+![Screenshot](images/kevaultresourcegroupview.jpg)
+
+4)  Select the **Private DNS zone**, called **privatelink.vaultcore.azure.net**.  
+  
+5)  On your left hand side menu, under **Settings** click on **Virtual network links**.
+
+6)  Validate that there is a link name called **hubnetdnsconfig** and the link status is set to **Completed** and the virtual network is set to **Hub_VNET**, ensure you have a link to both the hub and also the spoke, the link status should be set to **completed**.
+
+![Screenshot](images/keyvaultdnszoneprivatelinks.jpg)
+
+8) On the top menu, click on **Home**. select **Resource Groups**, now click on the resource group called **rg-hub**.
+
+9)  Select Jumpbox VM called **Jumpbox-VM**.
+
+10) In the left-hand side menu, under the **Connect** section, select ‘Bastion’. Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
+
+In the Jumpbox VM command line type the following command and ensure it returns the **private ip address of the private endpoint**.
 
 ````bash
 dig <KEYVAULT NAME>.vault.azure.net
@@ -164,18 +183,22 @@ alibengtssonkeyvault.privatelink.vaultcore.azure.net. 1800 IN A10.1.2.6
 ````
 
 
-Now, you should have an infrastucture that looks like this:
+Now, you should have an infrastructure that looks like this:
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlinkandacrandinternalloadbalancerandapplicationgwandkeyvault.jpg)
 
- ### 4.1.4 Add a Secret to Azure Keyvault
+ ### 4.1.4 Add a Secret to Azure KeyVault
+
+We have successfully created an instance of Azure KeyVault with a private endpoint and set up a private DNS zone to resolve the Azure KeyVault instance from the hub and spoke using Virtual Network links. Additionally, we have updated our AKS cluster to support OIDC, enabling workload identity.
+
+The next step is to add a secret to Azure KeyVault instance.
 
 > [!IMPORTANT]
 > Because the Azure KeyVault is isolated in a VNET, you need to access it from the Jumpbox VM. Please log in to the Jumpbox VM, and set a few environment variables (or load all environment variables you stored in a file):
 
  ````
-RG=AKS_Security_RG
-LOCATION=westeurope 
+SPOKE_RG=rg-spoke
+LOCATION=eastus
 FRONTEND_NAMESPACE="frontend"
 BACKEND_NAMESPACE="backend"
 SERVICE_ACCOUNT_NAME="workload-identity-sa"
@@ -185,34 +208,37 @@ FEDERATED_IDENTITY_CREDENTIAL_NAME="keyvaultfederated"
 KEYVAULT_NAME=<Your key vault name>
 KEYVAULT_SECRET_NAME="redissecret"
 AKS_CLUSTER_NAME=private-aks
+STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
+ACR_NAME=<NAME OF THE AZURE CONTAINER REGISTRY>
+
  ````
 
-Now create a secret in the Azure KeyVault. This is the secret that will be used by the frontend application to connect to the (redis) backend.
+From the **Jumpbox VM** create a secret in the Azure KeyVault. This is the secret that will be used by the frontend application to connect to the (redis) backend.
 
- ````
+ ````bash
  az keyvault secret set --vault-name $KEYVAULT_NAME --name $KEYVAULT_SECRET_NAME --value 'redispassword'
  ````
 
 ### 4.1.5 Add the KeyVault URL to the Environment Variable *KEYVAULT_URL*
 
- ````
- export KEYVAULT_URL="$(az keyvault show -g $RG  -n $KEYVAULT_NAME --query properties.vaultUri -o tsv)"
+ ````bash
+ export KEYVAULT_URL="$(az keyvault show -g $SPOKE_RG  -n $KEYVAULT_NAME --query properties.vaultUri -o tsv)"
  ````
 
  ### 4.1.6 Create a managed identity and grant permissions to access the secret
 
 Create a User Managed Identity. We will give this identity *GET access* to the keyvault, and later associate it with a Kubernetes service account. 
 
- ````
+ ````bash
  az account set --subscription $SUBSCRIPTION 
- az identity create --name $USER_ASSIGNED_IDENTITY_NAME  --resource-group $RG  --location $LOCATION  --subscription $SUBSCRIPTION 
+ az identity create --name $USER_ASSIGNED_IDENTITY_NAME  --resource-group $SPOKE_RG  --location $LOCATION  --subscription $SUBSCRIPTION 
 
  ````
 
- Set an access policy for the managed identity to access the Key Vault
+ Set an access policy for the managed identity to access the Key Vault.
 
- ````
- export USER_ASSIGNED_CLIENT_ID="$(az identity show --resource-group $RG  --name $USER_ASSIGNED_IDENTITY_NAME  --query 'clientId' -otsv)"
+ ````bash
+ export USER_ASSIGNED_CLIENT_ID="$(az identity show --resource-group $SPOKE_RG  --name $USER_ASSIGNED_IDENTITY_NAME  --query 'clientId' -otsv)"
 
  az keyvault set-policy --name $KEYVAULT_NAME  --secret-permissions get --spn $USER_ASSIGNED_CLIENT_ID 
  ````
@@ -222,8 +248,8 @@ Create a User Managed Identity. We will give this identity *GET access* to the k
 
 First, connect to the cluster if not already connected
  
- ````
- az aks get-credentials -n $AKS_CLUSTER_NAME -g $RG
+ ````bash
+ az aks get-credentials -n $AKS_CLUSTER_NAME-${STUDENT_NAME}  -g $SPOKE_RG
  ````
 
 ### 4.1.8 Create Service Account
@@ -231,12 +257,12 @@ First, connect to the cluster if not already connected
 The service account should exist in the frontend namespace, because it's the frontend service that will use that service account to get the credentials to connect to the (redis) backend service.
 
 > [!Note]
-> Instead of creating kubenetes manifest files, we will create them on the command line like below. I a real life case, you would create manifest files and store them in a version control system, like git.
+> Instead of creating kubenetes manifest files, we will create them on the command line like below. In a real life case, you would create manifest files and store them in a version control system, like git.
 
 
 First create the frontend namespace
 
-````
+````yaml
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
@@ -246,8 +272,12 @@ metadata:
     name: $FRONTEND_NAMESPACE
 EOF
 ````
+Verify that the namespace called **frontend** has been created.
+````bash
+kubectl get ns
+````
 
-Then create a service account in that namespace. Notice the annotation for *workload identity*
+Then create a service account in that namespace. Notice the annotation for **workload identity**
 ````
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -265,31 +295,33 @@ EOF
 
 In this step we connect the Kubernetes service account with the user defined managed identity in Azure, using a federated credential.
 
-````
-  az identity federated-credential create --name $FEDERATED_IDENTITY_CREDENTIAL_NAME --identity-name $USER_ASSIGNED_IDENTITY_NAME --resource-group $RG --issuer $AKS_OIDC_ISSUER --subject system:serviceaccount:$FRONTEND_NAMESPACE:$SERVICE_ACCOUNT_NAME
+````bash
+  az identity federated-credential create --name $FEDERATED_IDENTITY_CREDENTIAL_NAME --identity-name $USER_ASSIGNED_IDENTITY_NAME --resource-group $SPOKE_RG --issuer $AKS_OIDC_ISSUER --subject system:serviceaccount:$FRONTEND_NAMESPACE:$SERVICE_ACCOUNT_NAME
 ````
 
 ### 4.1.10 Build the Application
 
 Now its time to build the application. In order to do so, first clone the applications repository:
 
-````
+````bash
 git clone https://github.com/pelithne/az-vote-with-workload-identity.git
 ````
 
 In order to push images, you may have to login to the registry first using your Azure AD identity: 
-````
-az acr login
+
+````bash
+az acr login --name $ACR_NAME
 ````
 
 
 Then run the following commands to build, tag and push your container image to the Azure Container Registry
-````
-cd cd az-vote-with-workload-identity
+
+````bash
+cd az-vote-with-workload-identity
 cd azure-vote 
-sudo docker build -t azure-vote-front:v1 .
-sudo docker tag azure-vote-front:v1 $ACR_NAME.azurecr.io/azure-vote-front:v1
-sudo docker push $ACR_NAME.azurecr.io/azure-vote-front:v1
+docker build -t azure-vote-front:v1 .
+docker tag azure-vote-front:v1 $ACR_NAME.azurecr.io/azure-vote-front:v1
+docker push $ACR_NAME.azurecr.io/azure-vote-front:v1
 
 ````
 The string after ````:```` is the image tag. This can be used to manage versions of your app, but in this case we will only have one version. 
@@ -315,8 +347,11 @@ metadata:
     name: backend
 EOF
 ````
+Verify that the namespace called **backend** has been created.
 
-
+````bash
+kubectl get ns
+````
 
 Then create the Backend application, which is a Redis store which we will use as a "database". Notice how we inject a password to Redis using an environment variable (not best practice obviously, but for simplicity).
 
@@ -361,7 +396,6 @@ spec:
     app: azure-vote-back
 EOF
 ````
-
 
 Then create the frontend. We already created the frontend namespace in an earlier step, so ju go ahead and create the frontend app in the frontend namespace.
 > [!Note]
@@ -443,7 +477,7 @@ You can also verify in the application logs that the frontend was able to connec
 
 To do that, you need to find the name of the pod:
 ````bash
-kubectl get pods ---namespace frontend
+kubectl get pods --namespace frontend
 ````
 This should give a result timilar to this
 ````bash
@@ -464,7 +498,6 @@ And then a little later:
 ````bash
 Connected to Redis!
 ````
-
 
 
 ### 4.1.13 Workload Network Policy
