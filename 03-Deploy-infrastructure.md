@@ -30,7 +30,7 @@ ACR_NAME=<NAME OF THE AZURE CONTAINER REGISTRY>
 STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
 ````
 
-### 3.1.2 Create the Resource Group for the Hub and Spoke.
+### 3.1.2 Create the Resource Groups for the Hub and Spoke.
 
 ````bash
 az group create --name $HUB_RG --location $LOCATION
