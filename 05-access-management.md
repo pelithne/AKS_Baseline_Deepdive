@@ -259,9 +259,9 @@ Validate your deployment in the Azure portal.
 
 This section will demonstrate how to connect to the AKS cluster from the jumpbox using the user account defined in Microsoft Entra ID. We will check two things: first, that we can successfully connect to the cluster; and second, that the Operations teams have access only to their own namespaces, while the Admin has full access to the cluster.
 
-1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com)and enter your login credentials.
+1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-2) Once logged in, locate and select your **resource group** where the Jumpbox has been deployed.
+2) Once logged in, locate and select your **rg-hub** where the Jumpbox has been deployed.
 
 3) Within your resource group, find and click on the **Jumpbox VM**.
 
@@ -269,36 +269,71 @@ This section will demonstrate how to connect to the AKS cluster from the jumpbox
 
 5) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
 
-6) Clean up the stored credentials on the jumpbox host.
+First remove the existing stored configuration that you have previously downloaded with Azure CLI and kubectl.
+
+6) From the Jumpbox VM execute the following commands:
 
 ````bash
-sudo rm -R .azure/
-sudo rm -R .kube/
+rm -R .azure/
+rm -R .kube/
 ````
 
-7) **login to Azure** with the Frontend username and password.
-
 > [!Note]
-> The username is stored in this variable **AAD_OPS_FE_UPN** and password is stored in **AAD_OPS_FE_PW**. Simple run an echo on the environment variables to retrieve the username and password.
+> The .azure and .kube directories store configuration files for Azure and Kubernetes, respectively, for your user account. Removing these files triggers a login prompt, allowing you to re-authenticate with different credentials.
+
+
+7) Retrieve the username and password for Frontend user.
+
+> [!IMPORTANT]
+> Retrieve the username and password from your local shell, and not the shell from Jumpbox VM.
 
 ````bash
-sudo az login
+echo $AAD_OPS_FE_UPN
+echo $AAD_OPS_FE_PW
 ````
-> [!Note]
-> If prompted to pick an account then choose **Use another account** and supply the username in the **AAD_OPS_FE_UPN** variable.
 
-8) Download Cluster credential.
+8) From the Jumbox VM Initiate the authentication process.
+
 
 ````bash
-az aks get-credentials --resource-group <RESOURCE GROUP NAME> --name <AKS CLUSTER NAME>
+az login
+````
+Example output:
+
+````bash
+azureuser@Jumpbox-VM:~$ az login
+To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code FPT7AXRKE to authenticate.
+````
+9) Open a new tab in your web browser and access https://microsoft.com/devicelogin. Enter the generated **code**, and press ***Next**
+
+![Screenshot](images/devicecodelogin.jpg)
+
+
+10) You will be prompted with an authentication window asking which user you want to login with select **Use another account** and supply the username in the **AAD_OPS_FE_UPN** variable and Password from variable **AAD_OPS_FE_PW** And then press **Next**.
+
+> [!Note]
+> When you authenticate with a user for the first time, you will be prompted to set up Multi-Factor Authentication (MFA). Choose authentication option from the drop-down menu, and select phone, supply your phone number, and receive a one-time passcode to authenticate to Azure with your user account.
+
+![Screenshot](images/ADlogin.jpg)
+
+  
+
+11) From the Jumpbox VM download AKS cluster credential.
+
+````bash
+SPOKE_RG=rg-spoke
+STUDENT_NAME=<YOUR STUDENT NAME>
+AKS_CLUSTER_NAME=private-aks
+az aks get-credentials --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
 You should see a similar output as illustrated below:
+
 ````bash
-azureuser@Jumpbox-VM:~$ az aks get-credentials --resource-group AKS_Security_RG --name private-aks
+azureuser@Jumpbox-VM:~$ az aks get-credentials --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 Merged "private-aks" as current context in /home/azureuser/.kube/config
 azureuser@Jumpbox-VM:~$ 
 ````
-9) You should be able to list all pods in namespace frontend.
+12) You should be able to list all pods in namespace frontend.
 
 > [!Note]
 > You will now be prompted to authenticate your user again, as this time it will validate your permissions within the AKS cluster.
@@ -313,7 +348,7 @@ XXXXXXX to authenticate.
 NAME    READY   STATUS             RESTARTS   AGE
 nginx   1/1     Running               0       89m
 ````
-10) Try to list pods in default namespace
+13) Try to list pods in default namespace
 
 ````bash
 sudo kubectl get po
@@ -325,4 +360,14 @@ Error from server (Forbidden): pods is forbidden: User "opsfe-test@MngEnvMCAP148
  cannot list resource "pods" in API group "" in the namespace "default": User does not have access t
 o the resource in Azure. Update role assignment to allow access.
 ````
-Repeat step **7** and **10** for the remaining users, and see how their permissions differs.
+Repeat step **6** and **13** for the remaining users, and see how their permissions differs.
+````bash
+# Username and password for Admin user
+echo AAD_ADMIN_UPN
+echo AAD_ADMIN_PW
+
+# Username and password for Backend user
+echo AAD_OPS_BE_UPN
+echo AAD_OPS_BE_PW
+
+````
