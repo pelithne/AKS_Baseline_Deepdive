@@ -380,14 +380,14 @@ AAD_STUDENT_UPN=$(az account show --query 'user.name' --output tsv)
 STUDENT_USER_OBJECT_ID=$(az ad user show --id $AAD_STUDENT_UPN --query 'id' --output tsv)
 az ad group member add --group $ADMIN_GROUP --member-id $STUDENT_USER_OBJECT_ID
 ````
-From the Jumpbox, execute the following command.
+From the **Jumpbox**, execute the following command.
 
 ````bash
 # Remove the configuration
 rm -R .azure/
 rm -R .kube/
 ````
-From the Jumpbox, execute the following command and login with your Student account.
+From the **Jumpbox**, execute the following command and login with your Student account.
 
 ````bash
 # Authenticate to Azure
