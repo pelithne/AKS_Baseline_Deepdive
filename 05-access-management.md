@@ -217,7 +217,7 @@ az ad group member add --group $OPS_BE_GROUP --member-id $BE_USER_OBJECT_ID
 ````
 Current architecture can now be described as follows:
 
-![Screenshot](images/AAD-integration-users.jpg)
+![Screenshot](images/withuserad.jpg)
 
 Validate your deployment in the Azure portal.
 
@@ -312,13 +312,13 @@ To sign in, use a web browser to open the page https://microsoft.com/devicelogin
 10) You will be prompted with an authentication window asking which user you want to login with select **Use another account** and supply the username in the **AAD_OPS_FE_UPN** variable and Password from variable **AAD_OPS_FE_PW** And then press **Next**.
 
 > [!Note]
-> When you authenticate with a user for the first time, you will be prompted to set up Multi-Factor Authentication (MFA). Choose authentication option from the drop-down menu, and select phone, supply your phone number, and receive a one-time passcode to authenticate to Azure with your user account.
+> When you authenticate with a user for the first time, you will be prompted by Microsoft Authenticator to set up Multi-Factor Authentication (MFA). Choose **"I want to setup a different method"** option from the drop-down menu, and select **Phone**, supply your phone number, and receive a one-time passcode to authenticate to Azure with your user account.
 
 ![Screenshot](images/ADlogin.jpg)
 
   
 
-11) From the Jumpbox VM download AKS cluster credential.
+1)  From the Jumpbox VM download AKS cluster credential.
 
 ````bash
 SPOKE_RG=rg-spoke
@@ -335,11 +335,11 @@ azureuser@Jumpbox-VM:~$
 ````
 12) You should be able to list all pods in namespace frontend.
 
-> [!Note]
-> You will now be prompted to authenticate your user again, as this time it will validate your permissions within the AKS cluster.
+> [!IMPORTANT]
+> You will now be prompted to authenticate your user again, as this time it will validate your permissions within the AKS cluster. Ensure you login with the user you created and **not your company email address**.
 
 ````bash
-sudo kubectl get po -n frontend
+kubectl get po -n frontend
 ````
 ````bash
 azureuser@Jumpbox-VM:~$ kubectl get po -n frontend
@@ -362,12 +362,25 @@ o the resource in Azure. Update role assignment to allow access.
 ````
 Repeat step **6** and **13** for the remaining users, and see how their permissions differs.
 ````bash
-# Username and password for Admin user
-echo AAD_ADMIN_UPN
-echo AAD_ADMIN_PW
+# Username and password for Admin user execute the command from your local shell and not from Jumpbox VM
+echo $AAD_ADMIN_UPN
+echo $AAD_ADMIN_PW
 
-# Username and password for Backend user
-echo AAD_OPS_BE_UPN
-echo AAD_OPS_BE_PW
+# Username and password for Backend user execute the command from your local shell and not from Jumpbox VM
+echo $AAD_OPS_BE_UPN
+echo $AAD_OPS_BE_PW
 
+````
+14) Ensure you clean up your local Azure and kubernetes configuration.
+
+
+````bash
+# Remove the configuration
+rm -R .azure/
+rm -R .kube/
+````
+
+````bash
+# Authenticate to Azure
+az login
 ````
