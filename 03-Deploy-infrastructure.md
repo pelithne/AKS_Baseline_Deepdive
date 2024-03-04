@@ -1375,7 +1375,7 @@ We have successfully completed the deployment and configuration of our network a
 
 
 ### 3.1.9 Validate Ingress Connection.
-Open your web browser and access your domain: **STUDENT NAME.akssecurity.se**
+Open your web browser and access your domain: **https://YOUR-STUDENT-NAME.akssecurity.se**
 you should see a similar output as to the one below.
 
 ![Screenshot](/images/splashscreen.jpg)
