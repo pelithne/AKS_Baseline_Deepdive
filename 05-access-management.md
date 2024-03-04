@@ -39,8 +39,11 @@ Throughout this article, this is the target architecture we will aim to create:
 all procedures will be conducted by using Azure CLI.
 
 
-
 ![Screenshot](images/aad-targetarchitecture.jpg)
+
+The current architecture can be described as follows:
+
+![Screenshot](images/AAD-integration-scrap-no-integration-plain-aks.jpg)
 
 ## 5.3 Deployment
 
@@ -86,14 +89,23 @@ az ad group create --display-name $OPS_FE_GROUP --mail-nickname $OPS_FE_GROUP
 az ad group create --display-name $OPS_BE_GROUP --mail-nickname $OPS_BE_GROUP
 ````
 
+Current architecture can now be described as follows:
+
+![Screenshot](images/AAD-integration-create-user-groups.jpg)
+
 
 ### 5.3.3 Integrate AKS with Microsoft Entra ID
 
-1) Lets update our existing AKS cluster to support Microsoft Entra ID integration, and configure a cluster admin group, and disable local admin accounts in AKS, as this will prevent anyone from using the **--admin** switch to get the cluster credentials.
+1) Lets update our existing AKS cluster to support Microsoft Entra ID integration, and configure a cluster admin group, and disable local admin accounts in AKS, as this will prevent anyone from using the **--admin** switch to get full cluster credentials.
 
 ````bash
-az aks update -g $RG -n $AKS_CLUSTER_NAME --enable-azure-rbac --enable-aad --disable-local-accounts
+az aks update -g $SPOKE_RG -n $AKS_CLUSTER_NAME-${STUDENT_NAME}  --enable-azure-rbac --enable-aad --disable-local-accounts
 ````
+
+Current architecture can now be described as follows:
+
+![Screenshot](images/AAD-integration-disabled-local-account-aad-enabled-azurerbacenabled.jpg)
+
 ### 5.3.4 Scope and Role Assignment for Security Groups
 This chapter will explain how to create the scope for the operation teams to perform their daily tasks. The scope is based on the AKS resource ID and a fixed path in AKS, which is **/namespaces/<NAMESPACE>**. The scope will assign the **Application Operations Frontend Team** to the **frontend namespace** and the **Application Operation Backend Team** to the **backend namespace**.
 
@@ -102,47 +114,51 @@ This chapter will explain how to create the scope for the operation teams to per
  ````bash
  AKS_BACKEND_NAMESPACE='/namespaces/backend'
  AKS_FRONTEND_NAMESPACE='/namespaces/frontend'
- AKS_RESOURCE_ID=$(az aks show -g $RG -n $AKS_CLUSTER_NAME --query 'id' --output tsv)
+ AKS_RESOURCE_ID=$(az aks show -g $SPOKE_RG -n $AKS_CLUSTER_NAME-${STUDENT_NAME} --query 'id' --output tsv)
  ````
 2) lets fetch the Object ID of the operations teams and admin security groups.
 
   Application Operation Frontend Team.
  ````bash
- fe_group_object_id=$(az ad group show --group $OPS_FE_GROUP --query 'id' --output tsv)
+ FE_GROUP_OBJECT_ID=$(az ad group show --group $OPS_FE_GROUP --query 'id' --output tsv)
  ````
  Application Operation Backend Team.
   ````bash
- be_group_object_id=$(az ad group show --group $OPS_BE_GROUP --query 'id' --output tsv)
+ BE_GROUP_OBJECT_ID=$(az ad group show --group $OPS_BE_GROUP --query 'id' --output tsv)
  ````
  Admin.
  ````bash
- admin_group_object_id=$(az ad group show --group $ADMIN_GROUP --query 'id' --output tsv)
+ ADMIN_GROUP_OBJECT_ID=$(az ad group show --group $ADMIN_GROUP --query 'id' --output tsv)
  
 ````
 
  3) This commands will grant the **Application Operations Frontend Team** group users the permissions to download the credential for AKS, and only operate within given namespace.
 
 ````bash
-az role assignment create --assignee $fe_group_object_id --role "Azure Kubernetes Service RBAC Writer" --scope ${AKS_RESOURCE_ID}${AKS_FRONTEND_NAMESPACE}
+az role assignment create --assignee $FE_GROUP_OBJECT_ID --role "Azure Kubernetes Service RBAC Writer" --scope ${AKS_RESOURCE_ID}${AKS_FRONTEND_NAMESPACE}
  ````
 
  ````bash
- az role assignment create --assignee $fe_group_object_id --role "Azure Kubernetes Service Cluster User Role" --scope ${AKS_RESOURCE_ID}
+ az role assignment create --assignee $FE_GROUP_OBJECT_ID --role "Azure Kubernetes Service Cluster User Role" --scope ${AKS_RESOURCE_ID}
  ````
  4) This commands will grant the **Application Operations Backend Team** group users the permissions to download the credential for AKS, and only operate within given namespace.
 
 ````bash
-az role assignment create --assignee $be_group_object_id --role "Azure Kubernetes Service Cluster User Role" --scope ${AKS_RESOURCE_ID}${AKS_BACKEND_NAMESPACE}
+az role assignment create --assignee $BE_GROUP_OBJECT_ID --role "Azure Kubernetes Service RBAC Writer" --scope ${AKS_RESOURCE_ID}${AKS_BACKEND_NAMESPACE}
  ````
   ````bash
- az role assignment create --assignee $be_group_object_id --role "Azure Kubernetes Service Cluster User Role" --scope ${AKS_RESOURCE_ID}
+ az role assignment create --assignee $BE_GROUP_OBJECT_ID --role "Azure Kubernetes Service Cluster User Role" --scope ${AKS_RESOURCE_ID}
  ````
 
  4) This command will grant the **Admin** group users the permissions to connect to and manage all aspects of the AKS cluster.
 
 ````bash
-az role assignment create --assignee $admin_group_object_id --role "Azure Kubernetes Service RBAC Cluster Admin" --scope ${AKS_RESOURCE_ID}
+az role assignment create --assignee $ADMIN_GROUP_OBJECT_ID --role "Azure Kubernetes Service RBAC Cluster Admin" --scope ${AKS_RESOURCE_ID}
  ````
+
+Current architecture can now be described as follows:
+
+![Screenshot](images/AAD-integration-role-assignment.jpg)
 
 ### 5.3.5 Create Users and Assign them to Security Groups.
 This exercise will guide you through the steps of creating three users and adding them to their corresponding security groups.
@@ -157,12 +173,12 @@ az ad user create --display-name $AAD_ADMIN_DISPLAY_NAME  --user-principal-name 
 First identify the object id of the user as we will need this number to assign the user to the admin group.
 
 ````bash
-admin_user_object_id=$(az ad user show --id $AAD_ADMIN_UPN --query 'id' --output tsv)
+ADMIN_USER_OBJECT_ID=$(az ad user show --id $AAD_ADMIN_UPN --query 'id' --output tsv)
 ````
 Assign the user to the admin security group.
 
 ````bash
-az ad group member add --group $ADMIN_GROUP --member-id $admin_user_object_id
+az ad group member add --group $ADMIN_GROUP --member-id $ADMIN_USER_OBJECT_ID
 ````
 3) Create the frontend operations user.
 
@@ -174,12 +190,12 @@ az ad user create --display-name $AAD_OPS_FE_DISPLAY_NAME  --user-principal-name
 First identify the object id of the user as we will need this number to assign the user to the frontend security group.
 
 ````bash
-fe_user_object_id=$(az ad user show --id $AAD_OPS_FE_UPN --query 'id' --output tsv)
+FE_USER_OBJECT_ID=$(az ad user show --id $AAD_OPS_FE_UPN --query 'id' --output tsv)
 ````
 Assign the user to the frontend security group.
 
 ````bash
-az ad group member add --group $OPS_FE_GROUP --member-id $fe_user_object_id
+az ad group member add --group $OPS_FE_GROUP --member-id $FE_USER_OBJECT_ID
 ````
 5) Create the backend operations user.
 
@@ -191,13 +207,54 @@ az ad user create --display-name $AAD_OPS_BE_DISPLAY_NAME  --user-principal-name
 First identify the object id of the user as we will need this number to assign the user to the backend security group.
 
 ````bash
-be_user_object_id=$(az ad user show --id $AAD_OPS_BE_UPN --query 'id' --output tsv)
+BE_USER_OBJECT_ID=$(az ad user show --id $AAD_OPS_BE_UPN --query 'id' --output tsv)
 ````
 Assign the user to the backend security group.
 
 ````bash
-az ad group member add --group $OPS_BE_GROUP --member-id $be_user_object_id
+az ad group member add --group $OPS_BE_GROUP --member-id $BE_USER_OBJECT_ID
+
 ````
+Current architecture can now be described as follows:
+
+![Screenshot](images/AAD-integration-users.jpg)
+
+Validate your deployment in the Azure portal.
+
+7) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+
+8) Once logged in, on your top left hand side, click on the **portal menu** (three strips).
+
+9) From the menu list click on **Microsoft Entra ID**.
+
+10) On your left hand side menu under **Manage** click on **Users**.
+    
+11) Validate that your users are created, there shall be **three users**, each user name shall end with your student name.
+
+![Screenshot](images/users.jpg)
+
+> [!Note]
+> In the workshop tenant their may be more users configured, ensure you identify your three users which ends with your student name.
+
+12) On the top menu bar click on **Contoso | Users** link.
+
+
+13) On your left hand side menu under **Manage** click on **Groups**. Ensure you have three groups as depicted in the picture, the group names should end with your student name.
+
+![Screenshot](images/groups.jpg)
+
+14) Click on security group called **Ops_Backend_team-<YOUR STUDENT NAME>**.
+    
+15) On your left hand side menu click on **Members**, verify that your user Backend-<YOUR STUDENT NAME> is assigned. 
+
+![Screenshot](images/assigneduser.jpg)
+
+16) On your left hand side menu click on **Azure role Assignments**, from the drop down menu select your subscription. Ensure the following roles are assigned to the group: **Azure Kubernetes service Cluster User Role** assigned on the Cluster level and **Azure Kubernetes Service RBAC Writer** assigned on the namespace level called **backend**.
+
+![Screenshot](images/roleassignment.jpg)
+
+17) On the top menu bar click on **Contoso | Groups** link. Repeat step 13 - 16 for **Ops_Frontend_team-<YOUR STUDENT NAME>** and **ClusterAdminGroup-<YOUR STUDENT NAME>**
+
 ### 5.3.5 Validate the Access for the Different Users.
 
 This section will demonstrate how to connect to the AKS cluster from the jumpbox using the user account defined in Microsoft Entra ID. We will check two things: first, that we can successfully connect to the cluster; and second, that the Operations teams have access only to their own namespaces, while the Admin has full access to the cluster.
