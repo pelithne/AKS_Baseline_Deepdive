@@ -373,14 +373,27 @@ echo $AAD_OPS_BE_PW
 ````
 14) Ensure you clean up your local Azure and kubernetes configuration.
 
+Assign your Student user account to AKS admin cluster group in Microsoft Entra ID. Execute the following command from you local shell, and **not the shell in the Jumbox VM**. 
+
+````bash
+AAD_STUDENT_UPN=$(az account show --query 'user.name' --output tsv)
+STUDENT_USER_OBJECT_ID=$(az ad user show --id $AAD_STUDENT_UPN --query 'id' --output tsv)
+az ad group member add --group $ADMIN_GROUP --member-id $STUDENT_USER_OBJECT_ID
+````
+From the Jumpbox, execute the following command.
 
 ````bash
 # Remove the configuration
 rm -R .azure/
 rm -R .kube/
 ````
+From the Jumpbox, execute the following command and login with your Student account.
 
 ````bash
 # Authenticate to Azure
 az login
+````
+````bash
+# Re-authenticate to AKS with your Student account.
+az aks get-credentials --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
