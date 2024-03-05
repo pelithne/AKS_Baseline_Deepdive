@@ -245,7 +245,7 @@ Validate your deployment in the Azure portal.
 
 14) Click on security group called **Ops_Backend_team-YOUR STUDENT NAME**.
     
-15) On your left hand side menu click on **Members**, verify that your user Backend-<YOUR STUDENT NAME> is assigned. 
+15) On your left hand side menu click on **Members**, verify that your user Backend-YOUR STUDENT NAME is assigned. 
 
 ![Screenshot](images/assigneduser.jpg)
 
@@ -253,7 +253,7 @@ Validate your deployment in the Azure portal.
 
 ![Screenshot](images/roleassignment.jpg)
 
-17) On the top menu bar click on **Contoso | Groups** link. Repeat step 13 - 16 for **Ops_Frontend_team-<YOUR STUDENT NAME>** and **ClusterAdminGroup-<YOUR STUDENT NAME>**
+17) On the top menu bar click on **Contoso | Groups** link. Repeat step 13 - 16 for **Ops_Frontend_team-YOUR STUDENT NAME** and **ClusterAdminGroup-YOUR STUDENT NAME**
 
 ### 5.3.5 Validate the Access for the Different Users.
 
