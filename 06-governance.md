@@ -58,7 +58,7 @@ In this section, we will apply an Azure built-in policy definition named **“Ku
 SUBSCRIPTION=$(az account show --query id -o tsv)
 ````
 > [!IMPORTANT]
-> Before proceeding with Step 1, make sure you are logged in to the correct subscription. You can verify this by running the following command: **az account show**:
+> Before proceeding with Step 1, make sure you are logged in to the correct subscription. You can verify this by running the following command: ````az account show````:
 
 2) Let’s retrieve the **policy definition ID** for the **“Kubernetes cluster should not allow privileged containers”** policy. We’ll use this ID later when applying the policy at the subscription level.
 
