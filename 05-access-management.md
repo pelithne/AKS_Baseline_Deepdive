@@ -271,7 +271,7 @@ This section will demonstrate how to connect to the AKS cluster from the jumpbox
 
 First remove the existing stored configuration that you have previously downloaded with Azure CLI and kubectl.
 
-6) From the Jumpbox VM execute the following commands:
+6) From the **Jumpbox VM** execute the following commands:
 
 ````bash
 rm -R .azure/
@@ -292,7 +292,7 @@ echo $AAD_OPS_FE_UPN
 echo $AAD_OPS_FE_PW
 ````
 
-8) From the Jumbox VM Initiate the authentication process.
+8) From the **Jumpbox VM ** initiate the authentication process.
 
 
 ````bash
@@ -309,7 +309,7 @@ To sign in, use a web browser to open the page https://microsoft.com/devicelogin
 ![Screenshot](images/devicecodelogin.jpg)
 
 
-10) You will be prompted with an authentication window asking which user you want to login with select **Use another account** and supply the username in the **AAD_OPS_FE_UPN** variable and Password from variable **AAD_OPS_FE_PW** And then press **Next**.
+10) You will be prompted with an authentication window asking which user you want to login with select **Use another account** and supply the username in the **AAD_OPS_FE_UPN** variable and password from variable **AAD_OPS_FE_PW** And then press **Next**.
 
 > [!Note]
 > When you authenticate with a user for the first time, you will be prompted by Microsoft Authenticator to set up Multi-Factor Authentication (MFA). Choose **"I want to setup a different method"** option from the drop-down menu, and select **Phone**, supply your phone number, and receive a one-time passcode to authenticate to Azure with your user account.
@@ -318,7 +318,7 @@ To sign in, use a web browser to open the page https://microsoft.com/devicelogin
 
   
 
-1)  From the Jumpbox VM download AKS cluster credential.
+11) From the **Jumpbox VM** download AKS cluster credential.
 
 ````bash
 SPOKE_RG=rg-spoke
@@ -336,7 +336,7 @@ azureuser@Jumpbox-VM:~$
 12) You should be able to list all pods in namespace frontend.
 
 > [!IMPORTANT]
-> You will now be prompted to authenticate your user again, as this time it will validate your permissions within the AKS cluster. Ensure you login with the user you created and **not your company email address**.
+> You will now be prompted to authenticate your user again, as this time it will validate your newly created user permissions within the AKS cluster. Ensure you login with the user you created i.e $AAD_OPS_FE_UPN, $AAD_OPS_BE_UPN or $AAD_ADMIN_UPN and **not your company email address**.
 
 ````bash
 kubectl get po -n frontend
@@ -380,14 +380,14 @@ AAD_STUDENT_UPN=$(az account show --query 'user.name' --output tsv)
 STUDENT_USER_OBJECT_ID=$(az ad user show --id $AAD_STUDENT_UPN --query 'id' --output tsv)
 az ad group member add --group $ADMIN_GROUP --member-id $STUDENT_USER_OBJECT_ID
 ````
-From the **Jumpbox**, execute the following command.
+From the **Jumpbox VM**, execute the following command.
 
 ````bash
 # Remove the configuration
 rm -R .azure/
 rm -R .kube/
 ````
-From the **Jumpbox**, execute the following command and login with your Student account.
+From the **Jumpbox VM**, execute the following command and login with your Student account.
 
 ````bash
 # Authenticate to Azure
