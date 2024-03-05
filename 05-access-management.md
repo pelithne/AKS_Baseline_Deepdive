@@ -243,7 +243,7 @@ Validate your deployment in the Azure portal.
 
 ![Screenshot](images/groups.jpg)
 
-14) Click on security group called **Ops_Backend_team-<YOUR STUDENT NAME>**.
+14) Click on security group called **Ops_Backend_team-YOUR STUDENT NAME**.
     
 15) On your left hand side menu click on **Members**, verify that your user Backend-<YOUR STUDENT NAME> is assigned. 
 
