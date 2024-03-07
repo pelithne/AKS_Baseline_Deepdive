@@ -63,6 +63,18 @@ variable "hub_bastion_subnet_address_prefix" {
   type        = list(string)
 }
 
+variable "vm_subnet_name" {
+  description = "Specifies the name of the jumpbox subnet"
+  default     = "VmSubnet"
+  type        = string
+}
+
+variable "vm_subnet_address_prefix" {
+  description = "Specifies the address prefix of the jumpbox subnet"
+  default     = ["10.1.2.0/28"]
+  type        = list(string)
+}
+
 variable "aks_vnet_name" {
   description = "Specifies the name of the AKS subnet"
   default     = "AksVNet"
@@ -75,22 +87,46 @@ variable "aks_vnet_address_space" {
   type        = list(string)
 }
 
-variable "vm_subnet_name" {
-  description = "Specifies the name of the jumpbox subnet"
-  default     = "VmSubnet"
-  type        = string
-}
-
-variable "vm_subnet_address_prefix" {
-  description = "Specifies the address prefix of the jumbox subnet"
-  default     = ["10.0.48.0/20"]
-  type        = list(string)
-}
-
 variable "aks_cluster_name" {
   description = "(Required) Specifies the name of the AKS cluster."
   default     = "Akspelithne"
   type        = string
+}
+
+variable "appgw_subnet_name" {
+  description = "Specifies the name of the application gateway subnet"
+  default     = "applicationgateway"
+  type        = string
+}
+
+variable "appgw_subnet_address_prefix" {
+  description = "Specifies the address prefix of the application gateway subnet"
+  default     = ["10.0.1.0/24"]
+  type        = list(string)
+}
+
+variable "pe_subnet_name" {
+  description = "Specifies the name of the private endpoint subnet"
+  default     = "endpoints"
+  type        = string
+}
+
+variable "pe_subnet_address_prefix" {
+  description = "Specifies the address prefix of the private endpoint subnet"
+  default     = ["10.0.2.16/28"]
+  type        = list(string)
+}
+
+variable "lb_subnet_name" {
+  description = "Specifies the name of the lb subnet"
+  default     = "endpoints"
+  type        = string
+}
+
+variable "lb_subnet_address_prefix" {
+  description = "Specifies the address prefix of the lb subnet"
+  default     = ["10.0.2.0/28"]
+  type        = list(string)
 }
 
 variable "role_based_access_control_enabled" {
@@ -536,7 +572,7 @@ variable "storage_account_replication_type" {
 variable "key_vault_name" {
   description = "Specifies the name of the key vault."
   type        = string
-  default     = "kvpelithne"
+  default     = "kvalipelithne"
 }
 
 variable "key_vault_sku_name" {

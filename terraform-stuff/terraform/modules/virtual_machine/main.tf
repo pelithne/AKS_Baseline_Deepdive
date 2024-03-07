@@ -150,7 +150,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
   }
 }
 */
-
+/*
 resource "azurerm_virtual_machine_extension" "monitor_agent" {
   name                       = "${var.name}MonitoringAgent"
   virtual_machine_id         = azurerm_linux_virtual_machine.virtual_machine.id
@@ -220,3 +220,4 @@ resource "azurerm_monitor_diagnostic_setting" "nsg_settings" {
     category = "NetworkSecurityGroupRuleCounter"
   }
 }
+*/

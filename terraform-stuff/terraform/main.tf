@@ -66,6 +66,12 @@ module "hub_network" {
       address_prefixes : var.hub_bastion_subnet_address_prefix
       private_endpoint_network_policies_enabled : true
       private_link_service_network_policies_enabled : false
+    },
+    {
+      name : var.vm_subnet_name
+      address_prefixes : var.vm_subnet_address_prefix
+      private_endpoint_network_policies_enabled : true
+      private_link_service_network_policies_enabled : false
     }
   ]
 }
@@ -100,15 +106,29 @@ module "aks_network" {
       private_link_service_network_policies_enabled : false
     },
     {
-      name : var.vm_subnet_name
-      address_prefixes : var.vm_subnet_address_prefix
+      name : var.appgw_subnet_name
+      address_prefixes : var.appgw_subnet_address_prefix
+      private_endpoint_network_policies_enabled : true
+      private_link_service_network_policies_enabled : false
+    },
+
+    {
+      name : var.pe_subnet_name
+      address_prefixes : var.pe_subnet_address_prefix
+      private_endpoint_network_policies_enabled : true
+      private_link_service_network_policies_enabled : false
+    },
+    {
+      name : var.lb_subnet_name
+      address_prefixes : var.lb_subnet_address_prefix
       private_endpoint_network_policies_enabled : true
       private_link_service_network_policies_enabled : false
     }
+    
   ]
 }
 
-/*
+
 module "vnet_peering" {
   source              = "./modules/virtual_network_peering"
   vnet_1_name         = var.hub_vnet_name
@@ -119,8 +139,9 @@ module "vnet_peering" {
   vnet_2_rg           = azurerm_resource_group.spoke_rg.name
   peering_name_1_to_2 = "${var.hub_vnet_name}To${var.aks_vnet_name}"
   peering_name_2_to_1 = "${var.aks_vnet_name}To${var.hub_vnet_name}"
+  depends_on          = [module.hub_network, module.aks_network]
 }
-*/
+
 module "firewall" {
   source                       = "./modules/firewall"
   name                         = var.firewall_name
@@ -269,7 +290,7 @@ module "virtual_machine" {
   os_disk_image                       = var.vm_os_disk_image
   domain_name_label                   = var.domain_name_label
   resource_group_name                 = azurerm_resource_group.hub_rg.name
-  subnet_id                           = module.aks_network.subnet_ids[var.vm_subnet_name]
+  subnet_id                           = module.hub_network.subnet_ids[var.vm_subnet_name]
   os_disk_storage_account_type        = var.vm_os_disk_storage_account_type
   boot_diagnostics_storage_account    = module.storage_account.primary_blob_endpoint
   log_analytics_workspace_id          = module.log_analytics_workspace.workspace_id
@@ -332,7 +353,7 @@ module "acr_private_dns_zone" {
   virtual_networks_to_link     = {
     (module.hub_network.name) = {
       subscription_id = data.azurerm_client_config.current.subscription_id
-      resource_group_name = azurerm_resource_group.spoke_rg.name
+      resource_group_name = azurerm_resource_group.hub_rg.name
     }
     (module.aks_network.name) = {
       subscription_id = data.azurerm_client_config.current.subscription_id
@@ -348,7 +369,7 @@ module "key_vault_private_dns_zone" {
   virtual_networks_to_link     = {
     (module.hub_network.name) = {
       subscription_id = data.azurerm_client_config.current.subscription_id
-      resource_group_name = azurerm_resource_group.spoke_rg.name
+      resource_group_name = azurerm_resource_group.hub_rg.name
     }
     (module.aks_network.name) = {
       subscription_id = data.azurerm_client_config.current.subscription_id
@@ -364,7 +385,7 @@ module "blob_private_dns_zone" {
   virtual_networks_to_link     = {
     (module.hub_network.name) = {
       subscription_id = data.azurerm_client_config.current.subscription_id
-      resource_group_name = azurerm_resource_group.spoke_rg.name
+      resource_group_name = azurerm_resource_group.hub_rg.name
     }
     (module.aks_network.name) = {
       subscription_id = data.azurerm_client_config.current.subscription_id
@@ -378,7 +399,7 @@ module "acr_private_endpoint" {
   name                           = "${module.container_registry.name}PrivateEndpoint"
   location                       = var.location
   resource_group_name            = azurerm_resource_group.spoke_rg.name
-  subnet_id                      = module.aks_network.subnet_ids[var.vm_subnet_name]
+  subnet_id                      = module.hub_network.subnet_ids[var.vm_subnet_name]
   tags                           = var.tags
   private_connection_resource_id = module.container_registry.id
   is_manual_connection           = false
@@ -392,7 +413,7 @@ module "key_vault_private_endpoint" {
   name                           = "${title(module.key_vault.name)}PrivateEndpoint"
   location                       = var.location
   resource_group_name            = azurerm_resource_group.spoke_rg.name
-  subnet_id                      = module.aks_network.subnet_ids[var.vm_subnet_name]
+  subnet_id                      = module.hub_network.subnet_ids[var.vm_subnet_name]
   tags                           = var.tags
   private_connection_resource_id = module.key_vault.id
   is_manual_connection           = false
@@ -405,8 +426,8 @@ module "blob_private_endpoint" {
   source                         = "./modules/private_endpoint"
   name                           = "${title(module.storage_account.name)}PrivateEndpoint"
   location                       = var.location
-  resource_group_name            = azurerm_resource_group.spoke_rg.name
-  subnet_id                      = module.aks_network.subnet_ids[var.vm_subnet_name]
+  resource_group_name            = azurerm_resource_group.hub_rg.name
+  subnet_id                      = module.hub_network.subnet_ids[var.vm_subnet_name]
   tags                           = var.tags
   private_connection_resource_id = module.storage_account.id
   is_manual_connection           = false
