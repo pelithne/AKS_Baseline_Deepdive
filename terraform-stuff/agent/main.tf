@@ -60,7 +60,7 @@ module "virtual_machine" {
   location                            = var.location
   public_ip                           = var.vm_public_ip
   vm_user                             = var.admin_username
-  admin_ssh_public_key                = var.ssh_public_key
+ # admin_ssh_public_key                = var.ssh_public_key
   os_disk_image                       = var.vm_os_disk_image
   resource_group_name                 = var.resource_group_name
   subnet_id                           = data.azurerm_subnet.subnet.id

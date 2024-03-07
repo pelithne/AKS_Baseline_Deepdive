@@ -13,10 +13,7 @@ output "name" {
   description = "Specifies the name of the log analytics workspace"
 }
 
-output "resource_group_name" {
-  value = azurerm_log_analytics_workspace.log_analytics_workspace.resource_group_name
-  description = "Specifies the name of the resource group that contains the log analytics workspace"
-}
+
 
 output "workspace_id" {
   value = azurerm_log_analytics_workspace.log_analytics_workspace.workspace_id

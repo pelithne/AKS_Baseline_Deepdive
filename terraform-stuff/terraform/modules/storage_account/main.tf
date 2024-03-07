@@ -8,6 +8,15 @@ terraform {
   required_version = ">= 0.14.9"
 }
 
+# Generate a random storage name
+resource "random_string" "script" {
+  length = 8
+  upper = false
+  numeric = true
+  lower = true
+  special = false
+}
+
 resource "azurerm_storage_account" "storage_account" {
   name                = var.name
   resource_group_name = var.resource_group_name

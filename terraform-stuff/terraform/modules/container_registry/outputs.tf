@@ -8,11 +8,6 @@ output "id" {
   value       = azurerm_container_registry.acr.id
 }
 
-output "resource_group_name" {
-  description = "Specifies the name of the resource group."
-  value       = var.resource_group_name
-}
-
 output "login_server" {
   description = "Specifies the login server of the container registry."
   value = azurerm_container_registry.acr.login_server

@@ -8,6 +8,7 @@ terraform {
   required_version = ">= 0.14.9"
 }
 
+
 resource "azurerm_virtual_network" "vnet" {
   name                = var.vnet_name
   address_space       = var.address_space

@@ -92,7 +92,7 @@ variable "admin_ssh_public_key" {
   description = "Specifies the public SSH key"
   type        = string
 }
-
+/*
 variable "script_storage_account_name" {
   description = "(Required) Specifies the name of the storage account that contains the custom script."
   type        = string
@@ -112,3 +112,4 @@ variable "script_name" {
   description = "(Required) Specifies the name of the custom script."
   type        = string
 }
+*/

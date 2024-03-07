@@ -27,9 +27,15 @@ variable "location" {
   type        = string
 }
 
-variable "resource_group_name" {
-  description = "Specifies the resource group name"
-  default     = "AKS-Terraform-RG"
+variable "hub_resource_group_name" {
+  description = "Specifies the hub resource group name"
+  default     = "hub-rg"
+  type        = string
+}
+
+variable "spoke_resource_group_name" {
+  description = "Specifies the spoke resource group name"
+  default     = "spoke-rg"
   type        = string
 }
 
@@ -232,7 +238,7 @@ variable "system_node_pool_node_taints" {
 variable "default_node_pool_os_disk_type" {
   description = "(Optional) The type of disk which should be used for the Operating System. Possible values are Ephemeral and Managed. Defaults to Managed. Changing this forces a new resource to be created."
   type          = string
-  default       = "Ephemeral"
+  default       = "Managed"
 } 
 
 variable "default_node_pool_max_count" {
@@ -328,7 +334,7 @@ variable "additional_node_pool_node_taints" {
 variable "additional_node_pool_os_disk_type" {
   description = "(Optional) The type of disk which should be used for the Operating System. Possible values are Ephemeral and Managed. Defaults to Managed. Changing this forces a new resource to be created."
   type          = string
-  default       = "Ephemeral"
+  default       = "Managed"
 } 
 
 variable "additional_node_pool_os_type" {
@@ -577,7 +583,7 @@ variable"key_vault_purge_protection_enabled" {
 variable "key_vault_soft_delete_retention_days" {
   description = "(Optional) The number of days that items should be retained for once soft-deleted. This value can be between 7 and 90 (the default) days."
   type        = number
-  default     = 5
+  default     = 10
 }
 
 variable "key_vault_bypass" { 
@@ -612,7 +618,7 @@ variable "ssh_public_key" {
   description = "(Required) Specifies the SSH public key for the jumpbox virtual machine and AKS worker nodes."
   type        = string
 }
-
+/*
 variable "script_storage_account_name" {
   description = "(Required) Specifies the name of the storage account that contains the custom script."
   type        = string
@@ -634,6 +640,7 @@ variable "script_name" {
   type        = string
   default     = "configure-jumpbox-vm.sh"
 }
+*/
 
 variable "keda_enabled" {
   description = "(Optional) Specifies whether KEDA Autoscaler can be used for workloads."
@@ -682,3 +689,15 @@ variable "http_application_routing_enabled" {
   type        = bool
   default     = false
 }
+
+variable "default_node_pool_node_labels" {
+  description = "(Optional) A list of Kubernetes taints which should be applied to nodes in the agent pool (e.g key=value:NoSchedule). Changing this forces a new resource to be created."
+  type          = map(any)
+  default       = {}
+} 
+
+variable "default_node_pool_node_taints" {
+  description = "(Optional) A map of Kubernetes labels which should be applied to nodes in this Node Pool. Changing this forces a new resource to be created."
+  type          = list(string)
+  default       = []
+} 

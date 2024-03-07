@@ -119,6 +119,7 @@ resource "azurerm_linux_virtual_machine" "virtual_machine" {
   ]
 }
 
+/*
 resource "azurerm_virtual_machine_extension" "custom_script" {
   name                    = "${var.name}CustomScript"
   virtual_machine_id      = azurerm_linux_virtual_machine.virtual_machine.id
@@ -148,6 +149,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
     ]
   }
 }
+*/
 
 resource "azurerm_virtual_machine_extension" "monitor_agent" {
   name                       = "${var.name}MonitoringAgent"
@@ -174,7 +176,7 @@ resource "azurerm_virtual_machine_extension" "monitor_agent" {
       tags
     ]
   }
-  depends_on = [azurerm_virtual_machine_extension.custom_script]
+  //depends_on = [azurerm_virtual_machine_extension.custom_script]
 }
 
 resource "azurerm_virtual_machine_extension" "dependency_agent" {

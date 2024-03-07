@@ -81,7 +81,7 @@ variable "os_disk_size_gb" {
 variable "os_disk_type" {
   description = "(Optional) The type of disk which should be used for the Operating System. Possible values are Ephemeral and Managed. Defaults to Managed. Changing this forces a new resource to be created."
   type          = string
-  default       = "Ephemeral"
+  default       = "Managed"
 } 
 
 variable "os_type" {
@@ -132,10 +132,7 @@ variable "node_count" {
   default       = 3
 }
 
-variable resource_group_name {
-  description = "Specifies the resource group name"
-  type        = string
-}
+
 
 variable "oidc_issuer_enabled" {
   description = " (Optional) Enable or Disable the OIDC issuer URL."
