@@ -130,7 +130,9 @@ Validate your deployment in the Azure portal.
 
 1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-2) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should have 3 RGs which you have created,**MC_rg-spoke_private-aks-xxxx_eastus**, **rg-hub** and **rg-spoke**, select **rg-spoke**
+2) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should see the 3 Resouce groups created during previous steps: **MC_rg-spoke_private-aks-xxxx_eastus**, **rg-hub** and **rg-spoke**.
+
+Select **rg-spoke**
 
 ![Screenshot](images/resourcegroups.jpg)
 
@@ -145,7 +147,7 @@ Validate your deployment in the Azure portal.
 
 ![Screenshot](images/keyvaultdnszoneprivatelinks.jpg)
 
-8) On the top menu, click on **Home**. select **Resource Groups**, now click on the resource group called **rg-hub**.
+8) On the top menu, click on **Home**. Select **Resource Groups** then click on the resource group called **rg-hub**.
 
 9)  Select Jumpbox VM called **Jumpbox-VM**.
 
@@ -205,9 +207,9 @@ SERVICE_ACCOUNT_NAME="workload-identity-sa"
 SUBSCRIPTION="$(az account show --query id --output tsv)"
 USER_ASSIGNED_IDENTITY_NAME="keyvaultreader"
 FEDERATED_IDENTITY_CREDENTIAL_NAME="keyvaultfederated"
-KEYVAULT_NAME=<Your key vault name>
 KEYVAULT_SECRET_NAME="redissecret"
 AKS_CLUSTER_NAME=private-aks
+KEYVAULT_NAME=<WRITE YOUR KEYVAULT NAME HERE>
 STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
 ACR_NAME=<NAME OF THE AZURE CONTAINER REGISTRY>
 
