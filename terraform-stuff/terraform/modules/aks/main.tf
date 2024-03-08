@@ -133,7 +133,7 @@ resource "kubernetes_service" "aks_cluster" {
     name = "lb-internal-service"
     annotations = {
       "service.beta.kubernetes.io/azure-load-balancer-internal" = "true"
-      "service.beta.kubernetes.io/azure-load-balancer-internal-subnet" = "lb-subnet"
+      "service.beta.kubernetes.io/azure-load-balancer-internal-subnet" = "loadbalancer"
     }
   }
   spec {
