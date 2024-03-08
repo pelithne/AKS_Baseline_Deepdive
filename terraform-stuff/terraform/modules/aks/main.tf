@@ -111,6 +111,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
   }
 }
 
+/*
 resource "azurerm_monitor_diagnostic_setting" "settings" {
   name                       = "DiagnosticsSettings"
   target_resource_id         = azurerm_kubernetes_cluster.aks_cluster.id
@@ -148,3 +149,4 @@ resource "azurerm_monitor_diagnostic_setting" "settings" {
     category = "AllMetrics"
   }
 }
+*/

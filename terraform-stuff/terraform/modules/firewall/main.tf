@@ -235,6 +235,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "policy" {
   }
 }
 
+/*
 resource "azurerm_monitor_diagnostic_setting" "settings" {
   name                       = "DiagnosticsSettings"
   target_resource_id         = azurerm_firewall.firewall.id
@@ -278,3 +279,4 @@ resource "azurerm_monitor_diagnostic_setting" "pip_settings" {
     category = "AllMetrics"
   }
 }
+*/

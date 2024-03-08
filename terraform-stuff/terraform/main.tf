@@ -22,6 +22,7 @@ locals {
   route_name             = "RouteToAzureFirewall"
 }
 
+
 data "azurerm_client_config" "current" {
 }
 
@@ -434,4 +435,11 @@ module "blob_private_endpoint" {
   subresource_name               = "blob"
   private_dns_zone_group_name    = "BlobPrivateDnsZoneGroup"
   private_dns_zone_group_ids     = [module.blob_private_dns_zone.id]
+}
+
+module "application_gateway" {
+  source                       = "./modules/application_gateway"
+  resource_group_name          = azurerm_resource_group.spoke_rg.name
+  location                     = var.location
+  subnet_id                    = module.aks_network.subnet_ids[var.appgw_subnet_name]
 }

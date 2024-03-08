@@ -42,6 +42,7 @@ resource "azurerm_network_security_group" "nsg" {
   }
 }
 
+/*
 resource "azurerm_monitor_diagnostic_setting" "settings" {
   name                       = "DiagnosticsSettings"
   target_resource_id         = azurerm_network_security_group.nsg.id
@@ -55,3 +56,4 @@ resource "azurerm_monitor_diagnostic_setting" "settings" {
     category = "NetworkSecurityGroupRuleCounter"
   }
 }
+*/

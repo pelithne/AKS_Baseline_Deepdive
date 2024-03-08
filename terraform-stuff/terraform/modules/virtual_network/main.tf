@@ -34,6 +34,7 @@ resource "azurerm_subnet" "subnet" {
   private_link_service_network_policies_enabled  = each.value.private_link_service_network_policies_enabled
 }
 
+/*
 resource "azurerm_monitor_diagnostic_setting" "settings" {
   name                       = "DiagnosticsSettings"
   target_resource_id         = azurerm_virtual_network.vnet.id
@@ -47,3 +48,4 @@ resource "azurerm_monitor_diagnostic_setting" "settings" {
     category = "AllMetrics"
   }
 }
+*/

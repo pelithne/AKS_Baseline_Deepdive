@@ -8,17 +8,8 @@ variable "resource_group_name" {
   description = "(Required) Specifies the name of the resource group."
   type        = string
 }
-variable "application_gateway_subnet_id" {
-  description = "(Required) Specifies the ip address name of the resource."
-  type        = string
-}
 
-variable "ip_domain_name" {
-  description = "(Required) Specifies the ip address name of the resource."
-  type        = string
-}
-
-variable "application_gateway_subnet_id" {
-  description = "(Required) Specifies the ip address name of the resource."
+variable subnet_id {
+  description = "(Required) Specifies the resource id of the subnet hosting the virtual machine"
   type        = string
 }

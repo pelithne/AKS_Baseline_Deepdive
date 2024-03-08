@@ -41,6 +41,7 @@ resource "azurerm_bastion_host" "bastion_host" {
   }
 }
 
+/*
 resource "azurerm_monitor_diagnostic_setting" "settings" {
   name                       = "DiagnosticsSettings"
   target_resource_id         = azurerm_bastion_host.bastion_host.id
@@ -54,6 +55,7 @@ resource "azurerm_monitor_diagnostic_setting" "settings" {
     category = "AllMetrics"
   }
 }
+
 
 resource "azurerm_monitor_diagnostic_setting" "pip_settings" {
   name                       = "DiagnosticsSettings"
@@ -76,3 +78,4 @@ resource "azurerm_monitor_diagnostic_setting" "pip_settings" {
     category = "AllMetrics"
   }
 }
+*/

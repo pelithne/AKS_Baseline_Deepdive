@@ -47,19 +47,19 @@ variable "hub_vnet_name" {
 
 variable "hub_address_space" {
   description = "Specifies the address space of the hub virtual virtual network"
-  default     = ["10.1.0.0/16"]
+  default     = ["10.0.0.0/22"]
   type        = list(string)
 }
 
 variable "hub_firewall_subnet_address_prefix" {
   description = "Specifies the address prefix of the firewall subnet"
-  default     = ["10.1.0.0/24"]
+  default     = ["10.0.0.0/26"]
   type        = list(string)
 }
 
 variable "hub_bastion_subnet_address_prefix" {
   description = "Specifies the address prefix of the firewall subnet"
-  default     = ["10.1.1.0/24"]
+  default     = ["10.0.0.128/26"]
   type        = list(string)
 }
 
@@ -71,7 +71,7 @@ variable "vm_subnet_name" {
 
 variable "vm_subnet_address_prefix" {
   description = "Specifies the address prefix of the jumpbox subnet"
-  default     = ["10.1.2.0/28"]
+  default     = ["10.0.0.64/26"]
   type        = list(string)
 }
 
@@ -83,7 +83,7 @@ variable "aks_vnet_name" {
 
 variable "aks_vnet_address_space" {
   description = "Specifies the address prefix of the AKS subnet"
-  default     =  ["10.0.0.0/16"]
+  default     =  ["10.1.0.0/22"]
   type        = list(string)
 }
 
@@ -101,7 +101,7 @@ variable "appgw_subnet_name" {
 
 variable "appgw_subnet_address_prefix" {
   description = "Specifies the address prefix of the application gateway subnet"
-  default     = ["10.0.1.0/24"]
+  default     = ["10.1.2.0/24"]
   type        = list(string)
 }
 
@@ -113,19 +113,49 @@ variable "pe_subnet_name" {
 
 variable "pe_subnet_address_prefix" {
   description = "Specifies the address prefix of the private endpoint subnet"
-  default     = ["10.0.2.16/28"]
+  default     = ["10.1.1.16/28"]
   type        = list(string)
 }
 
 variable "lb_subnet_name" {
   description = "Specifies the name of the lb subnet"
-  default     = "endpoints"
+  default     = "loadbalancer"
   type        = string
 }
 
 variable "lb_subnet_address_prefix" {
   description = "Specifies the address prefix of the lb subnet"
-  default     = ["10.0.2.0/28"]
+  default     = ["10.1.1.0/28"]
+  type        = list(string)
+}
+
+variable "pod_subnet_name" {
+  description = "Specifies the name of the pod subnet."
+  default     =  "PodSubnet"
+  type        = string
+}
+
+variable "pod_subnet_address_prefix" {
+  description = "Specifies the address prefix of the pod subnet"
+  type        = list(string)
+  default     = ["10.1.3.0/24"]
+}
+
+variable "default_node_pool_name" {
+  description = "Specifies the name of the default node pool"
+  default     =  "system"
+  type        = string
+}
+
+variable "default_node_pool_subnet_name" {
+  description = "Specifies the name of the subnet that hosts the default node pool"
+  default     =  "SystemSubnet"
+  type        = string
+}
+
+variable "default_node_pool_subnet_address_prefix" {
+  description = "Specifies the address prefix of the subnet that hosts the default node pool"
+  default     =  ["10.1.0.0/24"]
   type        = list(string)
 }
 
@@ -205,35 +235,6 @@ variable "network_plugin" {
   type        = string
 }
 
-variable "pod_subnet_name" {
-  description = "Specifies the name of the pod subnet."
-  default     =  "PodSubnet"
-  type        = string
-}
-
-variable "pod_subnet_address_prefix" {
-  description = "Specifies the address prefix of the pod subnet"
-  type        = list(string)
-  default     = ["10.0.32.0/20"]
-}
-
-variable "default_node_pool_name" {
-  description = "Specifies the name of the default node pool"
-  default     =  "system"
-  type        = string
-}
-
-variable "default_node_pool_subnet_name" {
-  description = "Specifies the name of the subnet that hosts the default node pool"
-  default     =  "SystemSubnet"
-  type        = string
-}
-
-variable "default_node_pool_subnet_address_prefix" {
-  description = "Specifies the address prefix of the subnet that hosts the default node pool"
-  default     =  ["10.0.0.0/20"]
-  type        = list(string)
-}
 
 variable "default_node_pool_enable_auto_scaling" {
   description = "(Optional) Whether to enable auto-scaler. Defaults to true."
@@ -572,7 +573,7 @@ variable "storage_account_replication_type" {
 variable "key_vault_name" {
   description = "Specifies the name of the key vault."
   type        = string
-  default     = "kvalipelithne"
+  default     = "kvalipelithne2"
 }
 
 variable "key_vault_sku_name" {
