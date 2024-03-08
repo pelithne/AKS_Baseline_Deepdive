@@ -199,6 +199,7 @@ resource "azurerm_application_gateway" "network" {
     http_listener_name         = "listener"
     backend_address_pool_name  = "backend-address-pool"
     backend_http_settings_name = "backend-http-settings"
+    priority = 1
   }
 
   probe {

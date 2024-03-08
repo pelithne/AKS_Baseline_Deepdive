@@ -124,7 +124,7 @@ variable "default_node_pool_name" {
 
 variable "default_node_pool_subnet_name" {
   description = "Specifies the name of the subnet that hosts the default node pool"
-  default     =  "SystemSubnet"
+  default     =  "SystemNodePoolSubnet"
   type        = string
 }
 
