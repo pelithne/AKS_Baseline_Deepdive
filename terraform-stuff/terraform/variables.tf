@@ -83,7 +83,7 @@ variable "aks_vnet_name" {
 
 variable "aks_vnet_address_space" {
   description = "Specifies the address prefix of the AKS subnet"
-  default     =  ["10.1.0.0/22"]
+  default     =  ["10.1.0.0/20"]
   type        = list(string)
 }
 
@@ -305,7 +305,7 @@ variable "additional_node_pool_subnet_name" {
 variable "additional_node_pool_subnet_address_prefix" {
   description = "Specifies the address prefix of the subnet that hosts the additional node pool"
   type        = list(string)
-  default     = ["10.0.16.0/20"]
+  default     = ["10.1.4.0/24"]
 }
 
 variable "additional_node_pool_name" {
