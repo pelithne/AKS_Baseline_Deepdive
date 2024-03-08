@@ -28,3 +28,7 @@ output "private_fqdn" {
   value       = azurerm_kubernetes_cluster.aks_cluster.private_fqdn
   description = "The FQDN for the Kubernetes Cluster when private link has been enabled, which is only resolvable inside the Virtual Network used by the Kubernetes Cluster."
 }
+
+output "load_balancer_ip" {
+  value = kubernetes_service.aks_cluster.load_balancer_ingress.0.ip
+}
