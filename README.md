@@ -25,7 +25,7 @@ Apart from these main topics, there are a number of additional sections intended
 
 8: <a href="08-automation.md">Automation</a>
 
-9: <a href="09-vulnerability-management.md">Vulnerability Management</a>
+9: <a href="09-defender-for-containers.md">Defender for Containers</a>
 
 
 # Introduction
