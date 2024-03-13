@@ -2,7 +2,7 @@
 
 Welcome to the AKS baseline workshop. In this workshop, you will learn how to deploy a secure and scalable Kubernetes cluster on Azure using Azure Kubernetes Service (AKS).You will also learn how to apply the best practices from the AKS secure baseline reference architecture, which provides a recommended starting point for a general purpose AKS cluster infrastructure. 
 
-The workshop has two main part. THe forst one describes how to deploy the AKS secure baseline using Azure CLI. This is essentially "AKS Secure Baseline - The Hard Way". The second main part is centered around Terraform and how Infrastructure as Code can be used to deploy the baseline in a much easier and much more reproducible way.
+The workshop has two main themes. THe first one describes how to deploy the AKS secure baseline using Azure CLI. This is essentially an "AKS Secure Baseline - The Hard Way". The second main part is centered around Terraform and how *Infrastructure as Code* can be used to deploy the baseline in a much easier and much more reproducible way.
 
 Apart from these main topics, there are a number of additional sections intended to give a better understanding of how Kubernetes upgrades are managed, how governance can be setup, how to configure observability etc, etc.
 
