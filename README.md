@@ -13,7 +13,7 @@ Welcome to the AKS baseline workshop. In this workshop, you will learn how to de
 
 4: <a href="04-workload-protection.md">Workload Protection</a>
 
-5: <a href="05-upgrade-management.md">Uprgade Management</a>
+5: <a href="05-upgrade-management.md">Upgrade Management</a>
 
 6: <a href="06-access-management.md">Access Management</a>
 
