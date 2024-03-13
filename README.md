@@ -5,7 +5,7 @@ Welcome to the AKS baseline workshop. In this workshop, you will learn how to de
 
 **There are 9 hands-on exercises that you will go through during the workshop:**
 
-1: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/01-introduction.md">Introduction</a>
+1: <a href="01-introduction.md">Introduction</a>
 
 2: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/02-ip-planning.md">IP Planning</a>
 
