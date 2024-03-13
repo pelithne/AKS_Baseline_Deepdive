@@ -1,4 +1,4 @@
-# 5.0 Access management
+# 6.0 Access management
 
 **In This Article:**
 - [5.0 Access management](#50-access-management)
