@@ -9,7 +9,7 @@ In this section you learn how to:
 * Validate a successful upgrade.
 
 
-## 5.1 Get available cluster versions
+## 5.1 Get Available Cluster Versions
 
 Before you upgrade, check which Kubernetes releases are available for your cluster using the ````az aks get-upgrades```` command.
 
@@ -78,7 +78,7 @@ The following example output shows part of the result of upgrading to *1.27.3*. 
 ````
 
 
-## 5.3 View the upgrade events
+## 5.3 View the Upgrade Events
 
 When you upgrade your cluster, the following Kubernetes events may occur on the nodes:
  * **Surge**: Create a surge node.
@@ -104,7 +104,7 @@ default 9m22s Normal Surge node/aks-nodepool1-96663640-vmss000002 Created a surg
 
 
 
-## 5.4 Validate an upgrade
+## 5.4 Validate an Upgrade
 
 Confirm the upgrade was successful using the ````az aks show```` command.
 
@@ -120,7 +120,7 @@ The following example output shows the AKS cluster runs *KubernetesVersion 1.27.
 k8s     northeurope     security-workshop  1.27.3               1.27.3                      Succeeded            k8s-security-worksho-16153f-mwrte3d1.hcp.northeurope.azmk8s.io
 ````
 
-## 5.5 Allowed upgrade paths
+## 5.5 Allowed Upgrade Paths
 Kubernetes can only be upgraded one minor version at a time. For example, you can upgrade from 1.26.x to 1.27.x, but you can't upgrade from 1.26.x to 1.28.x directly. To upgrade from 1.26.x to 1.28.x, you must first upgrade from 1.26.x to 1.27.x, then perform another upgrade from 1.27.x to 1.28.x.
 
 As you are now on 1.27.3, you should be able to see the available upgrade to 1.28.0. You can confirm this by once again running this command:
