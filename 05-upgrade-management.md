@@ -1,5 +1,15 @@
 # 5 Upgrade Management
 
+**In This Article:**
+
+- [5 Upgrade Management](#5-upgrade-management)
+  - [5.1 Get Available Cluster Versions](#51-get-available-cluster-versions)
+  - [5.2 Upgrade a Cluster](#52-upgrade-a-cluster)
+  - [5.3 View the Upgrade Events](#53-view-the-upgrade-events)
+  - [5.4 Validate an Upgrade](#54-validate-an-upgrade)
+  - [5.5 Allowed Upgrade Paths](#55-allowed-upgrade-paths)
+
+
 As part of the application and cluster lifecycle, you need to make sure to stay on a current version of Kubernetes. You can upgrade your Azure Kubernetes Service (AKS) cluster using the Azure CLI, Azure PowerShell, or the Azure portal. In this instuction you will use the Azure CLI.
 
 In this section you learn how to:
