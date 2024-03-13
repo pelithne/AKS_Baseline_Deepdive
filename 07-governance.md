@@ -1,4 +1,4 @@
-# 7.0 Governance
+# 7 Governance
 
 **In This Article:**
 

@@ -1,4 +1,4 @@
-# 1.0 Introduction
+# 1 Introduction
 
 **In This Article:**
 - [1.0 Introduction](#10-introduction)

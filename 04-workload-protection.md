@@ -1,4 +1,4 @@
-# 4.0 Workload Protection
+# 4 Workload Protection
 
 **In This Article:**
 
