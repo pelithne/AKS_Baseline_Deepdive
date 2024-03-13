@@ -7,20 +7,20 @@ Welcome to the AKS baseline workshop. In this workshop, you will learn how to de
 
 1: <a href="01-introduction.md">Introduction</a>
 
-2: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/02-ip-planning.md">IP Planning</a>
+2: <a href="02-ip-planning.md">IP Planning</a>
 
-3: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/03-deploy-infrastructure.md">Deploy Infrastructure</a>
+3: <a href="03-deploy-infrastructure.md">Deploy Infrastructure</a>
 
-4: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/04-workload-protection.md">Workload Protection</a>
+4: <a href="04-workload-protection.md">Workload Protection</a>
 
-5: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/05-upgrade-management.md">Uprgade Management</a>
+5: <a href="05-upgrade-management.md">Uprgade Management</a>
 
-6: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/06-access-management.md">Access Management</a>
+6: <a href="06-access-management.md">Access Management</a>
 
-7: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/07-governance.md">Governance</a>
+7: <a href="07-governance.md">Governance</a>
 
-8: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/08-monitoring.md">Monitoring</a>
+8: <a href="08-monitoring.md">Monitoring</a>
 
-9: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/09-automation.md">Automation</a>
+9: <a href="09-automation.md">Automation</a>
 
-10: <a href="https://github.com/pelithne/AKS_Security_and_monitoring/blob/main/10-vulnerability-management.md">Vulnerability Management</a>
+10: <a href="10-vulnerability-management.md">Vulnerability Management</a>
