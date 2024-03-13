@@ -40,7 +40,7 @@ The following example output shows the current version as *1.26.6* and lists the
 ````
 
 
-## 5.2 Upgrade a cluster
+## 5.2 Upgrade a Cluster
 
 AKS nodes are carefully cordoned and drained to minimize any potential disruptions to running applications. During this process, AKS performs the following steps:
 
