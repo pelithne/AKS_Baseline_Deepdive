@@ -1,4 +1,4 @@
-# 3 Deploy Infrastructure
+# 2 Deploy Infrastructure
 
  **In This Article:**
 - [3.0 Deploy Infrastructure](#30-deploy-infrastructure)

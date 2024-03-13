@@ -1,4 +1,4 @@
-# 8 Monitoring
+# 7 Monitoring
 
 # Enable monitoring for Kubernetes clusters
 
@@ -21,7 +21,7 @@ az monitor account create --name <azure-monitor-workspace-name> --resource-group
 
 Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4243-b5c1-f5d92fb8f8a4/resourcegroups/akstemp/providers/microsoft.monitor/accounts/monitorworkspace````
 
-To enable Grafana, you also need to create a Grafana workspace
+To enable Grafana, you also need to create a Grafana workspace.
 
 ```azurecli
 az grafana create --name <managed-grafana-resource-name> --resource-group <resource-group-name>
@@ -34,16 +34,12 @@ Now you can connect the Azure monitor workspace with the Grafana workspace. This
 Use the following example command, but replace with your own information (for example the resource ids created in the previous steps):
 
 ```azurecli
- az aks update --enable-azure-monitor-metrics -n aks -g akstemp --azure-monitor-workspace-resource-id "/subscriptions/e1519e1a-ec51-4173-b5c1-f5d92fb8f8a4/resourcegroups/akstemp/providers/microsoft.monitor/accounts/monitorworkspace"  --grafana-resource-id  "/subscriptions/e1519e1a-ec51-4173-b5c1-f5d92fb8f8a4/resourceGroups/akstemp/providers/Microsoft.Dashboard/grafana/managedgrafanaws"
+ az aks update --enable-azure-monitor-metrics -n aks -g spoke-rg --azure-monitor-workspace-resource-id "/subscriptions/e1519e1a-ec51-4173-b5c1-f5d92fb8f8a4/resourcegroups/akstemp/providers/microsoft.monitor/accounts/monitorworkspace"  --grafana-resource-id  "/subscriptions/e1519e1a-ec51-4173-b5c1-f5d92fb8f8a4/resourceGroups/akstemp/providers/Microsoft.Dashboard/grafana/managedgrafanaws"
  ```
-
-Use the `-enable-azure-monitor-metrics` option for `az aks update`  to install the metrics add-on that scrapes Prometheus metrics.
 
 
 
 ## Enable Container insights
-
-
 
 ```azurecli
 ### Use default Log Analytics workspace

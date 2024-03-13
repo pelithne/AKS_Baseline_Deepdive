@@ -1,4 +1,4 @@
-# 7 Governance
+# 6 Governance
 
 **In This Article:**
 

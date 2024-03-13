@@ -1,4 +1,4 @@
-# 2 IP Planning
+# 1 IP Planning
 
  **In This Article:**
 
