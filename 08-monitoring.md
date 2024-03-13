@@ -19,7 +19,7 @@ The only requirement to enable Azure Monitor managed service for Prometheus is t
 az monitor account create --name <azure-monitor-workspace-name> --resource-group <resource-group-name> --location <location>
 ```
 
-Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4173-b5c1-f5d92fb8f8a4/resourcegroups/akstemp/providers/microsoft.monitor/accounts/monitorworkspace````
+Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4243-b5c1-f5d92fb8f8a4/resourcegroups/akstemp/providers/microsoft.monitor/accounts/monitorworkspace````
 
 To enable Grafana, you also need to create a Grafana workspace
 
@@ -27,7 +27,7 @@ To enable Grafana, you also need to create a Grafana workspace
 az grafana create --name <managed-grafana-resource-name> --resource-group <resource-group-name>
 ```
 
-Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4173-b5c1-f5d92fb8f8a4/resourceGroups/akstemp/providers/Microsoft.Dashboard/grafana/managedgrafanaws````
+Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4243-b5c1-f5d92fb8f8a4/resourceGroups/akstemp/providers/Microsoft.Dashboard/grafana/managedgrafanaws````
 
 Now you can connect the Azure monitor workspace with the Grafana workspace. This will enable you to create Grafana dashboards using the Azure monitor workspace, with prometheus metrics enabled, as a backend data source.
 
@@ -143,20 +143,6 @@ The command will return JSON-formatted information about the solution. The `addo
 ```
 
 
-## Resources provisioned
+## Experimentation time
 
-When you enable monitoring, the following resources are created in your subscription:
-
-| Resource Name | Resource Type | Resource Group | Region/Location | Description |
-|:---|:---|:---|:---|:---|
-| `MSCI-<aksclusterregion>-<clustername>` | **Data Collection Rule** | Same as cluster | Same as Log Analytics workspace | This data collection rule is for log collection by Azure Monitor agent, which uses the Log Analytics workspace as destination, and is associated to the AKS cluster resource. |
-| `MSPROM-<aksclusterregion>-<clustername>` | **Data Collection Rule** | Same as cluster | Same as Azure Monitor workspace | This data collection rule is for prometheus metrics collection by metrics addon, which has the chosen Azure monitor workspace as destination, and also it is associated to the AKS cluster resource |
-| `MSPROM-<aksclusterregion>-<clustername>` | **Data Collection endpoint** | Same as cluster | Same as Azure Monitor workspace | This data collection endpoint is used by the above data collection rule for ingesting Prometheus metrics from the metrics addon|
-    
-When you create a new Azure Monitor workspace, the following additional resources are created as part of it
-
-| Resource Name | Resource Type | Resource Group | Region/Location | Description |
-|:---|:---|:---|:---|:---|
-| `<azuremonitor-workspace-name>` | **Data Collection Rule** | MA_\<azuremonitor-workspace-name>_\<azuremonitor-workspace-region>_managed | Same as Azure Monitor Workspace | DCR created when you use OSS Prometheus server to Remote Write to Azure Monitor Workspace. |
-| `<azuremonitor-workspace-name>` | **Data Collection Endpoint** | MA_\<azuremonitor-workspace-name>_\<azuremonitor-workspace-region>_managed | Same as Azure Monitor Workspace | DCE created when you use OSS Prometheus server to Remote Write to Azure Monitor Workspace.|
-    
+Use copilot/google/stack overflow/MS learn to create dashboards in Grafana and Azure Monitor.
