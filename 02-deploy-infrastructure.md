@@ -1005,7 +1005,7 @@ In this section, you will learn how to check if you can access your private Azur
 21) Once successfully logged in to the jumpbox **login to Azure** if you have not already done so in previous steps.
 
 ````bash
-sudo az login
+az login
 ````
 Identify your subscription id from the list, if you have several subscriptions.
 
@@ -1014,7 +1014,7 @@ az account list -o table
 ````
 Set your subscription id to be the default subscription.
 ````bash
-sudo az account set --subscription <SUBSCRIPTION ID>
+az account set --subscription <SUBSCRIPTION ID>
 ````
 22) Validate private link connection 
 
