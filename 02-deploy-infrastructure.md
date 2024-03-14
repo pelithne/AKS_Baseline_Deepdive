@@ -433,7 +433,7 @@ Upon successful installation of the Jumpbox Virtual Machine (VM), the next step 
 
 8) Within your resource group, find and click on the **Jumpbox VM**.
 
-9) In the left-hand side menu, under the **Operations** section, select ‘Bastion’.
+9) In the left-hand side menu, under the **Connect** section, select ‘Bastion’.
 
 10) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully. 
 
