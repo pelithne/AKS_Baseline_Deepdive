@@ -998,7 +998,7 @@ In this section, you will learn how to check if you can access your private Azur
 
 18) Within your resource group, find and click on the **Jumpbox VM**.
 
-19) In the left-hand side menu, under the **Operations** section, select ‘Bastion’.
+19) In the left-hand side menu, under the **Connect** section, select ‘Bastion’.
 
 20) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
 
