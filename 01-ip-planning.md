@@ -45,7 +45,7 @@ Each subnet in AKS baseline has a specific purpose and configuration, further in
 
 - **Azure Application Gateway Subnet**: This subnet is where the Azure Application Gateway is deployed. The application gateway acts as an ingress controller for the AKS cluster, routing external traffic to the appropriate services or pods inside the cluster. It also provides web application firewall (WAF) functionality, which helps protect the applications from common web attacks. The subnet size can be small, as it only needs to accommodate one or more application gateway instances. The subnet also has a NSG that allows inbound traffic on ports 80 and 443, and outbound traffic to the AKS cluster.
 
-- **Azure Application Gateway Subnet**: The load balancer subnet is a part of the network topology that supports the AKS cluster. It is where the internal load balancer (ILB) resides and assigns IP addresses to the services that are exposed within the cluster.
+- **Azure Loadbalancer Subnet**: The load balancer subnet is a part of the network topology that supports the AKS cluster. It is where the internal load balancer (ILB) resides and assigns IP addresses to the services that are exposed within the cluster.
 
 
 ### 2.2.3 Prepare Environment Variables for HUB VNET and SPOKE VNET
