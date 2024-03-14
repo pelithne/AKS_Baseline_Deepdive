@@ -15,9 +15,9 @@ Apart from these main topics, there are a number of additional sections intended
 
 3: <a href="03-workload-protection.md">Workload Protection</a>
 
-4: <a href="04-upgrade-management.md">Upgrade Management</a>
+4: <a href="04-access-management.md">Access Management</a>
 
-5: <a href="05-access-management.md">Access Management</a>
+5: <a href="05-upgrade-management.md">Upgrade Management</a>
 
 6: <a href="06-governance.md">Governance</a>
 
