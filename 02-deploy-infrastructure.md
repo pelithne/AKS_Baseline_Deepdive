@@ -10,11 +10,11 @@
     - [3.1.5 Create Vnet Peering Between Hub and Spoke](#315-create-vnet-peering-between-hub-and-spoke)
     - [3.1.6 Create Azure Bastion and Jumpbox VM](#316-create-azure-bastion-and-jumpbox-vm)
     - [3.1.7 Create an Azure Firewall and Setup a UDR](#317-create-an-azure-firewall-and-setup-a-udr)
-    - [3.1.6 Deploy Azure Kubernetes Service](#316-deploy-azure-kubernetes-service)
-    - [3.1.7 Deploy Azure Container Registry](#317-deploy-azure-container-registry)
-    - [3.1.8 Deploy Azure Application Gateway.](#318-deploy-azure-application-gateway)
-    - [3.1.9 Validate Ingress Connection.](#319-validate-ingress-connection)
-    - [3.1.10 Clean Up Resources in AKS](#3110-clean-up-resources-in-aks)
+    - [3.1.8 Deploy Azure Kubernetes Service](#316-deploy-azure-kubernetes-service)
+    - [3.1.9 Deploy Azure Container Registry](#317-deploy-azure-container-registry)
+    - [3.1.10 Deploy Azure Application Gateway.](#318-deploy-azure-application-gateway)
+    - [3.1.11 Validate Ingress Connection.](#319-validate-ingress-connection)
+    - [3.1.12 Clean Up Resources in AKS](#3110-clean-up-resources-in-aks)
 
 
 The objective of this chapter is to guide you through the process of deploying the AKS baseline infrastructure. This infrastructure consists of the essential components and configurations that are required for running a secure and scalable AKS cluster. By following the steps in this chapter, you will be able to set up the AKS baseline infrastructure.
@@ -590,7 +590,7 @@ Validate your deployment in the Azure portal.
 
 
 
-### 3.1.6 Deploy Azure Kubernetes Service
+### 3.1.8 Deploy Azure Kubernetes Service
 
 This chapter covers deploying AKS with outbound traffic configured to use a user-defined routing table, ensuring traffic passes through the Azure Firewall. A private DNS zone is also created when deploying a private AKS cluster. A user-assigned identity with necessary permissions is assigned to the cluster and load balancer subnet. This identity is a type of managed identity in Azure.
 
@@ -809,7 +809,7 @@ Congratulations! You have completed the steps to deploy a private AKS cluster an
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlink.jpg)
 ![Screenshot](/images/aksjumpbox.jpg)
 
-### 3.1.7 Deploy Azure Container Registry
+### 3.1.9 Deploy Azure Container Registry
 In this chapter, we will learn how to deploy a private Azure container registry that will store our container images. A private container registry is a type of container registry that is not accessible from the public internet. To enable access to the private container registry from the jumpbox, we need to create some network resources that will allow us to resolve the container registry name and connect to it securely. These resources are: a private endpoint, a private link, and a virtual network link. We will see how to create and configure these resources in the following steps. We will also test the connection to the private container registry by pushing some images to it from the jumpbox.
 
 1) Create the Azure Container Registry, and disable public access to the registry.
@@ -1276,7 +1276,7 @@ You have successfully deployed a private Azure Container Registry that is access
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlinkandacrandinternalloadbalancer.jpg)
 
-### 3.1.8 Deploy Azure Application Gateway.
+### 3.1.10 Deploy Azure Application Gateway.
 
 In this chapter, you will set up an application gateway that can terminate TLS connections at its own level. You will also learn how to perform these tasks: create an application gateway and upload a certificate to it, configure AKS as a backend pool for routing traffic to its internal load balancer, create a health probe to check the health of the AKS backend pool, and set up a WAF (Web Application Firewall) to defend against common web attacks.
 
@@ -1377,13 +1377,13 @@ We have successfully completed the deployment and configuration of our network a
 
 
 
-### 3.1.9 Validate Ingress Connection.
+### 3.1.11 Validate Ingress Connection.
 Open your web browser and access your domain: **https://YOUR-STUDENT-NAME.akssecurity.se**
 you should see a similar output as to the one below.
 
 ![Screenshot](/images/splashscreen.jpg)
 
-### 3.1.10 Clean Up Resources in AKS
+### 3.1.12 Clean Up Resources in AKS
 Once you have verified that everything works as depicted earlier. from the jumpbox host delete the resources.
 
 ````bash
