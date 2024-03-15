@@ -351,7 +351,7 @@ nginx   1/1     Running               0       89m
 13) Try to list pods in default namespace
 
 ````bash
-sudo kubectl get po
+kubectl get pods
 ````
 Example output:
 ````bash
