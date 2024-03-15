@@ -79,9 +79,9 @@ az network private-dns zone create --resource-group $SPOKE_RG --name privatelink
 Link the Private DNS Zone to the HUB and SPOKE Virtual Network
 
 ````bash
-az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $HUB_VNET_ID --zone-name privatelink.vaultcore.azure.net --name hubvnetkvdnsconfig --registration-enabled false
+az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $HUB_VNET_NAME --zone-name privatelink.vaultcore.azure.net --name hubvnetkvdnsconfig --registration-enabled false
 
-az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $SPOKE_VNET_ID --zone-name privatelink.vaultcore.azure.net --name spokevnetkvdnsconfig --registration-enabled false
+az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $SPOKE_VNET_NAME --zone-name privatelink.vaultcore.azure.net --name spokevnetkvdnsconfig --registration-enabled false
 ````
 
 Create a private endpoint for the Keyvault
@@ -95,7 +95,7 @@ KEYVAULT_ID=$(az keyvault show --name $KEYVAULT_NAME \
 Create the private endpoint in endpoint subnet.
 
 ````bash
-az network private-endpoint create --resource-group $SPOKE_RG --vnet-name $SPOKE_VNET_ID --subnet $ENDPOINTS_SUBNET_NAME --name KVPrivateEndpoint --private-connection-resource-id $KEYVAULT_ID --group-ids vault --connection-name PrivateKVConnection --location $LOCATION
+az network private-endpoint create --resource-group $SPOKE_RG --vnet-name $SPOKE_VNET_NAME --subnet $ENDPOINTS_SUBNET_NAME --name KVPrivateEndpoint --private-connection-resource-id $KEYVAULT_ID --group-ids vault --connection-name PrivateKVConnection --location $LOCATION
 ````
 
 Fetch IP of the private endpoint and create an *A record* in the private DNS zone.
