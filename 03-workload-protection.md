@@ -79,7 +79,7 @@ az network private-dns zone create --resource-group $SPOKE_RG --name privatelink
 Link the Private DNS Zone to the HUB and SPOKE Virtual Network
 
 ````bash
-az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $HUB_VNET_NAME --zone-name privatelink.vaultcore.azure.net --name hubvnetkvdnsconfig --registration-enabled false
+az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $HUB_VNET_ID --zone-name privatelink.vaultcore.azure.net --name hubvnetkvdnsconfig --registration-enabled false
 
 az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $SPOKE_VNET_NAME --zone-name privatelink.vaultcore.azure.net --name spokevnetkvdnsconfig --registration-enabled false
 ````
