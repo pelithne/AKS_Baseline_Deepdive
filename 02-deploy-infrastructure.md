@@ -310,7 +310,7 @@ Validate your deployment in the Azure portal.
 
 11) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-12) Once logged in, locate and select your resource group called **rg-spoke** where the hub vnet is deployed.
+12) Once logged in, locate and select your resource group called **rg-spoke** where the spoke vnet is deployed.
 
 13) Select your vnet called **Spoke_VNET**.
 
@@ -362,7 +362,7 @@ Validate your deployment in the Azure portal.
 
 3) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-4) Once logged in, locate and select your resource group called **rg-spoke** where the hub vnet is deployed.
+4) Once logged in, locate and select your resource group called **rg-spoke** where the spoke vnet is deployed.
 
 5) Select your vnet called **Spoke_VNET**.
 
@@ -529,7 +529,7 @@ Then store the output (the ip address) in an environment variable:
 FW_PRIVATE_IP=<IP Address from previous command>
 ````
 
-To get the private IP address of the Firewall, you need to run the following command and store the output in an environment variable.
+Create the route table to route egress traffic to the firewall in the hub VNET:
 ````bash
 az network route-table route create \
     --resource-group $SPOKE_RG  \
