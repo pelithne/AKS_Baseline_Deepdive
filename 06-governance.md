@@ -1,14 +1,14 @@
-# 6 Governance
+# Governance
 
 **In This Article:**
 
-- [6 Governance](#6-governance)
-  - [6.1 Introduction](#61-introduction)
-  - [6.2 Deployment](#62-deployment)
-    - [6.2.1 Assign Azure Policy to Subcription.](#621-assign-azure-policy-to-subcription)
-    - [6.2.2 Enable Azure Policy add-on for Azure Kubernetes Services.](#622-enable-azure-policy-add-on-for-azure-kubernetes-services)
-    - [6.2.3 Validate Deployment in Azure Portal](#623-validate-deployment-in-azure-portal)
-    - [6.2.4 Deploy a Privileged Pod to Azure Kubernetes Services](#624-deploy-a-privileged-pod-to-azure-kubernetes-services)
+- [Governance](#governance)
+  - [1.1 Introduction](#11-introduction)
+  - [1.2 Deployment](#12-deployment)
+    - [1.2.1 Assign Azure Policy to Subcription.](#121-assign-azure-policy-to-subcription)
+    - [1.2.2 Enable Azure Policy add-on for Azure Kubernetes Services.](#122-enable-azure-policy-add-on-for-azure-kubernetes-services)
+    - [1.2.3 Validate Deployment in Azure Portal](#123-validate-deployment-in-azure-portal)
+    - [1.2.4 Deploy a Privileged Pod to Azure Kubernetes Services](#124-deploy-a-privileged-pod-to-azure-kubernetes-services)
 
 
 You can apply and enforce built-in security policies on your Azure Kubernetes Service (AKS) clusters using
@@ -32,7 +32,7 @@ This article emphasizes the implementation of robust security practices within y
 
 
 
-## 6.1 Introduction
+## 1.1 Introduction
 
 In this section, you will get a walk through of the steps to secure your Azure Kubernetes Service (AKS) clusters using Azure Policy:
 
@@ -46,9 +46,9 @@ In this section, you will get a walk through of the steps to secure your Azure K
 
 Remember, Azure Policy helps maintain consistency and security across your AKS clusters, ensuring adherence to best practices and compliance requirements. 
 
-## 6.2 Deployment
+## 1.2 Deployment
 
-### 6.2.1 Assign Azure Policy to Subcription.
+### 1.2.1 Assign Azure Policy to Subcription.
 
 In this section, we will apply an Azure built-in policy definition named **“Kubernetes cluster should not allow privileged containers.”** on subscription level. This definition includes the required configuration to prevent privileged containers from being created within our cluster.
 
@@ -74,7 +74,7 @@ az policy assignment create --name "Kubernetes cluster should not allow privileg
 > [!Note]
 > For simplicity, we have chosen to name the Policy the same as the definition name. However, you have the flexibility to assign a different name if desired. The policy has been assigned to the subscription, and it may take up to **20 minutes** before the policy enforcement takes effect.
 
-### 6.2.2 Enable Azure Policy add-on for Azure Kubernetes Services.
+### 1.2.2 Enable Azure Policy add-on for Azure Kubernetes Services.
 
 1) Enable the Azure Policy add-on for you AKS cluster.
 
@@ -112,7 +112,7 @@ kubectl get pods -n gatekeeper-system
 > Gatekeeper extends the capabilities of Azure Policy by integrating with Open Policy Agent (OPA). It acts as an admission controller webhook for your AKS clusters. For more information refer to [Understand Azure Policy for Kubernetes clusters](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes)
 
 
-### 6.2.3 Validate Deployment in Azure Portal
+### 1.2.3 Validate Deployment in Azure Portal
 
 In this section we will acccess the Azure portal to validate our policy compliance state, we will also explore the Azure built in policies.
 
@@ -136,7 +136,7 @@ In this section we will acccess the Azure portal to validate our policy complian
 > [!Note]
 > By reviewing these policies, you can enhance the security and compliance of your AKS environment.
 
-### 6.2.4 Deploy a Privileged Pod to Azure Kubernetes Services
+### 1.2.4 Deploy a Privileged Pod to Azure Kubernetes Services
 
 "We have implemented the following configurations:
 - **Subscription-level policy enforcement** for Azure Kubernetes Service (AKS).
