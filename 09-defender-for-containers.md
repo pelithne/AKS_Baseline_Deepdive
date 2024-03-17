@@ -2,7 +2,7 @@
 
 **In This Article:**
 
-- [10 Defender for Containers](#10-defender-for-containers)
+- [9 Defender for Containers](#9-defender-for-containers)
   - [10.1 Introduction](#101-introduction)
   - [10.2 Prerequisites](#102-prerequisites)
   - [10.3 Generate a Security Alert for Kubernetes Workload](#103-generate-a-security-alert-for-kubernetes-workload)
