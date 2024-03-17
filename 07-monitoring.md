@@ -202,15 +202,15 @@ azureuser@Jumpbox-VM:~$ echo $AKS_RESOURCE_ID
 /subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c6599495/resourcegroups/rg-spoke/providers/Microsoft.ContainerService/managedClusters/private-aks
 ````
 
-
+Now, create a diagnostic setting that collects all metrics from your AKS cluster and forwards them to the log-analytics workpace previously created.
 
 ````
-az monitor diagnostic-settings create --resource $AKS_RESOURCE_ID --name diagnostic-setting-aks --logs '[{"category": "WorkflowRuntime", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]' --metrics '[{"category": "WorkflowRuntime", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]' --resource-group $SPOKE_RG
+az monitor diagnostic-settings create --resource $AKS_RESOURCE_ID --name ds-allmetrics-aks --metrics '[{"category": "AllMetrics", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]' --resource-group $SPOKE_RG --workspace $LOG_ANALYTICS_WORKSPACE
   ````
 
 ## 1.9 Create an alert
 
-Azure Monitor alerts proactively notify you when important conditions are found in your monitoring data. Log search alert rules create an alert when a log query returns a particular result. For example, receive an alert when a particular event is created on a virtual machine, or send a warning when excessive anonymous requests are made to a storage account.
+Azure Monitor alerts proactively notify you when important conditions are found in your monitoring data. Log search alert rules create an alert when a log query returns a particular result. For example, receive an alert when a particular event is created on a virtual machine, or send a warning when pods can not be scheduled on any node in an AKS cluster.
 
 
 
