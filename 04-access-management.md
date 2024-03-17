@@ -1,7 +1,7 @@
 # 4 Access management
 
 **In This Article:**
-- [5.0 Access management](#50-access-management)
+- [4 Access management](#4-access-management)
   - [5.1 Introduction](#51-introduction)
   - [5.2 Target Architecture](#52-target-architecture)
   - [5.3 Deployment](#53-deployment)
