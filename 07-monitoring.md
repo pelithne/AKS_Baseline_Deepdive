@@ -1,5 +1,24 @@
 # 7 Monitoring
 
+**In This Article:**
+
+- [7 Monitoring](#7-monitoring)
+- [Enable monitoring for Kubernetes clusters](#enable-monitoring-for-kubernetes-clusters)
+  - [Enable Prometheus and Grafana](#enable-prometheus-and-grafana)
+  - [Create grafana dashboard](#create-grafana-dashboard)
+  - [Enable Container insights](#enable-container-insights)
+  - [Verify deployment](#verify-deployment)
+    - [Managed Prometheus](#managed-prometheus)
+    - [Container insights](#container-insights)
+  - [Configure data collection in Container insights using ConfigMap](#configure-data-collection-in-container-insights-using-configmap)
+    - [TODO](#todo)
+  - [Configure syslog and display using grafana](#configure-syslog-and-display-using-grafana)
+  - [Query logs from Container insights](#query-logs-from-container-insights)
+  - [Create an alert](#create-an-alert)
+  - [Experimentation time](#experimentation-time)
+
+
+
 Env var
 
 ````
