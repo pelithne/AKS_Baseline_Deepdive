@@ -2,7 +2,7 @@
 
 **In This Article:**
 
-- [4.0 Workload Protection](#40-workload-protection)
+- [3 Workload Protection](#3-workload-protection)
   - [4.1 Deployment](#41-deployment)
     - [4.1.1 Prepare Environment Variables for Infrastructure](#411-prepare-environment-variables-for-infrastructure)
     - [4.1.2 Update AKS Cluster with OIDC Issuer](#412-update-aks-cluster-with-oidc-issuer)
