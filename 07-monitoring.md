@@ -8,13 +8,7 @@ SPOKE_RG=rg-spoke
 LOCATION=eastus 
 BASTION_NSG_NAME=Bastion_NSG
 JUMPBOX_NSG_NAME=Jumpbox_NSG
-AKS_NSG_NAME=Aks_NSG
-ENDPOINTS_NSG_NAME=Endpoints_NSG
-LOADBALANCER_NSG_NAME=Loadbalancer_NSG
-APPGW_NSG=Appgw_NSG
 FW_NAME=azure-firewall
-APPGW_NAME=AppGateway
-ROUTE_TABLE_NAME=spoke-rt
 AKS_IDENTITY_NAME=aks-msi
 JUMPBOX_VM_NAME=Jumpbox-VM
 AKS_CLUSTER_NAME=private-aks
@@ -23,6 +17,10 @@ MANAGED_GRAFANA_NAME=managed-grafana-ws
 LOG_ANALYTICS_WORKSPACE=log-analytics-ws
 
 ````
+
+# Precondition
+
+Open up FW to allow access to Azure Monitor endpoints. 
 
 # Enable monitoring for Kubernetes clusters
 
@@ -40,51 +38,30 @@ You can enable monitoring in multiple different ways. You can use the Azure Port
 The only requirement to enable Azure Monitor managed service for Prometheus is to create an Azure Monitor workspace, which is where Prometheus metrics are stored. Once this workspace is created, you can onboard services that collect Prometheus metrics.
 
 ```azurecli
-az monitor account create --name  --resource-group $SPOKE_RG --location $LOCATION
+az monitor account create --name  $AZ_MON_WORKSPACE --resource-group $SPOKE_RG --location $LOCATION
 ```
 
-Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4243-b5c1-f5d92fb8f8a4/resourcegroups/akstemp/providers/microsoft.monitor/accounts/monitorworkspace````
+Make a note of the resource id. It should look similar to this ````"/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourcegroups/pelithne/providers/microsoft.monitor/accounts/azmon-ws"````
 
-To enable Grafana, you also need to create a Grafana workspace.
+To enable Grafana, you also need to create a Grafana workspace. If you are prompted to install the "amg" extension, just accept that. 
 
 ```azurecli
 az grafana create --name $MANAGED_GRAFANA_NAME --resource-group $SPOKE_RG
 ```
 
-Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4243-b5c1-f5d92fb8f8a4/resourceGroups/akstemp/providers/Microsoft.Dashboard/grafana/managedgrafanaws````
+Make a note of the resource id. It should look similar to this ````"/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/pelithne/providers/Microsoft.Dashboard/grafana/managed-grafana-ws"````
 
 Now you can connect the Azure monitor workspace with the Grafana workspace. This will enable you to create Grafana dashboards using data from the Azure monitor workspace, with prometheus metrics enabled.
 
 Use the following example command, but replace with your own information (for example the resource ids created in the previous steps):
 
 ```azurecli
- az aks update --enable-azure-monitor-metrics -n $AKS_CLUSTER_NAME -g $SPOKE_RG --azure-monitor-workspace-resource-id "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourcegroups/rg-spoke/providers/microsoft.monitor/accounts/azmon-workspace"  --grafana-resource-id  "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg-spoke/providers/Microsoft.Dashboard/grafana/managed-grafana"
+ az aks update --enable-azure-monitor-metrics -n $AKS_CLUSTER_NAME -g $SPOKE_RG --azure-monitor-workspace-resource-id "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourcegroups/pelithne/providers/microsoft.monitor/accounts/azmon-ws"  --grafana-resource-id  "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/pelithne/providers/Microsoft.Dashboard/grafana/managed-grafana-ws"
  ```
-
-## Create grafana dashboard
-
-
-
-## Enable Container insights
-
-Create a log-analytics workspace
-
-````azurecli
-az monitor log-analytics workspace create -g $SPOKE_RG -n LOG_ANALYTICS_WORKSPACE
-````
-
-Make a note of the log-analytics workspace resource ID. It should look similar to ````/subscriptions/e1519e1a-ec51-4173-b4d 1-f5d92fb8f8a4/resourceGroups/rg-spoke/providers/Microsoft.OperationalInsights/workspaces/MyWorkspace````
-
-
-Then enable the monitoring add-on for AKS. 
-
-```azurecli
-az aks enable-addons -a monitoring -n <cluster-name>  -g spoke-rg --workspace-resource-id <workspace-resource-id>
-```
 
 
 ## Verify deployment
-Use the *kubectl*  to verify that the agent is deployed properly.
+Use *kubectl*  to verify that the agent is deployed properly.
 
 ### Managed Prometheus
 
@@ -117,6 +94,43 @@ ama-metrics-5c974985b8          1         1         1       11h
 ama-metrics-ksm-5fcf8dffcd      1         1         1       11h
 ```
 
+## Create grafana dashboard
+Go to the "Azure Managed Grafana" resource that was created in your spoke RG. In the blade that opens up, you should see a "Endpoint" that looks similar to this: ```` https://managed-grafana-eqbpc5gdbvh2dub7.eus.grafana.azure.com````
+
+Use the menu (three parallell lines) in the top left of the page, and select "Dashboards".
+
+Expand "Azure Managed Prometheus". These are a number of build it dashboards that comes out of the box. Select e.g. ````Kubernetes / Kubelet````
+
+You should see something similar to this (but dont forget to scroll further down):
+
+
+
+![Screenshot](images/kubelet-grafana.png)
+
+
+## Experimentation time
+Use google/copilot/your own imagination to experiment a little bit with some dashboards.
+
+
+## Enable Container insights
+
+Create a log-analytics workspace
+
+````azurecli
+az monitor log-analytics workspace create -g $SPOKE_RG -n $LOG_ANALYTICS_WORKSPACE
+````
+
+Make a note of the log-analytics workspace resource ID. It should look similar to ````subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg-spoke/providers/Microsoft.OperationalInsights/workspaces/log-analytics-ws/````
+
+
+Then enable the monitoring add-on for AKS (use the resource ID from above). 
+
+```azurecli
+az aks enable-addons -a monitoring -n $AKS_CLUSTER_NAME  -g $SPOKE_RG --workspace-resource-id "subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg-spoke/providers/Microsoft.OperationalInsights/workspaces/log-analytics-ws/"
+```
+
+
+## Verify deployment
 
 ### Container insights
 
@@ -155,7 +169,7 @@ ama-logs-rs   1/1     1            1           24d
 Use the `aks show` command to find out whether the solution is enabled, the Log Analytics workspace resource ID, and summary information about the cluster.
 
 ```azurecli
-az aks show -g <resourceGroupofAKSCluster> -n <nameofAksCluster>
+az aks show -g $SPOKE_RG -n $AKS_CLUSTER_NAME
 ```
 
 The command will return JSON-formatted information about the solution. The `addonProfiles` section should include information on the `omsagent` as in the following example:
