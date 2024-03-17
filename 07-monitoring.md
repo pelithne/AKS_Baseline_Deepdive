@@ -1,8 +1,8 @@
-# 7 Monitoring
+# Monitoring
 
 **In This Article:**
 
-- [7 Monitoring](#7-monitoring)
+- [Monitoring](#monitoring)
 - [Enable monitoring for Kubernetes clusters](#enable-monitoring-for-kubernetes-clusters)
   - [Enable Prometheus and Grafana](#enable-prometheus-and-grafana)
   - [Create grafana dashboard](#create-grafana-dashboard)
@@ -19,7 +19,7 @@
 
 
 
-Env var
+First, recreate a few environment variables
 
 ````
 HUB_RG=rg-hub
@@ -183,32 +183,15 @@ NAME          READY   UP-TO-DATE   AVAILABLE   AGE
 ama-logs-rs   1/1     1            1           24d
 ```
 
-**View configuration with CLI**
 
-Use the `aks show` command to find out whether the solution is enabled, the Log Analytics workspace resource ID, and summary information about the cluster.
+## Create an alert
 
-```azurecli
-az aks show -g $SPOKE_RG -n $AKS_CLUSTER_NAME
-```
-
-The command will return JSON-formatted information about the solution. The `addonProfiles` section should include information on the `omsagent` as in the following example:
-
-```output
-"addonProfiles": {
-    "omsagent": {
-        "config": {
-            "logAnalyticsWorkspaceResourceID": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/my-resource-group/providers/microsoft.operationalinsights/workspaces/my-workspace",
-            "useAADAuth": "true"
-        },
-        "enabled": true,
-        "identity": null
-    },
-}
-```
+Azure Monitor alerts proactively notify you when important conditions are found in your monitoring data. Log search alert rules create an alert when a log query returns a particular result. For example, receive an alert when a particular event is created on a virtual machine, or send a warning when excessive anonymous requests are made to a storage account.
 
 
 
-## Configure data collection in Container insights using ConfigMap
+
+## Optional: Configure data collection in Container insights using ConfigMap
 
 ### TODO 
 https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-data-collection-configmap
@@ -226,30 +209,7 @@ A few examples
 
 
 
-## Configure syslog and display using grafana
 
-Container Insights offers the ability to collect Syslog events from Linux nodes in your Azure Kubernetes Service (AKS) clusters. This includes the ability to collect logs from control plane components like kubelet. Customers can also use Syslog for monitoring security and health events, typically by ingesting syslog into a SIEM system like Microsoft Sentinel.
-
-https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-syslog
-
-````
-az aks enable-addons -a monitoring --enable-msi-auth-for-monitoring --enable-syslog -g syslog-rg -n existing-cluster
-````
-
-## Query logs from Container insights
-
-Container insights collects performance metrics, inventory data, and health state information from container hosts and containers. The data is collected every three minutes and forwarded to the Log Analytics workspace in Azure Monitor where it's available for log queries using Log Analytics in Azure Monitor.
-
-https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-log-query
-https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-tutorial
-
-
-Use "playground" to learn more:
-https://portal.azure.com/#view/Microsoft_OperationsManagementSuite_Workspace/LogsDemo.ReactView
-
-
-
-## Create an alert
 
 
 ## Experimentation time
