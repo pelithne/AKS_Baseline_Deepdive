@@ -1,16 +1,16 @@
-# 9 Defender for Containers
+# Defender for Containers
 
 **In This Article:**
 
-- [9 Defender for Containers](#9-defender-for-containers)
-  - [10.1 Introduction](#101-introduction)
-  - [10.2 Prerequisites](#102-prerequisites)
-  - [10.3 Generate a Security Alert for Kubernetes Workload](#103-generate-a-security-alert-for-kubernetes-workload)
-  - [10.4 Import Vulnerable image to Container Registry](#104-import-vulnerable-image-to-container-registry)
-  - [10.5 Review Microsoft Defender for Containers Recommendations](#105-review-microsoft-defender-for-containers-recommendations)
+- [Defender for Containers](#defender-for-containers)
+  - [1.1 Introduction](#11-introduction)
+  - [1.2 Prerequisites](#12-prerequisites)
+  - [1.3 Generate a Security Alert for Kubernetes Workload](#13-generate-a-security-alert-for-kubernetes-workload)
+  - [1.4 Import Vulnerable image to Container Registry](#14-import-vulnerable-image-to-container-registry)
+  - [1.5 Review Microsoft Defender for Containers Recommendations](#15-review-microsoft-defender-for-containers-recommendations)
 
 
-## 10.1 Introduction
+## 1.1 Introduction
 
 Microsoft Defender for Containers is a cloud-native solution that helps you secure your containers and their applications. It protects your Kubernetes clusters from misconfigurations, vulnerabilities, and threats, whether they are running on Azure, AWS, GCP, or on-premises. With Microsoft Defender for Containers, you can:
 
@@ -30,7 +30,7 @@ During this activity you will:
 
 Import the metasploit vulnerability emulator docker image from Docker Hub to your Azure container registry.
 
-## 10.2 Prerequisites
+## 1.2 Prerequisites
 
 Please make sure that Microsoft Defender for Containers is activated on your subscription. Here are the steps you can follow to enable it.
 
@@ -79,7 +79,7 @@ azureuser@Jumpbox-VM:~$
 
 
 
-## 10.3 Generate a Security Alert for Kubernetes Workload
+## 1.3 Generate a Security Alert for Kubernetes Workload
 
 
 Login to the jumpbox and launch a pod that executes a test command, to simulate a security alert in Microsoft Defender for cloud.
@@ -175,13 +175,13 @@ Verify that Microsoft defender has triggered a security alert in Microsoft Defen
 kubectl delete pods mdc-test
 ````
 
-## 10.4 Import Vulnerable image to Container Registry
+## 1.4 Import Vulnerable image to Container Registry
 
 ````bash
 az acr import --name $ACRNAME --source docker.io/vulnerables/metasploit-vulnerability-emulator
 ````
 
-## 10.5 Review Microsoft Defender for Containers Recommendations
+## 1.5 Review Microsoft Defender for Containers Recommendations
 
  In this section, you will learn how to review the security recommendations that Defender for Containers generates for your clusters and containers. These recommendations are based on the continuous assessment of your configurations and the comparison with the initiatives applied to your subscriptions. You will also learn how to investigate and remediate the issues that are identified by Defender for Containers.
 
