@@ -75,7 +75,7 @@ Now you can connect the Azure monitor workspace with the Grafana workspace. This
 Use the following example command, but replace with your own information (for example the resource ids created in the previous steps):
 
 ```azurecli
- az aks update --enable-azure-monitor-metrics -n $AKS_CLUSTER_NAME -g $SPOKE_RG --azure-monitor-workspace-resource-id "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourcegroups/pelithne/providers/microsoft.monitor/accounts/azmon-ws"  --grafana-resource-id  "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/pelithne/providers/Microsoft.Dashboard/grafana/managed-grafana-ws"
+ az aks update --enable-azure-monitor-metrics -n $AKS_CLUSTER_NAME-${STUDENT_NAME} -g $SPOKE_RG --azure-monitor-workspace-resource-id "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourcegroups/pelithne/providers/microsoft.monitor/accounts/azmon-ws"  --grafana-resource-id  "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/pelithne/providers/Microsoft.Dashboard/grafana/managed-grafana-ws"
  ```
 
 
@@ -118,10 +118,9 @@ Go to the "Azure Managed Grafana" resource that was created in your spoke RG. In
 
 Use the menu (three parallell lines) in the top left of the page, and select "Dashboards".
 
-Expand "Azure Managed Prometheus". These are a number of build it dashboards that comes out of the box. Select e.g. ````Kubernetes / Kubelet````
+Expand "Azure Managed Prometheus". Here you will find a number of pre-built dashboards that comes out of the box. Select e.g. ````Kubernetes / Kubelet````
 
 You should see something similar to this (but dont forget to scroll further down):
-
 
 
 ![Screenshot](images/kubelet-grafana.png)
@@ -145,7 +144,7 @@ Make a note of the log-analytics workspace resource ID. It should look similar t
 Then enable the monitoring add-on for AKS (use the resource ID from above). 
 
 ```azurecli
-az aks enable-addons -a monitoring -n $AKS_CLUSTER_NAME  -g $SPOKE_RG --workspace-resource-id "subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg-spoke/providers/Microsoft.OperationalInsights/workspaces/log-analytics-ws/"
+az aks enable-addons -a monitoring -n $AKS_CLUSTER_NAME-${STUDENT_NAME}  -g $SPOKE_RG --workspace-resource-id "subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg-spoke/providers/Microsoft.OperationalInsights/workspaces/log-analytics-ws/"
 ```
 
 
@@ -184,9 +183,30 @@ ama-logs-rs   1/1     1            1           24d
 ```
 
 
+## Enable diagnostic settings to collect logs from your AKS deployment
+
+Get the resource ID of your AKS cluster (needed below)
+````
+AKS_RESOURCE_ID=$(az aks show -g $SPOKE_RG -n $AKS_CLUSTER_NAME-${STUDENT_NAME} --query 'id' --output tsv)
+````
+When you echo the content of the environment variable it should look similar to this:
+
+````bash
+azureuser@Jumpbox-VM:~$ echo $AKS_RESOURCE_ID
+/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c6599495/resourcegroups/rg-spoke/providers/Microsoft.ContainerService/managedClusters/private-aks
+````
+
+
+
+````
+az monitor diagnostic-settings create --resource $AKS_RESOURCE_ID --name diagnostic-setting-aks --logs '[{"category": "WorkflowRuntime", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]' --metrics '[{"category": "WorkflowRuntime", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]' --resource-group $SPOKE_RG
+  ````
+
 ## Create an alert
 
 Azure Monitor alerts proactively notify you when important conditions are found in your monitoring data. Log search alert rules create an alert when a log query returns a particular result. For example, receive an alert when a particular event is created on a virtual machine, or send a warning when excessive anonymous requests are made to a storage account.
+
+
 
 
 
