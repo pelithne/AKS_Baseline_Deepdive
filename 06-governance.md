@@ -2,7 +2,7 @@
 
 **In This Article:**
 
-- [6.0 Governance](#60-governance)
+- [6 Governance](#6-governance)
   - [6.1 Introduction](#61-introduction)
   - [6.2 Deployment](#62-deployment)
     - [6.2.1 Assign Azure Policy to Subcription.](#621-assign-azure-policy-to-subcription)
