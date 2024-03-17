@@ -2,7 +2,7 @@
 
  **In This Article:**
 
-- [2.0 IP Planning](#20-ip-planning)
+- [1 IP Planning](#1-ip-planning)
   - [2.1 Overview](#21-overview)
   - [2.2 IP Plan](#22-ip-plan)
     - [2.2.1 Hub VNET](#221-hub-vnet)
