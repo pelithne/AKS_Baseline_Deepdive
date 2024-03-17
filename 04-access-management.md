@@ -1,16 +1,16 @@
-# 4 Access management
+# Access management
 
 **In This Article:**
-- [5.0 Access management](#50-access-management)
-  - [5.1 Introduction](#51-introduction)
-  - [5.2 Target Architecture](#52-target-architecture)
-  - [5.3 Deployment](#53-deployment)
-    - [5.3.1 Prepare Environment Variables](#531-prepare-environment-variables)
-    - [5.3.2 Create Microsoft Entra ID Security Groups](#532-create-microsoft-entra-id-security-groups)
-    - [5.3.3 Integrate AKS with Microsoft Entra ID](#533-integrate-aks-with-microsoft-entra-id)
-    - [5.3.4 Scope and Role Assignment for Security Groups](#534-scope-and-role-assignment-for-security-groups)
-    - [5.3.5 Create Users and Assign them to Security Groups.](#535-create-users-and-assign-them-to-security-groups)
-    - [5.3.5 Validate the Access for the Different Users.](#535-validate-the-access-for-the-different-users)
+- [Access management](#access-management)
+  - [1.1 Introduction](#11-introduction)
+  - [1.2 Target Architecture](#12-target-architecture)
+  - [1.3 Deployment](#13-deployment)
+    - [1.3.1 Prepare Environment Variables](#131-prepare-environment-variables)
+    - [1.3.2 Create Microsoft Entra ID Security Groups](#132-create-microsoft-entra-id-security-groups)
+    - [1.3.3 Integrate AKS with Microsoft Entra ID](#133-integrate-aks-with-microsoft-entra-id)
+    - [1.3.4 Scope and Role Assignment for Security Groups](#134-scope-and-role-assignment-for-security-groups)
+    - [1.3.5 Create Users and Assign them to Security Groups.](#135-create-users-and-assign-them-to-security-groups)
+    - [1.3.6 Validate the Access for the Different Users.](#136-validate-the-access-for-the-different-users)
 
 
 Azure Kubernetes Service (AKS) supports Microsoft Entra ID integration, which allows you to control access to your cluster resources using Azure role-based access control (RBAC). In this tutorial, you will learn how to integrate AKS with Microsoft Entra ID and assign different roles and permissions to three types of users:
@@ -20,7 +20,7 @@ A backend ops team, who will be responsible for managing the backend application
 A frontend ops team, who will be responsible for managing the frontend application deployed in the AKS cluster. They will only have access to the frontend namespace and the resources within it.
 By following this tutorial, you will be able to implement the least privilege access model, which means that each user or group will only have the minimum permissions required to perform their tasks.
 
-## 5.1 Introduction
+## 1.1 Introduction
 
 In this section, you will learn how to:
 
@@ -33,7 +33,7 @@ In this section, you will learn how to:
 - Create role bindings to grant access to the backend ops group and the frontend ops group to their respective namespaces.
 - Test the access of each user type by logging in with different credentials and running kubectl commands.
 
-## 5.2 Target Architecture
+## 1.2 Target Architecture
 
 Throughout this article, this is the target architecture we will aim to create:
 all procedures will be conducted by using Azure CLI.
@@ -45,9 +45,9 @@ The current architecture can be described as follows:
 
 ![Screenshot](images/AAD-integration-scrap-no-integration-plain-aks.jpg)
 
-## 5.3 Deployment
+## 1.3 Deployment
 
-### 5.3.1 Prepare Environment Variables
+### 1.3.1 Prepare Environment Variables
 This code defines the environment variables for the resources that you will create later in the tutorial.
 
 > [!Note]
@@ -71,7 +71,7 @@ AAD_ADMIN_UPN='clusteradmin'${STUDENT_NAME}'@MngEnvMCAP148390.onmicrosoft.com'
 AAD_ADMIN_PW=<ENTER USER PASSWORD>
 AAD_ADMIN_DISPLAY_NAME='Admin-'${STUDENT_NAME}
 ````
-### 5.3.2 Create Microsoft Entra ID Security Groups 
+### 1.3.2 Create Microsoft Entra ID Security Groups 
 
 We will now start by creating 3 security groups for respective team.
 
@@ -94,7 +94,7 @@ Current architecture can now be described as follows:
 ![Screenshot](images/AAD-integration-create-user-groups.jpg)
 
 
-### 5.3.3 Integrate AKS with Microsoft Entra ID
+### 1.3.3 Integrate AKS with Microsoft Entra ID
 
 1) Lets update our existing AKS cluster to support Microsoft Entra ID integration, and configure a cluster admin group, and disable local admin accounts in AKS, as this will prevent anyone from using the **--admin** switch to get full cluster credentials.
 
@@ -106,7 +106,7 @@ Current architecture can now be described as follows:
 
 ![Screenshot](images/AAD-integration-disabled-local-account-aad-enabled-azurerbacenabled.jpg)
 
-### 5.3.4 Scope and Role Assignment for Security Groups
+### 1.3.4 Scope and Role Assignment for Security Groups
 This chapter will explain how to create the scope for the operation teams to perform their daily tasks. The scope is based on the AKS resource ID and a fixed path in AKS, which is **/namespaces/<NAMESPACE>**. The scope will assign the **Application Operations Frontend Team** to the **frontend namespace** and the **Application Operation Backend Team** to the **backend namespace**.
 
 
@@ -160,7 +160,7 @@ Current architecture can now be described as follows:
 
 ![Screenshot](images/AAD-integration-role-assignment.jpg)
 
-### 5.3.5 Create Users and Assign them to Security Groups.
+### 1.3.5 Create Users and Assign them to Security Groups.
 This exercise will guide you through the steps of creating three users and adding them to their corresponding security groups.
 
 1) Create the Admin user.
@@ -255,7 +255,7 @@ Validate your deployment in the Azure portal.
 
 17) On the top menu bar click on **Contoso | Groups** link. Repeat step 13 - 16 for **Ops_Frontend_team-YOUR STUDENT NAME** and **ClusterAdminGroup-YOUR STUDENT NAME**
 
-### 5.3.5 Validate the Access for the Different Users.
+### 1.3.6 Validate the Access for the Different Users.
 
 This section will demonstrate how to connect to the AKS cluster from the jumpbox using the user account defined in Microsoft Entra ID. We will check two things: first, that we can successfully connect to the cluster; and second, that the Operations teams have access only to their own namespaces, while the Admin has full access to the cluster.
 

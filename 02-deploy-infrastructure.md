@@ -1,27 +1,27 @@
-# 2 Deploy Infrastructure
+# Deploy Infrastructure
 
  **In This Article:**
-- [3.0 Deploy Infrastructure](#30-deploy-infrastructure)
-  - [3.1 Deployment](#31-deployment)
-    - [3.1.1 Prepare Environment Variables for infrastructure](#311-prepare-environment-variables-for-infrastructure)
-    - [3.1.2 Create the Resource Groups for the Hub and Spoke.](#312-create-the-resource-groups-for-the-hub-and-spoke)
-    - [3.1.3 Create Network Security Groups (NSG) and Virtual Network (Vnet) for the Hub.](#313-create-network-security-groups-nsg-and-virtual-network-vnet-for-the-hub)
-    - [3.1.4 Create Network Security Groups and Virtual Network for the Spoke.](#314-create-network-security-groups-and-virtual-network-for-the-spoke)
-    - [3.1.5 Create Vnet Peering Between Hub and Spoke](#315-create-vnet-peering-between-hub-and-spoke)
-    - [3.1.6 Create Azure Bastion and Jumpbox VM](#316-create-azure-bastion-and-jumpbox-vm)
-    - [3.1.7 Create an Azure Firewall and Setup a UDR](#317-create-an-azure-firewall-and-setup-a-udr)
-    - [3.1.8 Deploy Azure Kubernetes Service](#316-deploy-azure-kubernetes-service)
-    - [3.1.9 Deploy Azure Container Registry](#317-deploy-azure-container-registry)
-    - [3.1.10 Deploy Azure Application Gateway.](#318-deploy-azure-application-gateway)
-    - [3.1.11 Validate Ingress Connection.](#319-validate-ingress-connection)
-    - [3.1.12 Clean Up Resources in AKS](#3110-clean-up-resources-in-aks)
+- [Deploy Infrastructure](#deploy-infrastructure)
+  - [1.1 Deployment](#11-deployment)
+    - [1.1.1 Prepare Environment Variables for infrastructure](#111-prepare-environment-variables-for-infrastructure)
+    - [1.1.2 Create the Resource Groups for the Hub and Spoke.](#112-create-the-resource-groups-for-the-hub-and-spoke)
+    - [1.1.3 Create Network Security Groups (NSG) and Virtual Network (Vnet) for the Hub.](#113-create-network-security-groups-nsg-and-virtual-network-vnet-for-the-hub)
+    - [1.1.4 Create Network Security Groups and Virtual Network for the Spoke.](#114-create-network-security-groups-and-virtual-network-for-the-spoke)
+    - [1.1.5 Create Vnet Peering Between Hub and Spoke](#115-create-vnet-peering-between-hub-and-spoke)
+    - [1.1.6 Create Azure Bastion and Jumpbox VM](#116-create-azure-bastion-and-jumpbox-vm)
+    - [1.1.7 Create an Azure Firewall and Setup a UDR](#117-create-an-azure-firewall-and-setup-a-udr)
+    - [1.1.8 Deploy Azure Kubernetes Service](#118-deploy-azure-kubernetes-service)
+    - [1.1.9 Deploy Azure Container Registry](#119-deploy-azure-container-registry)
+    - [1.1.10 Deploy Azure Application Gateway.](#1110-deploy-azure-application-gateway)
+    - [1.1.11 Validate Ingress Connection.](#1111-validate-ingress-connection)
+    - [1.1.12 Clean Up Resources in AKS](#1112-clean-up-resources-in-aks)
 
 
 The objective of this chapter is to guide you through the process of deploying the AKS baseline infrastructure. This infrastructure consists of the essential components and configurations that are required for running a secure and scalable AKS cluster. By following the steps in this chapter, you will be able to set up the AKS baseline infrastructure.
 
-## 3.1 Deployment
+## 1.1 Deployment
 
-### 3.1.1 Prepare Environment Variables for infrastructure
+### 1.1.1 Prepare Environment Variables for infrastructure
 
 This configuration sets up environment variables for the names and locations of various network and security resources, such as resource group, virtual network, subnets, network security groups, firewall, application gateway, route table, identity, virtual machine, AKS cluster, and ACR registry.
 
@@ -48,14 +48,14 @@ ACR_NAME=<NAME OF THE AZURE CONTAINER REGISTRY>
 STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
 ````
 
-### 3.1.2 Create the Resource Groups for the Hub and Spoke.
+### 1.1.2 Create the Resource Groups for the Hub and Spoke.
 
 ````bash
 az group create --name $HUB_RG --location $LOCATION
 az group create --name $SPOKE_RG --location $LOCATION
 ````
 
-### 3.1.3 Create Network Security Groups (NSG) and Virtual Network (Vnet) for the Hub.
+### 1.1.3 Create Network Security Groups (NSG) and Virtual Network (Vnet) for the Hub.
 In this step, we will begin by establishing a Network Security Group (NSG) that will subsequently be associated with their respective subnet. It is crucial to note that there are specific prerequisites concerning security rules for certain subnets that must be met  before a service can be deployed, Azure Bastion is one of them.
 
 For Azure Bastion, we are establishing security rules to permit both the control and data plane access to the AzureBastion. For a more detailed understanding of these rules, please refer to the following resource: [More Information](https://learn.microsoft.com/en-us/azure/bastion/bastion-nsg).
@@ -197,7 +197,7 @@ Validate your deployment in the Azure portal.
 
 ![Screenshot](images/hubandspokevnet.jpg)
 
-### 3.1.4 Create Network Security Groups and Virtual Network for the Spoke.
+### 1.1.4 Create Network Security Groups and Virtual Network for the Spoke.
 We will now start to setup the spoke vnet, subnets and their respective NSGs,
 
 1) Create the NSG for AKS subnet.
@@ -319,7 +319,7 @@ Validate your deployment in the Azure portal.
 
 ![Screenshot](images/spokevnet.jpg)
 
-### 3.1.5 Create Vnet Peering Between Hub and Spoke
+### 1.1.5 Create Vnet Peering Between Hub and Spoke
 
 The next step is to create a virtual network peering between the hub and spoke VNets. This will enable the communication between the VNets and allow the AKS cluster to route traffic to the Firewall.
 
@@ -373,7 +373,7 @@ Validate your deployment in the Azure portal.
 
 ![Screenshot](/images/vnetpeeringconnected.jpg)
 
-### 3.1.6 Create Azure Bastion and Jumpbox VM
+### 1.1.6 Create Azure Bastion and Jumpbox VM
 
 1) Create a public IP address for the bastion host
 
@@ -443,7 +443,7 @@ After completing these steps, The high-level targeted architecture now matches t
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpbox.jpg)
 
-### 3.1.7 Create an Azure Firewall and Setup a UDR
+### 1.1.7 Create an Azure Firewall and Setup a UDR
 
 To secure your AKS outbound traffic, you need to follow these steps for a basic cluster deployment. These steps will help you restrict the outbound access and to certain FQDNs that are needed by the cluster. further information can be found here: [Control egress traffic using Azure Firewall in Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/limit-egress-traffic)
 
@@ -590,7 +590,7 @@ Validate your deployment in the Azure portal.
 
 
 
-### 3.1.8 Deploy Azure Kubernetes Service
+### 1.1.8 Deploy Azure Kubernetes Service
 
 This chapter covers deploying AKS with outbound traffic configured to use a user-defined routing table, ensuring traffic passes through the Azure Firewall. A private DNS zone is also created when deploying a private AKS cluster. A user-assigned identity with necessary permissions is assigned to the cluster and load balancer subnet. This identity is a type of managed identity in Azure.
 
@@ -809,7 +809,7 @@ Congratulations! You have completed the steps to deploy a private AKS cluster an
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlink.jpg)
 ![Screenshot](/images/aksjumpbox.jpg)
 
-### 3.1.9 Deploy Azure Container Registry
+### 1.1.9 Deploy Azure Container Registry
 In this chapter, we will learn how to deploy a private Azure container registry that will store our container images. A private container registry is a type of container registry that is not accessible from the public internet. To enable access to the private container registry from the jumpbox, we need to create some network resources that will allow us to resolve the container registry name and connect to it securely. These resources are: a private endpoint, a private link, and a virtual network link. We will see how to create and configure these resources in the following steps. We will also test the connection to the private container registry by pushing some images to it from the jumpbox.
 
 1) Create the Azure Container Registry, and disable public access to the registry.
@@ -1276,7 +1276,7 @@ You have successfully deployed a private Azure Container Registry that is access
 
 ![Screenshot](/images/hubandspokewithpeeringBastionJumpboxFirewallaksvirtualnetlinkandacrandinternalloadbalancer.jpg)
 
-### 3.1.10 Deploy Azure Application Gateway.
+### 1.1.10 Deploy Azure Application Gateway.
 
 In this chapter, you will set up an application gateway that can terminate TLS connections at its own level. You will also learn how to perform these tasks: create an application gateway and upload a certificate to it, configure AKS as a backend pool for routing traffic to its internal load balancer, create a health probe to check the health of the AKS backend pool, and set up a WAF (Web Application Firewall) to defend against common web attacks.
 
@@ -1377,13 +1377,13 @@ We have successfully completed the deployment and configuration of our network a
 
 
 
-### 3.1.11 Validate Ingress Connection.
+### 1.1.11 Validate Ingress Connection.
 Open your web browser and access your domain: **https://YOUR-STUDENT-NAME.akssecurity.se**
 you should see a similar output as to the one below.
 
 ![Screenshot](/images/splashscreen.jpg)
 
-### 3.1.12 Clean Up Resources in AKS
+### 1.1.12 Clean Up Resources in AKS
 Once you have verified that everything works as depicted earlier. from the jumpbox host delete the resources.
 
 ````bash
