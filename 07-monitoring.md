@@ -5,19 +5,19 @@
 - [Monitoring](#monitoring)
 - [1.1 Precondition](#11-precondition)
 - [1.2 Enable monitoring for Kubernetes clusters](#12-enable-monitoring-for-kubernetes-clusters)
-  - [1.3 Enable Prometheus and Grafana](#13-enable-prometheus-and-grafana)
-  - [1.3 Verify deployment](#13-verify-deployment)
-    - [1.3.1 Managed Prometheus](#131-managed-prometheus)
-  - [1.4 Create grafana dashboard](#14-create-grafana-dashboard)
-  - [1.5 Experimentation time](#15-experimentation-time)
-  - [1.6 Enable Container insights](#16-enable-container-insights)
-  - [1.7 Verify deployment](#17-verify-deployment)
-    - [1.7.1 Container insights](#171-container-insights)
-  - [1.8 Enable diagnostic settings to collect logs from your AKS deployment](#18-enable-diagnostic-settings-to-collect-logs-from-your-aks-deployment)
-  - [1.9 Create an alert](#19-create-an-alert)
-  - [1.10 Optional: Configure data collection in Container insights using ConfigMap](#110-optional-configure-data-collection-in-container-insights-using-configmap)
-    - [1.10.1 TODO](#1101-todo)
-  - [1.11 Experimentation time](#111-experimentation-time)
+  - [1.2.1 Enable Prometheus and Grafana](#121-enable-prometheus-and-grafana)
+  - [1.2.2 Verify deployment](#122-verify-deployment)
+    - [1.2.2.1 Managed Prometheus](#1221-managed-prometheus)
+  - [1.3 Create grafana dashboard](#13-create-grafana-dashboard)
+  - [1.4 Experimentation time](#14-experimentation-time)
+  - [1.5 Enable Container insights](#15-enable-container-insights)
+  - [1.6 Verify deployment](#16-verify-deployment)
+    - [1.6.1 Container insights](#161-container-insights)
+  - [1.7 Enable diagnostic settings to collect logs from your AKS deployment](#17-enable-diagnostic-settings-to-collect-logs-from-your-aks-deployment)
+  - [1.8 Create an alert](#18-create-an-alert)
+  - [1.9 Optional: Configure data collection in Container insights using ConfigMap](#19-optional-configure-data-collection-in-container-insights-using-configmap)
+    - [1.9.1 TODO](#191-todo)
+  - [1.10 Experimentation time](#110-experimentation-time)
 
 
 
@@ -58,7 +58,7 @@ This section describes how to enable monitoring of your Kubernetes clusters usin
 You can enable monitoring in multiple different ways. You can use the Azure Portal, Azure CLI, Azure Resource Manager template, Terraform, or Azure Policy. In this section, we will use Azure CLI, but feel free to learn more. A good place to start is here: https://learn.microsoft.com/en-us/azure/azure-monitor/containers/kubernetes-monitoring-enable 
 
 
-## 1.3 Enable Prometheus and Grafana
+## 1.2.1 Enable Prometheus and Grafana
 
 The only requirement to enable Azure Monitor managed service for Prometheus is to create an Azure Monitor workspace, which is where Prometheus metrics are stored. Once this workspace is created, you can onboard services that collect Prometheus metrics.
 
@@ -85,10 +85,10 @@ Use the following example command, but replace with your own information (for ex
  ```
 
 
-## 1.3 Verify deployment
+## 1.2.2 Verify deployment
 Use *kubectl*  to verify that the agent is deployed properly.
 
-### 1.3.1 Managed Prometheus
+### 1.2.2.1 Managed Prometheus
 
 **Verify that the DaemonSet was deployed properly on the Linux node pools**
 
@@ -119,7 +119,7 @@ ama-metrics-5c974985b8          1         1         1       11h
 ama-metrics-ksm-5fcf8dffcd      1         1         1       11h
 ```
 
-## 1.4 Create grafana dashboard
+## 1.3 Create grafana dashboard
 Go to the "Azure Managed Grafana" resource that was created in your spoke RG. In the blade that opens up, you should see a "Endpoint" that looks similar to this: ```` https://managed-grafana-eqbpc5gdbvh2dub7.eus.grafana.azure.com````
 
 Use the menu (three parallell lines) in the top left of the page, and select "Dashboards".
@@ -132,11 +132,11 @@ You should see something similar to this (but dont forget to scroll further down
 ![Screenshot](images/kubelet-grafana.png)
 
 
-## 1.5 Experimentation time
+## 1.4 Experimentation time
 Use google/copilot/your own imagination to experiment a little bit with some dashboards.
 
 
-## 1.6 Enable Container insights
+## 1.5 Enable Container insights
 
 Create a log-analytics workspace
 
@@ -154,9 +154,9 @@ az aks enable-addons -a monitoring -n $AKS_CLUSTER_NAME-${STUDENT_NAME}  -g $SPO
 ```
 
 
-## 1.7 Verify deployment
+## 1.6 Verify deployment
 
-### 1.7.1 Container insights
+### 1.6.1 Container insights
 
 **Verify that the DaemonSets were deployed properly on the Linux node pools**
 
@@ -189,7 +189,7 @@ ama-logs-rs   1/1     1            1           24d
 ```
 
 
-## 1.8 Enable diagnostic settings to collect logs from your AKS deployment
+## 1.7 Enable diagnostic settings to collect logs from your AKS deployment
 
 Get the resource ID of your AKS cluster (needed below)
 ````
@@ -208,7 +208,7 @@ Now, create a diagnostic setting that collects all metrics from your AKS cluster
 az monitor diagnostic-settings create --resource $AKS_RESOURCE_ID --name ds-allmetrics-aks --metrics '[{"category": "AllMetrics", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]' --resource-group $SPOKE_RG --workspace $LOG_ANALYTICS_WORKSPACE
   ````
 
-## 1.9 Create an alert
+## 1.8 Create an alert
 
 Azure Monitor alerts proactively notify you when important conditions are found in your monitoring data. Log search alert rules create an alert when a log query returns a particular result. For example, receive an alert when a particular event is created on a virtual machine, or send a warning when pods can not be scheduled on any node in an AKS cluster.
 
@@ -217,9 +217,9 @@ Azure Monitor alerts proactively notify you when important conditions are found 
 
 
 
-## 1.10 Optional: Configure data collection in Container insights using ConfigMap
+## 1.9 Optional: Configure data collection in Container insights using ConfigMap
 
-### 1.10.1 TODO 
+### 1.9.1 TODO 
 https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-data-collection-configmap
 use monitoring-comfig-map.yaml
 
@@ -238,7 +238,7 @@ A few examples
 
 
 
-## 1.11 Experimentation time
+## 1.10 Experimentation time
 
 Use copilot/google/stack overflow/MS learn to create dashboards in Grafana and Azure Monitor.
 
