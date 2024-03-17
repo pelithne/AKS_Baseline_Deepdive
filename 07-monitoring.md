@@ -1,5 +1,29 @@
 # 7 Monitoring
 
+Env var
+
+````
+HUB_RG=rg-hub
+SPOKE_RG=rg-spoke
+LOCATION=eastus 
+BASTION_NSG_NAME=Bastion_NSG
+JUMPBOX_NSG_NAME=Jumpbox_NSG
+AKS_NSG_NAME=Aks_NSG
+ENDPOINTS_NSG_NAME=Endpoints_NSG
+LOADBALANCER_NSG_NAME=Loadbalancer_NSG
+APPGW_NSG=Appgw_NSG
+FW_NAME=azure-firewall
+APPGW_NAME=AppGateway
+ROUTE_TABLE_NAME=spoke-rt
+AKS_IDENTITY_NAME=aks-msi
+JUMPBOX_VM_NAME=Jumpbox-VM
+AKS_CLUSTER_NAME=private-aks
+AZ_MON_WORKSPACE=azmon-ws
+MANAGED_GRAFANA_NAME=managed-grafana-ws
+LOG_ANALYTICS_WORKSPACE=log-analytics-ws
+
+````
+
 # Enable monitoring for Kubernetes clusters
 
 This section describes how to enable monitoring of your Kubernetes clusters using the following Azure Monitor features:
@@ -16,7 +40,7 @@ You can enable monitoring in multiple different ways. You can use the Azure Port
 The only requirement to enable Azure Monitor managed service for Prometheus is to create an Azure Monitor workspace, which is where Prometheus metrics are stored. Once this workspace is created, you can onboard services that collect Prometheus metrics.
 
 ```azurecli
-az monitor account create --name <azure-monitor-workspace-name> --resource-group <resource-group-name> --location <location>
+az monitor account create --name  --resource-group $SPOKE_RG --location $LOCATION
 ```
 
 Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4243-b5c1-f5d92fb8f8a4/resourcegroups/akstemp/providers/microsoft.monitor/accounts/monitorworkspace````
@@ -24,27 +48,38 @@ Make a note of the resource id. It should look similar to this ````/subscription
 To enable Grafana, you also need to create a Grafana workspace.
 
 ```azurecli
-az grafana create --name <managed-grafana-resource-name> --resource-group <resource-group-name>
+az grafana create --name $MANAGED_GRAFANA_NAME --resource-group $SPOKE_RG
 ```
 
 Make a note of the resource id. It should look similar to this ````/subscriptions/e1519e1a-ec51-4243-b5c1-f5d92fb8f8a4/resourceGroups/akstemp/providers/Microsoft.Dashboard/grafana/managedgrafanaws````
 
-Now you can connect the Azure monitor workspace with the Grafana workspace. This will enable you to create Grafana dashboards using the Azure monitor workspace, with prometheus metrics enabled, as a backend data source.
+Now you can connect the Azure monitor workspace with the Grafana workspace. This will enable you to create Grafana dashboards using data from the Azure monitor workspace, with prometheus metrics enabled.
 
 Use the following example command, but replace with your own information (for example the resource ids created in the previous steps):
 
 ```azurecli
- az aks update --enable-azure-monitor-metrics -n aks -g spoke-rg --azure-monitor-workspace-resource-id "/subscriptions/e1519e1a-ec51-4173-b5c1-f5d92fb8f8a4/resourcegroups/akstemp/providers/microsoft.monitor/accounts/monitorworkspace"  --grafana-resource-id  "/subscriptions/e1519e1a-ec51-4173-b5c1-f5d92fb8f8a4/resourceGroups/akstemp/providers/Microsoft.Dashboard/grafana/managedgrafanaws"
+ az aks update --enable-azure-monitor-metrics -n $AKS_CLUSTER_NAME -g $SPOKE_RG --azure-monitor-workspace-resource-id "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourcegroups/rg-spoke/providers/microsoft.monitor/accounts/azmon-workspace"  --grafana-resource-id  "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/rg-spoke/providers/Microsoft.Dashboard/grafana/managed-grafana"
  ```
+
+## Create grafana dashboard
 
 
 
 ## Enable Container insights
 
-```azurecli
-### Use default Log Analytics workspace
-az aks enable-addons -a monitoring -n <cluster-name> -g <cluster-resource-group-name>
+Create a log-analytics workspace
 
+````azurecli
+az monitor log-analytics workspace create -g $SPOKE_RG -n LOG_ANALYTICS_WORKSPACE
+````
+
+Make a note of the log-analytics workspace resource ID. It should look similar to ````/subscriptions/e1519e1a-ec51-4173-b4d 1-f5d92fb8f8a4/resourceGroups/rg-spoke/providers/Microsoft.OperationalInsights/workspaces/MyWorkspace````
+
+
+Then enable the monitoring add-on for AKS. 
+
+```azurecli
+az aks enable-addons -a monitoring -n <cluster-name>  -g spoke-rg --workspace-resource-id <workspace-resource-id>
 ```
 
 
@@ -139,6 +174,58 @@ The command will return JSON-formatted information about the solution. The `addo
 ```
 
 
+
+## Configure data collection in Container insights using ConfigMap
+
+### TODO 
+https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-data-collection-configmap
+use monitoring-comfig-map.yaml
+
+A few examples
+
+| log_collection_settings           | Value                   | Description                                                 | Default value |
+| --------                          | --------                | ---------                                                   | ------- |
+| [stdout] enabled                  | true/false              | Controls whether stdout container log collection is enabled | true |
+| [stdout] exclude_namespaces       | Comma-separated array   | Array of namespaces for which stdout logs won't be collected| ["kube-system","gatekeeper-system"] |
+| [stderr] enabled                  | true/false              | Controls whether stderr container log collection is enabled | true |
+| [stderr] exclude_namespaces       | Comma-separated array   | Array of namespaces for which stderr logs won't be collected| ["kube-system","gatekeeper-system"] |
+| [collect_all_kube_events] enabled | true/false              | Controls whether Kube events of all types are collected. By default, the Kube events with type Normal aren't collected| false |
+
+
+
+## Configure syslog and display using grafana
+
+Container Insights offers the ability to collect Syslog events from Linux nodes in your Azure Kubernetes Service (AKS) clusters. This includes the ability to collect logs from control plane components like kubelet. Customers can also use Syslog for monitoring security and health events, typically by ingesting syslog into a SIEM system like Microsoft Sentinel.
+
+https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-syslog
+
+````
+az aks enable-addons -a monitoring --enable-msi-auth-for-monitoring --enable-syslog -g syslog-rg -n existing-cluster
+````
+
+## Query logs from Container insights
+
+Container insights collects performance metrics, inventory data, and health state information from container hosts and containers. The data is collected every three minutes and forwarded to the Log Analytics workspace in Azure Monitor where it's available for log queries using Log Analytics in Azure Monitor.
+
+https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-log-query
+https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-tutorial
+
+
+Use "playground" to learn more:
+https://portal.azure.com/#view/Microsoft_OperationsManagementSuite_Workspace/LogsDemo.ReactView
+
+
+
+## Create an alert
+
+
 ## Experimentation time
 
 Use copilot/google/stack overflow/MS learn to create dashboards in Grafana and Azure Monitor.
+
+
+
+
+
+
+//References: https://learn.microsoft.com/en-us/azure/azure-monitor/containers/monitor-kubernetes
