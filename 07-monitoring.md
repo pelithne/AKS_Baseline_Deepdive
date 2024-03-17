@@ -41,7 +41,7 @@ LOG_ANALYTICS_WORKSPACE=log-analytics-ws
 
 # 1.1 Precondition
 
-Open up FW to allow access to Azure Monitor endpoints.
+Open up FW to allow access to Azure Monitor endpoints. An alternative way to achieve the same behavior would be to make the log collection endpoints private within the VNET.
 
 ````bash
 az network firewall application-rule create --collection-name 'aksfwmon' --firewall-name $FW_NAME -n 'Allow_Azmon' --source-addresses '*' --protocols 'http=80' 'https=443' --target-fqdns "*.handler.control.monitor.azure.com" "*.ingest.monitor.azure.com" "*.monitoring.azure.com" "*.monitor.azure.com" "login.microsoftonline.com" --action Allow --priority 102 --resource-group $HUB_RG
