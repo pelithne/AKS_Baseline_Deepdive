@@ -1,7 +1,7 @@
-# 2 Deploy Infrastructure
+# Deploy Infrastructure
 
  **In This Article:**
-- [2 Deploy Infrastructure](#2-deploy-infrastructure)
+- [Deploy Infrastructure](#deploy-infrastructure)
   - [1.1 Deployment](#11-deployment)
     - [1.1.1 Prepare Environment Variables for infrastructure](#111-prepare-environment-variables-for-infrastructure)
     - [1.1.2 Create the Resource Groups for the Hub and Spoke.](#112-create-the-resource-groups-for-the-hub-and-spoke)
