@@ -23,7 +23,7 @@
 
 First, recreate a few environment variables
 
-````
+````bash
 HUB_RG=rg-hub
 SPOKE_RG=rg-spoke
 LOCATION=eastus 
@@ -41,7 +41,11 @@ LOG_ANALYTICS_WORKSPACE=log-analytics-ws
 
 # 1.1 Precondition
 
-Open up FW to allow access to Azure Monitor endpoints. 
+Open up FW to allow access to Azure Monitor endpoints.
+
+````bash
+az network firewall application-rule create --collection-name 'aksfwmon' --firewall-name $FW_NAME -n 'Allow_Azmon' --source-addresses '*' --protocols 'http=80' 'https=443' --target-fqdns "*.handler.control.monitor.azure.com" "*.ingest.monitor.azure.com" "*.monitoring.azure.com" "*.monitor.azure.com" "login.microsoftonline.com" --action Allow --priority 102 --resource-group $HUB_RG
+````
 
 # 1.2 Enable monitoring for Kubernetes clusters
 
