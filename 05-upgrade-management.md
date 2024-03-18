@@ -10,7 +10,7 @@
   - [1.5 Allowed Upgrade Paths](#15-allowed-upgrade-paths)
 
 
-As part of the application and cluster lifecycle, you need to make sure to stay on a current version of Kubernetes. You can upgrade your Azure Kubernetes Service (AKS) cluster using the Azure CLI, Azure PowerShell, or the Azure portal. In this instuction you will use the Azure CLI.
+As part of the application and cluster lifecycle, you need to make sure to stay on a current version of Kubernetes. You can upgrade your Azure Kubernetes Service (AKS) cluster using the Azure CLI, Azure PowerShell, or the Azure portal. In this instruction you will use the Azure CLI.
 
 In this section you learn how to:
 
@@ -24,7 +24,7 @@ In this section you learn how to:
 Before you upgrade, check which Kubernetes releases are available for your cluster using the ````az aks get-upgrades```` command.
 
 ````bash
-az aks get-upgrades --resource-group $RESOURCE_GROUP --name $CLUSTERNAME
+az aks get-upgrades --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME
 ````
 
 The following example output shows the current version as *1.26.6* and lists the available versions under *upgrades*.
@@ -56,7 +56,7 @@ AKS nodes are carefully cordoned and drained to minimize any potential disruptio
 
 * Adds a new buffer node (or as many nodes as configured in ````max surge````) to the cluster that runs the specified Kubernetes version.
 * Cordons and drains one of the old nodes to minimize disruption to running applications. If you're using max surge, it cordons and drains as many nodes at the same time as the number of buffer nodes specified.
-* When the old node is drained, it's reimaged to receive the new version and becomes the buffer node for the following node to be upgraded.
+* When the old node is drained, it's re-imaged to receive the new version and becomes the buffer node for the following node to be upgraded.
 * This process repeats until all nodes in the cluster have been upgraded.
 
 
@@ -64,8 +64,8 @@ Upgrade your cluster to 1.27.3 using the ````az aks upgrade```` command.
 
 ````bash
 az aks upgrade \
-    --resource-group $RESOURCE_GROUP \
-    --name $CLUSTERNAME \
+    --resource-group $SPOKE_RG \
+    --name $AKS_CLUSTER_NAME \
     --kubernetes-version 1.27.3
 ````
 
@@ -119,7 +119,7 @@ default 9m22s Normal Surge node/aks-nodepool1-96663640-vmss000002 Created a surg
 Confirm the upgrade was successful using the ````az aks show```` command.
 
 ````bash
-az aks show --resource-group $RESOURCE_GROUP --name $CLUSTERNAME --output table
+az aks show --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME --output table
 ````
 
 The following example output shows the AKS cluster runs *KubernetesVersion 1.27.3:
@@ -136,7 +136,7 @@ Kubernetes can only be upgraded one minor version at a time. For example, you ca
 As you are now on 1.27.3, you should be able to see the available upgrade to 1.28.0. You can confirm this by once again running this command:
 
 ````
-az aks get-upgrades --resource-group $RESOURCE_GROUP --name $CLUSTERNAME
+az aks get-upgrades --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME
 ````
 
 You should see the following output
