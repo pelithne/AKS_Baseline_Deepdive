@@ -296,13 +296,15 @@ KubeNodeInventory
 
 ````
 
-## 1.7 Challenge! Use this query to create an alert when node CPU utilization is over a threshold (pick a threshold that will generate alerts). 
+## 1.8 Challenge! 
+
+Use the previously query to create an alert when node CPU utilization is over a threshold (pick a threshold that will generate alerts). 
 
 Here's some help along the way: https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/tutorial-log-alert 
 
 
 
-### 1.8 Experiment
+### 1.9 Experiment
 
 Play around, and create a few queries. Pro-tip: if you right click on a field in the output from a query, you can select to include that field in the query (or you can select to exclude it). This is an easy way to start building useful queries. 
 
@@ -312,9 +314,9 @@ Read more about KubePodInventory here: https://learn.microsoft.com/en-us/azure/a
 
 
 
-## 1.9 Optional: Configure data collection in Container insights using ConfigMap
+## 1.10 Optional: Configure data collection in Container insights using ConfigMap
 
-### 1.9.1 TODO 
+### 1.10.1 TODO 
 https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-data-collection-configmap
 use monitoring-comfig-map.yaml
 
