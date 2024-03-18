@@ -132,6 +132,17 @@ You should see something similar to this (but dont forget to scroll further down
 
 ![Screenshot](images/kubelet-grafana.png)
 
+<br>
+<br>
+<br>
+  
+
+> [!Note]
+> Only the user that created the Grafana dashboard gets the permission to view it. 
+> To resolve this, other users needs to create a role-assignment of type *Grafana Admin*
+
+![Screenshot](images/grafana-role-assignment.png)
+
 
 ## 1.4 Experimentation time
 Use google/copilot/your own imagination to experiment a little bit with some dashboards.
