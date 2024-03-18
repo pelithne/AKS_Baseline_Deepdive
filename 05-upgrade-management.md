@@ -24,7 +24,7 @@ In this section you learn how to:
 Before you upgrade, check which Kubernetes releases are available for your cluster using the ````az aks get-upgrades```` command.
 
 ````bash
-az aks get-upgrades --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME
+az aks get-upgrades --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
 
 The following example output shows the current version as *1.26.6* and lists the available versions under *upgrades*.
@@ -65,7 +65,7 @@ Upgrade your cluster to 1.27.3 using the ````az aks upgrade```` command.
 ````bash
 az aks upgrade \
     --resource-group $SPOKE_RG \
-    --name $AKS_CLUSTER_NAME \
+    --name $AKS_CLUSTER_NAME-${STUDENT_NAME} \
     --kubernetes-version 1.27.3
 ````
 
@@ -119,7 +119,7 @@ default 9m22s Normal Surge node/aks-nodepool1-96663640-vmss000002 Created a surg
 Confirm the upgrade was successful using the ````az aks show```` command.
 
 ````bash
-az aks show --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME --output table
+az aks show --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME} --output table
 ````
 
 The following example output shows the AKS cluster runs *KubernetesVersion 1.27.3:
@@ -136,7 +136,7 @@ Kubernetes can only be upgraded one minor version at a time. For example, you ca
 As you are now on 1.27.3, you should be able to see the available upgrade to 1.28.0. You can confirm this by once again running this command:
 
 ````
-az aks get-upgrades --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME
+az aks get-upgrades --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
 
 You should see the following output
