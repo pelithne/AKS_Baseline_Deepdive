@@ -39,9 +39,9 @@ LOG_ANALYTICS_WORKSPACE=log-analytics-ws
 
 ````
 
-# 1.1 Precondition
+# 1.1 Prerequisite
 
-Open up FW to allow access to Azure Monitor endpoints. An alternative way to achieve the same behavior would be to make the log collection endpoints private within the VNET.
+Open up FW to allow access from the monitoring agents in the Kubernetes cluster to Azure Monitor endpoints. An alternative way to achieve the same goal would be to make the log collection endpoints private within the VNET.
 
 ````bash
 az network firewall application-rule create --collection-name 'aksfwmon' --firewall-name $FW_NAME -n 'Allow_Azmon' --source-addresses '*' --protocols 'http=80' 'https=443' --target-fqdns "*.handler.control.monitor.azure.com" "*.ingest.monitor.azure.com" "*.monitoring.azure.com" "*.monitor.azure.com" "login.microsoftonline.com" --action Allow --priority 102 --resource-group $HUB_RG
@@ -189,7 +189,7 @@ ama-logs-rs   1/1     1            1           24d
 ```
 
 
-## 1.7 Enable diagnostic settings to collect logs from your AKS deployment
+## 1.7 Create diagnostic settings to collect logs from your AKS deployment
 
 Get the resource ID of your AKS cluster (needed below)
 ````
@@ -205,10 +205,65 @@ azureuser@Jumpbox-VM:~$ echo $AKS_RESOURCE_ID
 Now, create a diagnostic setting that collects all metrics from your AKS cluster and forwards them to the log-analytics workpace previously created.
 
 ````
-az monitor diagnostic-settings create --resource $AKS_RESOURCE_ID --name ds-allmetrics-aks --metrics '[{"category": "AllMetrics", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]' --resource-group $SPOKE_RG --workspace $LOG_ANALYTICS_WORKSPACE
+az monitor diagnostic-settings create --resource $AKS_RESOURCE_ID --name ds-morelogs-aks --logs "[{category:kube-apiserver,enabled:true
+},{category:kube-audit,enabled:true}]" --resource-group $SPOKE_RG --workspace $LOG_ANALYTICS_WORKSPACE
   ````
+/*
+ --logs '[{"category": "kube-apiserver", "enabled": true}, {"category": "kube-controller-manager", "enabled": true}, {"category": "kube-scheduler", "enabled": true}, {"category": "kube-audit", "enabled": true}, {"category": "kube-node", "enabled": true}, {"category": "kube-problem-detector", "enabled": true}, {"category": "kube-proxy", "enabled": true}, {"category": "kubelet", "enabled": true}, {"category": "container-insights", "enabled": true}]'
+
+  --metrics '[{"category": "AllMetrics", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]'
+  */
+
+Now make a simple Kusto query, by navigating to the AKS cluster and clicking on logs. Close out the box that appears with suggested queries (this can be useful, but for now will will create our own queries). 
+
+In the "query window" type this, and then press the play button:
+
+````
+KubePodInventory 
+````
+Now you can make the query a little bit more specific:
+
+````
+KubePodInventory 
+| where PodRestartCount > 5
+````
+
+You can also generate more specific info, like this query which display metrics scraped by Azure Monitor and filtered by namespace "prometheus"
+
+````
+InsightsMetrics 
+| where Namespace contains "prometheus"
+| extend tags=parse_json(Tags)
+| summarize count() by Name
+````
+
+If you want to display results as a bar chart, you can do something like the below. This specific query identifies the ingestion volume of each metrics size in GB per day to understand if it's high. 
+
+````
+InsightsMetrics
+| where Namespace contains "prometheus"
+| where TimeGenerated > ago(24h)
+| summarize VolumeInGB = (sum(_BilledSize) / (1024 * 1024 * 1024)) by Name
+| order by VolumeInGB desc
+| render barchart
+````
+
+
+### 1.7.1 Experiment
+
+Play around, and create a few queries. Pro-tip: if you right click on a field in the output from a query, you can select to include that field in the query (or you can select to exclude it). This is an easy way to start building useful queries. 
+
+Here are some example queries: https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-log-query#example-log-search-queries
+
+Read more about KubePodInventory here: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/kubepodinventory
+
+
+
+
 
 ## 1.8 Create an alert
+
+TODO
 
 Azure Monitor alerts proactively notify you when important conditions are found in your monitoring data. Log search alert rules create an alert when a log query returns a particular result. For example, receive an alert when a particular event is created on a virtual machine, or send a warning when pods can not be scheduled on any node in an AKS cluster.
 
@@ -232,16 +287,6 @@ A few examples
 | [stderr] enabled                  | true/false              | Controls whether stderr container log collection is enabled | true |
 | [stderr] exclude_namespaces       | Comma-separated array   | Array of namespaces for which stderr logs won't be collected| ["kube-system","gatekeeper-system"] |
 | [collect_all_kube_events] enabled | true/false              | Controls whether Kube events of all types are collected. By default, the Kube events with type Normal aren't collected| false |
-
-
-
-
-
-
-## 1.10 Experimentation time
-
-Use copilot/google/stack overflow/MS learn to create dashboards in Grafana and Azure Monitor.
-
 
 
 
