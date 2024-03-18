@@ -208,11 +208,6 @@ Now, create a diagnostic setting that collects all metrics from your AKS cluster
 az monitor diagnostic-settings create --resource $AKS_RESOURCE_ID --name ds-morelogs-aks --logs "[{category:kube-apiserver,enabled:true
 },{category:kube-audit,enabled:true}]" --resource-group $SPOKE_RG --workspace $LOG_ANALYTICS_WORKSPACE
   ````
-/*
- --logs '[{"category": "kube-apiserver", "enabled": true}, {"category": "kube-controller-manager", "enabled": true}, {"category": "kube-scheduler", "enabled": true}, {"category": "kube-audit", "enabled": true}, {"category": "kube-node", "enabled": true}, {"category": "kube-problem-detector", "enabled": true}, {"category": "kube-proxy", "enabled": true}, {"category": "kubelet", "enabled": true}, {"category": "container-insights", "enabled": true}]'
-
-  --metrics '[{"category": "AllMetrics", "enabled": true, "retention-policy": {"enabled": false, "days": 0}}]'
-  */
 
 Now make a simple Kusto query, by navigating to the AKS cluster and clicking on logs. Close out the box that appears with suggested queries (this can be useful, but for now will will create our own queries). 
 
