@@ -14,7 +14,7 @@ In this repository, there are a number of Terraform templates. You will not use 
 
 In the folder named "Terraform" you will find the main template, aptly named ````main.tf````
 
-This main template is referencing a number of *modules*. The modules in term are responsible for deploying the various Azure resources used in the AKS Secure Baseline. YOu will see an AKS module, an application_gateway module, a virtual_network module, and so on.
+This main template is referencing a number of *modules*. The modules in term are responsible for deploying the various Azure resources used in the AKS Secure Baseline. You will see an AKS module, an application_gateway module, a virtual_network module, and so on.
 
 Please take some time to familiarize yourself with the content of the templates. No need to understand everything, but try to get an overview at least.
 
