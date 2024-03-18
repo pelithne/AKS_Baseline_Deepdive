@@ -22,9 +22,24 @@ Please take some time to familiarize yourself with the content of the templates.
 
 Azure Devops is the tool that will be used to run the templates. In order to do so, you need to go through a couple of steps, which will be detailed further down:
 
-* Login to the Azure Devops organization (we have prepared this for you)
+* Login to the Azure Devops organization (we have prepared the organization for you)
 * Create a service connection to Azure, to allow the pipeline to interact with Azure and AKS
 * Create a self-hosted agent that will run all the tasks in the pipeline (we have prepared this as well)
 * Clone repository (this repository) to give Azure Devops access to the Terraform templates, and the preconfigured pipeline definitions (we have prepared this )
 * Edit the necessary parameters, and run the pipeline
 * Troubleshoot... :-)
+
+### Login to the Azure Devops organization
+
+
+### Create a service connection to Azure
+
+
+### Create a self-hosted agent
+
+
+### Clone repository
+
+
+### Run the pipeline
+
