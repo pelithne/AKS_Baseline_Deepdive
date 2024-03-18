@@ -23,9 +23,11 @@ Apart from these main topics, there are a number of additional sections intended
 
 7: <a href="07-monitoring.md">Monitoring</a>
 
-8: <a href="08-automation.md">Automation</a>
+8: <a href="08-defender-for-containers.md">Defender for Containers</a>
 
-9: <a href="09-defender-for-containers.md">Defender for Containers</a>
+9: <a href="09-automation.md">Automation</a>
+
+
 
 
 # Introduction
