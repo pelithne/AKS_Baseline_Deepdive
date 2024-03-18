@@ -183,8 +183,23 @@ kubectl delete pods mdc-test
 
 ## 1.4 Import Vulnerable image to Container Registry
 
+Download the docker image to your **jumpbox VM**:
+
 ````bash
-az acr import --name $ACRNAME --source docker.io/vulnerables/metasploit-vulnerability-emulator
+docker pull docker.io/vulnerables/metasploit-vulnerability-emulator
+````
+
+Tag the docker image:
+
+````bash
+docker tag vulnerables/metasploit-vulnerability-emulator $ACR_NAME.azurecr.io/metasploit-vulnerability-emul
+ator
+````
+
+Push the vulnerable docker image to azure container registry.
+
+````bash
+docker push $ACR_NAME.azurecr.io/metasploit-vulnerability-emulator
 ````
 
 ## 1.5 Review Microsoft Defender for Containers Recommendations
