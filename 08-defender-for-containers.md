@@ -199,7 +199,7 @@ az acr import --name $ACRNAME --source docker.io/vulnerables/metasploit-vulnerab
 
 3) Click on your **container registry** from the list.
 
-![Screenshot](/images/Slide10.PNG)
+![Screenshot](/images/Slide4.PNG)
 
 4) On the menu to the left hand side click on **Microsoft Defender for Cloud** to view your **recommendations**.
 
