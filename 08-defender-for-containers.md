@@ -32,6 +32,12 @@ Import the metasploit vulnerability emulator docker image from Docker Hub to you
 
 ## 1.2 Prerequisites
 
+Update the firewall to allow AKS to pull images from docker hub.
+
+````bash
+az network firewall application-rule create --collection-name 'aksdockerhub' --firewall-name $FW_NAME -n 'Allow_Azmon' --source-addresses '*' --protocols 'http=80' 'https=443' --target-fqdns "*.docker.io" "auth.docker.io" "registry-1.docker.io" "*.monitor.azure.com" "production.cloudflare.docker.com" --action Allow --priority 103 --resource-group $HUB_RG
+````
+
 Please make sure that Microsoft Defender for Containers is activated on your subscription. Here are the steps you can follow to enable it.
 
 > [!IMPORTANT]
