@@ -298,7 +298,7 @@ KubeNodeInventory
 
 ## 1.8 Challenge! 
 
-Use the previously query to create an alert when node CPU utilization is over a threshold (pick a threshold that will generate alerts). 
+Use the previously created query to create an alert when node CPU utilization is over a threshold (pick a threshold that will generate alerts). 
 
 Here's some help along the way: https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/tutorial-log-alert 
 
