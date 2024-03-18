@@ -248,6 +248,48 @@ InsightsMetrics
 | render barchart
 ````
 
+Or, you could go big and query for average node cpu utilization per minute:
+````
+// Avg node CPU usage percentage per minute  
+// For your cluster view avg node CPU usage percentage per minute over the last hour. 
+// To create an alert for this query, click '+ New alert rule'
+//Modify the startDateTime & endDateTime to customize the timerange
+let endDateTime = now();
+let startDateTime = ago(1h);
+let trendBinSize = 1m;
+let capacityCounterName = 'cpuCapacityNanoCores';
+let usageCounterName = 'cpuUsageNanoCores';
+KubeNodeInventory
+| where TimeGenerated < endDateTime
+| where TimeGenerated >= startDateTime
+// cluster filter would go here if multiple clusters are reporting to the same Log Analytics workspace
+| distinct ClusterName, Computer, _ResourceId
+| join hint.strategy=shuffle (
+  Perf
+  | where TimeGenerated < endDateTime
+  | where TimeGenerated >= startDateTime
+  | where ObjectName == 'K8SNode'
+  | where CounterName == capacityCounterName
+  | summarize LimitValue = max(CounterValue) by Computer, CounterName, bin(TimeGenerated, trendBinSize)
+  | project Computer, CapacityStartTime = TimeGenerated, CapacityEndTime = TimeGenerated + trendBinSize, LimitValue
+) on Computer
+| join kind=inner hint.strategy=shuffle (
+  Perf
+  | where TimeGenerated < endDateTime + trendBinSize
+  | where TimeGenerated >= startDateTime - trendBinSize
+  | where ObjectName == 'K8SNode'
+  | where CounterName == usageCounterName
+  | project Computer, UsageValue = CounterValue, TimeGenerated
+) on Computer
+| where TimeGenerated >= CapacityStartTime and TimeGenerated < CapacityEndTime
+| project ClusterName, Computer, TimeGenerated, UsagePercent = UsageValue * 100.0 / LimitValue, _ResourceId
+| summarize AggregatedValue = avg(UsagePercent) by bin(TimeGenerated, trendBinSize), ClusterName, _ResourceId
+
+````
+
+Challenge: use this query to create an alert when node CPU utilization is over a threshold (pick a threshold that will generate alerts). Here's some help along the way: https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/tutorial-log-alert 
+
+
 
 ### 1.7.1 Experiment
 
@@ -256,19 +298,6 @@ Play around, and create a few queries. Pro-tip: if you right click on a field in
 Here are some example queries: https://learn.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-log-query#example-log-search-queries
 
 Read more about KubePodInventory here: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/kubepodinventory
-
-
-
-
-
-## 1.8 Create an alert
-
-TODO
-
-Azure Monitor alerts proactively notify you when important conditions are found in your monitoring data. Log search alert rules create an alert when a log query returns a particular result. For example, receive an alert when a particular event is created on a virtual machine, or send a warning when pods can not be scheduled on any node in an AKS cluster.
-
-
-
 
 
 
