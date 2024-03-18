@@ -210,9 +210,11 @@ az monitor diagnostic-settings create --resource $AKS_RESOURCE_ID --name ds-more
 },{category:kube-audit,enabled:true}]" --resource-group $SPOKE_RG --workspace $LOG_ANALYTICS_WORKSPACE
   ````
 
-Now make a simple Kusto query, by navigating to the AKS cluster and clicking on logs. Close out the box that appears with suggested queries (this can be useful, but for now will will create our own queries). 
+Now make a simple Kusto query, by navigating to your AKS cluster in the Azure Portal and clicking on logs in the left hand navigation panel.
 
-In the "query window" type this, and then press the play button:
+Close out the box that appears with suggested queries (this can be useful, but for now will will create our own queries). 
+
+In the "query window" that opens up type in the text below and then press the play button:
 
 ````
 KubePodInventory 
