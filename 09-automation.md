@@ -204,6 +204,14 @@ The predefined pipeline needs a few variables to run. Go to **Pipelines** -> **L
 
 Then fill out the values as follows, using values relevant to your subscription. It is important to name the the group **global-variables** as this is the name we used in the pre-created pipeline.
 
+| Key                              | Description                                                       |
+|----------------------------------|-------------------------------------------------------------------|
+| ssh-public-key                   | use e.g. ssh-keygen to generate a key pair. Use the public key here |
+| TerraformBackendContainerName    | tfstate                                                           |
+| TerraformBackendResourceGroupName| rg-agent-terraform                                                |
+| TerraformBackendStorageAccountKey| terraform.tfstate                                                 |
+| TerraformBackendStorageAccountName| <name of the storage account created in a previous step>          |
+
 <img src="images/new-variable-group-2.png" width="600">
 
 
