@@ -211,7 +211,7 @@ Then fill out the values as follows, using values relevant to your subscription.
 
 ### Run the pipeline
 
-Take a minute to review the pipeline. It's in yaml-format and is reasonably human-understandable. When you have started understanding, go ahead and replace the following string with your own information. 
+Take a minute to review the pipeline. It's in yaml-format and is reasonably human-understandable. When you have started understanding, go ahead and replace the following variables with information relevant to your subscription. 
 
 
 The "azureSubscription" variable should point to the service connection **name** you previously created.
