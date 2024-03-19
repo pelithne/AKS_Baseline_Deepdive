@@ -196,6 +196,19 @@ Finally, you need to specify which pipeline to use. The correct one is ````/pipe
 
 <img src="images/select-an-existing-yaml-file.png" width="400">
 
+
+
+### Create global variables
+
+The predefined pipeline needs a few variables to run. Go to **Pipelines** -> **Library** in the left hand navigation bar and select **create new variable group**
+
+<img src="images/new-variable-group.png" width="400">
+
+Then fill out the values as follows:
+
+<img src="images/new-variable-group-2.png" width="400">
+
+
 ### Run the pipeline
 
 Take a minute to review the pipeline. It's in yaml-format and is reasonably human-understandable. When you have started understanding, go ahead and replace the following string with your own information. 
