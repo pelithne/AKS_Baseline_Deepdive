@@ -230,10 +230,12 @@ The "prefix" needs to be unique. For instance you can use a corporate signum.
 
 
 
+
+ 
+All you have to do now, is to edit the parameters that are specific to your environment. Then run the pipeline.
+
 > [!Note]
 > The first time you run the pipeline, you will have to approve a few accesses, before the pipeline is allowed to run.
 
- 
-All you have to do now, is to edit the parameters that are specific to your environment. Then run the pipeline:
 
 ![Screenshot](images/run-pipeline.png)
