@@ -23,7 +23,7 @@ module "self_hosted_agent" {
   resource_group_name = module.resource_group.name
   location            = var.location
   subnet_id           = module.virtual_network.subnet_ids[var.subnet_name]
-  subnet_id           = module.virtual_network.subnet_id.id
+  #subnet_id           = module.virtual_network.subnet_id.id
   script_path         = "${path.module}/script/configure-self-hosted-agent.sh"
   admin_password      = var.admin_password
   org_service_url     = var.org_service_url
