@@ -16,7 +16,7 @@ variables:
 - name: environment
   value: production
 - name: prefix
-  value: alipelican
+  value: alipelicanxxx
 - name: location
   value: eastus
 - name: kubernetesVersion
