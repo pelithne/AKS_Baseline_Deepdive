@@ -204,7 +204,7 @@ The predefined pipeline needs a few variables to run. Go to **Pipelines** -> **L
 
 <img src="images/new-variable-group.png" width="400">
 
-Then fill out the values as follows, using values relevant to your subscription.
+Then fill out the values as follows, using values relevant to your subscription. It is important to name the the group **global-varialbles** as this is the name we used in the pre-created pipeline.
 
 <img src="images/new-variable-group-2.png" width="600">
 
