@@ -1,9 +1,5 @@
 # Automation
 
-**In This Article:**
-
-- [Azure Devops](#Azure Devops)
-
 
 ## Introduction
 This section contains instructions about how to automate deployment of the infrastructure for AKS Secure Baseline, using Azure Devops Pipelines and Terraform. The central idea is to have the complete infrastructure defined as code (IaC) and that deployment of that infrastructure can be completely automated using Deployment Pipelines. 
@@ -31,15 +27,16 @@ Azure Devops is the tool that will be used to run the templates. In order to do 
 
 ### Login to the Azure Devops organization
 
-Login use your azure identity
+Login using the azure identity created for this workshop.
 
-![Screenshot](images/azdo-login.png)
+<img src="images/azdo-login.png" width="400">
 
 <br>
 
 When logged in you should see something similar to this:
 
-![Screenshot](images/azdo-logged-in.png)
+
+<img src="images/azdo-logged-in.png" width="400">
 
 
 ### Create a service connection to Azure
@@ -79,15 +76,13 @@ Go to project settings -> service connections
 
 Choose "Create new service connection" and select **Azure Resource Manager** and press **next**, then select "Service Prinicipal - Manual". 
 
-![Screenshot](images/service-connection-sp-1.png)
+<img src="images/service-connection-sp-1.png" width="400">
 
 Fill out the service connection information, using the below image as a template. Use the Service Principal ID and Service Principal Key created in the previous step. 
 
 Give the pipeline a meaningful name and finally check the box named "Grant access permission to all pipelines" and click **Verify and Save**. 
 
-
-![Screenshot](images/service-connection-sp-2.png)
-
+<img src="images/service-connection-sp-2.png" width="400">
 
 
 ### Create a self-hosted agent
@@ -97,7 +92,7 @@ In order to provide the Self-hosted agent access to Azure Devops, we need to cre
 
 In Azure Devops, click on the user settings icon in the top left corner (icon is a person with a "cog") and select "Personal Access Tokens".
 
-![Screenshot](images/cog-user-settings-pat.png)
+<img src="images/cog-user-settings-pat.png" width="400">
 
 In the next window that appears, select "Create New Token". In the dialogue that appears, set "Scopes" to "Full Access" and give the token a descriptive name. Remember to copy the token, as it will not be retrievable.
 
@@ -124,7 +119,8 @@ terrform init
 
 You should see the init completing successfully
 
-![Screenshot](images/terraform-init.png)
+
+<img src="images/terraform-init.png" width="600">
 
 
 
@@ -145,7 +141,10 @@ If all went well, this should deploy a VM into a VNET in your subscription and c
 
 This is how it should look in Azure Devops
 
-![Screenshot](images/ado-agent.png)
+
+
+<img src="images/ado-agent.png" width="800">
+
 
 ### Clone repository in ADO
 
@@ -155,14 +154,16 @@ Go to **repositories** in the left hand navigation bar. Since this project is em
 
 Select **Import a Repository** and in the blade that opens up, just paste in the address to **this** repo in the **clone URL** field, and press **import**
 
-![Screenshot](images/import-repo.png)
+
+<img src="images/import-repo.png" width="800">
 
 ### Create Pipeline
 
 
 Now you can select **Pipelines** from the left hand navigation bar. You should see something similar to this:
 
-![Screenshot](images/create-your-first-pipeline.png)
+
+<img src="images/create-your-first-pipeline.png" width="400">
 
 <br>
 
@@ -171,7 +172,7 @@ Go ahead and **Create Pipeline**
 You will now be asked to provide Azure Devops with the location of your code. The code has been imported to your Azure Devops repository, so select **Azure Repos Git**. 
 
 
-![Screenshot](images/where-is-your-code.png)
+<img src="images/where-is-your-code.png" width="400">
 
 
 <br>
@@ -180,21 +181,22 @@ You will now be asked to provide Azure Devops with the location of your code. Th
 Then just select the repository, which should be **AKS_Baseline_Deepdive** (this repo). 
 
 
-![Screenshot](images/select-a-repository.png)
+    <img src="images/select-a-repository.png" width="400">
 
 
 <br>
 
 Now, select **Existing Azure Pipelines YAML file** (the alternative at the very bottom)
 
-![Screenshot](images/existing-pipeline.png)
+<img src="images/existing-pipeline.png" width="600">
 
 
 <br>
 
 Finally, you need to specify which pipeline to use. The correct one is ````/pipelines/cd-validate-plan-apply-one-stage-vars.yml```` in the ````main```` branch.
 
-![Screenshot](images/select-an-existing-yaml-file.png)
+
+<img src="images/select-an-existing-yaml-file.png" width="400">
 
 ### Run the pipeline
 
