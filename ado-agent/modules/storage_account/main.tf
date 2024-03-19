@@ -8,6 +8,6 @@ resource "azurerm_storage_account" "storage" {
 
 resource "azurerm_storage_container" "tfstate" {
   name                  = "tfstate"
-  storage_account_name  = module.storage_account.storage_account_name
+  storage_account_name  = azurerm_storage_account.storage.name
   container_access_type = "private"
 }
