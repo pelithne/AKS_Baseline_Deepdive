@@ -245,3 +245,8 @@ After approving, go ahead and RUN!
 
 <img src="images/run-pipeline.png" width="400">
 
+
+Now go and pour a nice cup of coffee (or your beverage of choice). Take your time, because this might take a while. And when you come back, if all went according to expectations, you have deployed the AKS Secure Baseline using Infrastructure as Code. 
+
+:sweat_smile:
+
