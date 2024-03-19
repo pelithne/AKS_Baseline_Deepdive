@@ -15,8 +15,6 @@ module "virtual_network" {
   virtual_network_name = var.virtual_network_name
   vnet_address_space  = [var.vnet_address_space]
   subnet_name         = var.subnet_name
-  remote_resource_group_name = var.remote_resource_group_name
-  peering_name        = var.peering_name
   subnet_address_prefixes = [var.subnet_address_prefixes]
 }
 
