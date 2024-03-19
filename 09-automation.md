@@ -237,5 +237,11 @@ All you have to do now, is to edit the parameters that are specific to your envi
 > [!Note]
 > The first time you run the pipeline, you will have to approve a few accesses, before the pipeline is allowed to run.
 
+<img src="images/permit.png" width="400">
 
-![Screenshot](images/run-pipeline.png)
+<br>
+
+After approving, go ahead and RUN!
+
+<img src="images/run-pipeline.png" width="400">
+
