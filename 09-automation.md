@@ -199,12 +199,14 @@ Finally, you need to specify which pipeline to use. The correct one is ````/pipe
 Take a minute to review the pipeline. It's in yaml-format and is reasonably human-understandable. When you have started understanding, go ahead and replace the following string with your own information. 
 
 
-
+The "azureSubscription" should point to the service connection you previously created for Azure.
 ````yaml
 - name: azureSubscription
   value: <create a service connection and use here>
 ````
 
+
+The "prefix" needs to be unique. For instance you can use a corporate signum. 
 ````yaml
 - name: prefix
   value: <use a globally unique prefix here>
