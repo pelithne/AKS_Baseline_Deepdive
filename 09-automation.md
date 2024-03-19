@@ -216,6 +216,7 @@ Then fill out the values as in the image below, using values relevant to your su
 | TerraformBackendStorageAccountKey| terraform.tfstate                                                 |
 | TerraformBackendStorageAccountName| name of the storage account created in a previous step         |
 
+<br>
 
 ### Run the pipeline
 
