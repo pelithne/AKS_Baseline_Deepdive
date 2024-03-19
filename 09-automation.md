@@ -130,7 +130,7 @@ terraform plan -out plan.out
 5. Terraform plan will display all the changes it will deploy, and store that in the output file, ````plan.out````. When it completes withouth errors, you can use the content in ````plan.out```` to deploy the hosted agent, using ````terraform apply````:
 
 ````bash
-terraform apply "plan.out" 
+terraform apply plan.out
 ````
 
 If all went well, this should deploy a VM into a VNET in your subscription and configure the VM with the necessary tools to act as a Self-hosted Agent. In Azure devops it will show up as a self-hosted agent, in the **default** agent pool (more about this later).
