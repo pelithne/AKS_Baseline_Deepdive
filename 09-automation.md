@@ -214,7 +214,7 @@ Then fill out the values as in the image below, using values relevant to your su
 | TerraformBackendContainerName    | tfstate                                                           |
 | TerraformBackendResourceGroupName| rg-agent-terraform                                                |
 | TerraformBackendStorageAccountKey| terraform.tfstate                                                 |
-| TerraformBackendStorageAccountName| <name of the storage account created in a previous step>          |
+| TerraformBackendStorageAccountName| name of the storage account created in a previous step         |
 
 
 ### Run the pipeline
