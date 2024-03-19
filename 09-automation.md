@@ -104,11 +104,12 @@ Now use **Azure Cloudshell** to create the agent, using Terraform. This involves
 git clone https://github.com/pelithne/AKS_Baseline_Deepdive.git
 
 cd AKS_Baseline_Deepdive/ado-agent/
-````
+
+````bash
 
 2. Create environment variables needed for Terraform
 
-````
+````bash
 export TF_VAR_org_service_url https://dev.azure.com/<Your devops organization name>
 export TF_VAR_personal_access_token=<Previously created PAT>
 ````
@@ -128,7 +129,7 @@ You should see the init completing successfully
 
 4. If ````terraform init```` returned without errors, run ````terraform plan```` to create a deployment (but not yet deploy). You will be asked to create a password to be able to access the VM later. Choose something you will remember!
 
-````
+````bash
 terraform plan -out plan.out
 ````
 
