@@ -45,7 +45,7 @@ There are different ways to create a connection from Azure Devops to Azure. One 
 
 Create a Service Principle in Azure, and create a Role Assignment that makes the SP **Owner** in the subscription. First make sure you are logged in to the right subscription with your shell (cloudshell is our suggestion for this step).
 
-````
+````bash
 SP_NAME=<a meaningful name e.g. your team name>
  
 # Login to Azure
@@ -99,21 +99,23 @@ In the next window that appears, select "Create New Token". In the dialogue that
 Now use **Azure Cloudshell** to create the agent, using Terraform. This involves a few steps:
 
 1. Clone the repository (this repository) to get access to the template used to create the agent. Then cd into the directory with the self-hosted template (ado-agent)
-````
+
+````bash
 git clone https://github.com/pelithne/AKS_Baseline_Deepdive.git
 
 cd AKS_Baseline_Deepdive/ado-agent/
-````
+
+````bash
 
 2. Create environment variables needed for Terraform
 
-````
+````bash
 export TF_VAR_org_service_url https://dev.azure.com/<Your devops organization name>
 export TF_VAR_personal_access_token=<Previously created PAT>
 ````
 3. Initialize Terraform (important that you are located in AKS_Baseline_Deepdive/ado-agent/)
 
-````
+````bash
 terrform init
 ````
 
@@ -127,13 +129,13 @@ You should see the init completing successfully
 
 4. If ````terraform init```` returned without errors, run ````terraform plan```` to create a deployment (but not yet deploy). You will be asked to create a password to be able to access the VM later. Choose something you will remember!
 
-````
+````bash
 terraform plan -out plan.out
 ````
 
 5. Terraform plan will display all the changes it will deploy, and store that in the output file, ````plan.out````. When it completes withouth errors, you can use the content in ````plan.out```` to deploy the hosted agent, using ````terraform apply````:
 
-````
+````bash
 terraform apply "plan.out" 
 ````
 
