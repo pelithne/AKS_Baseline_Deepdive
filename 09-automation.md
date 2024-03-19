@@ -179,7 +179,7 @@ You will now be asked to provide Azure Devops with the location of your code. Th
 Then just select the repository, which should be **AKS_Baseline_Deepdive** (this repo). 
 
 
-    <img src="images/select-a-repository.png" width="400">
+<img src="images/select-a-repository.png" width="400">
 
 
 <br>
