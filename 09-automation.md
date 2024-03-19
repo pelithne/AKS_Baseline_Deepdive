@@ -135,7 +135,7 @@ You should see the init completing successfully
 terraform plan -out plan.out
 ````
 
-Terraform plan will display all the changes it will deploy, and store that in the output file, ````plan.out````. When it completes withouth errors, you can use the content in ````plan.out```` to deploy the hosted agent, using ````terraform apply````:
+5. Terraform plan will display all the changes it will deploy, and store that in the output file, ````plan.out````. When it completes withouth errors, you can use the content in ````plan.out```` to deploy the hosted agent, using ````terraform apply````:
 
 ````
 terraform apply "plan.out" 
@@ -143,7 +143,11 @@ terraform apply "plan.out"
 
 If all went well, this should deploy a VM into a VNET in your subscription and configure the VM with the necessary tools to act as a Self-hosted Agent. In Azure devops it will show up as a self-hosted agent, in the **default** agent pool (more about this later).
 
-### Clone repository in ADO**
+This is how it should look in Azure Devops
+
+![Screenshot](images/ado-agent.png)
+
+### Clone repository in ADO
 
 Before you can execute the Azure Devops pipeline, you need to "download" all the terraform templates and other things in the repo, to make it available to Azure devops (the repository is in github, remember). You will do this as a part of creating your first **Azure Pipeline**
 
@@ -191,4 +195,28 @@ Finally, you need to specify which pipeline to use. The correct one is ````/pipe
 ![Screenshot](images/select-an-existing-yaml-file.png)
 
 ### Run the pipeline
+
+Take a minute to review the pipeline. It's in yaml-format and is reasonably human-understandable. When you have started understanding, go ahead and replace the following string with your own information. 
+
+
+
+````yaml
+- name: azureSubscription
+  value: <create a service connection and use here>
+````
+
+````yaml
+- name: prefix
+  value: <use a globally unique prefix here>
+````
+
+
+
+
+
+
+
+
+ 
+All you have to do now, is to edit the parameters that are specific to your environment 
 
