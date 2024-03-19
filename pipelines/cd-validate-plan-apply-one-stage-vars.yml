@@ -6,7 +6,7 @@ pr: none
 variables:
 - group: global-variables
 - name: azureSubscription
-  value: team4-serviceconnection
+  value: <service connection name>
 - name: terraformVersion
   value: 1.7.4
 - name: terraformPath
@@ -16,7 +16,7 @@ variables:
 - name: environment
   value: production
 - name: prefix
-  value: veryrandomprefix
+  value: <veryrandomprefix>
 - name: location
   value: eastus
 - name: kubernetesVersion
