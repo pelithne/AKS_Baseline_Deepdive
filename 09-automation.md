@@ -202,7 +202,11 @@ The predefined pipeline needs a few variables to run. Go to **Pipelines** -> **L
 
 <img src="images/new-variable-group.png" width="400">
 
-Then fill out the values as follows, using values relevant to your subscription. It is important to name the the group **global-variables** as this is the name we used in the pre-created pipeline.
+Then fill out the values as in the image below, using values relevant to your subscription (as described in the table under the image). It is important to name the the group **global-variables** as this is the name we used in the pre-created pipeline.
+
+
+
+<img src="images/new-variable-group-2.png" width="600">
 
 | Key                              | Description                                                       |
 |----------------------------------|-------------------------------------------------------------------|
@@ -211,8 +215,6 @@ Then fill out the values as follows, using values relevant to your subscription.
 | TerraformBackendResourceGroupName| rg-agent-terraform                                                |
 | TerraformBackendStorageAccountKey| terraform.tfstate                                                 |
 | TerraformBackendStorageAccountName| <name of the storage account created in a previous step>          |
-
-<img src="images/new-variable-group-2.png" width="600">
 
 
 ### Run the pipeline
