@@ -52,7 +52,7 @@ SP_NAME=<a meaningful name e.g. your team name>
 az login
  
 # Create a service principal
-sp=$(az ad sp create-for-rbac --name ServicePrincipalName --sdk-auth)
+sp=$(az ad sp create-for-rbac --name $SP_NAME --sdk-auth)
  
  
 # Get the subscription id of the subscription id.
