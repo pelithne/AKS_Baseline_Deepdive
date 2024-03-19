@@ -66,8 +66,6 @@ echo $sp | jq -r .clientSecret
  
 # Assign the 'Owner' role to the service principal for the subscription
 az role assignment create --assignee $spId --role Owner --scope /subscriptions/$subscriptionId
-has context menu
-
 ````
 
 Go back to Azure Devops and open up the project called the same thing as your team (we have already created the project for you).
