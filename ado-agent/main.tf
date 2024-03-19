@@ -42,7 +42,7 @@ module "storage_account" {
   source                  = "./modules/storage_account"
   storage_account_name    = "tfstatet${random_integer.ri.result}"
   resource_group_name     = module.resource_group.name
-  location                = module.resource_group.location
+  location                = var.location
   account_tier            = "Standard"
   account_replication_type = "GRS"
 }
