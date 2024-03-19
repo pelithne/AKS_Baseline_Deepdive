@@ -214,6 +214,11 @@ The "prefix" needs to be unique. For instance you can use a corporate signum.
 
 
 
+### TODO - set global variables
+![Screenshot](images/global-variables.png)
+
+
+
 
 
 
