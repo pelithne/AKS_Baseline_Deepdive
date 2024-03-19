@@ -32,3 +32,17 @@ module "self_hosted_agent" {
   vm_extension_name   = var.vm_extension_name
   computer_name       = var.computer_name
 }
+
+resource "random_integer" "ri" {
+  min = 1000
+  max = 9999
+}
+
+module "storage_account" {
+  source                  = "./modules/storage_account"
+  storage_account_name    = "tfstatet${random_integer.ri.result}"
+  resource_group_name     = azurerm_resource_group.rg.name
+  location                = azurerm_resource_group.rg.location
+  account_tier            = "Standard"
+  account_replication_type = "GRS"
+}
