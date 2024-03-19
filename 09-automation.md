@@ -220,4 +220,4 @@ Take a minute to review the pipeline. It's in yaml-format and is reasonably huma
  
 All you have to do now, is to edit the parameters that are specific to your environment. Then run the pipeline:
 
-![Screenshot](run-pipeline.png)
+![Screenshot](images/run-pipeline.png)
