@@ -6,7 +6,7 @@ pr: none
 variables:
 - group: global-variables
 - name: azureSubscription
-  value: <create a service connection and use here>
+  value: team4-serviceconnection
 - name: terraformVersion
   value: 1.7.4
 - name: terraformPath
@@ -16,7 +16,7 @@ variables:
 - name: environment
   value: production
 - name: prefix
-  value: <use a globally unique prefix here>
+  value: alipelican
 - name: location
   value: eastus
 - name: kubernetesVersion
