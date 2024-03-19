@@ -105,7 +105,7 @@ git clone https://github.com/pelithne/AKS_Baseline_Deepdive.git
 
 cd AKS_Baseline_Deepdive/ado-agent/
 
-````bash
+````
 
 2. Create environment variables needed for Terraform
 
