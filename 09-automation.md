@@ -204,9 +204,9 @@ The predefined pipeline needs a few variables to run. Go to **Pipelines** -> **L
 
 <img src="images/new-variable-group.png" width="400">
 
-Then fill out the values as follows:
+Then fill out the values as follows, using values relevant to your subscription.
 
-<img src="images/new-variable-group-2.png" width="400">
+<img src="images/new-variable-group-2.png" width="600">
 
 
 ### Run the pipeline
@@ -229,15 +229,9 @@ The "prefix" needs to be unique. For instance you can use a corporate signum.
 
 
 
-### TODO - set global variables
-![Screenshot](images/global-variables.png)
 
-
-
-
-
-
-
+> [!Note]
+> The first time you run the pipeline, you will have to approve a few accesses, before the pipeline is allowed to run.
 
  
 All you have to do now, is to edit the parameters that are specific to your environment. Then run the pipeline:
