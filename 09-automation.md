@@ -46,7 +46,7 @@ When logged in you should see something similar to this:
 
 There are different ways to create a connection from Azure Devops to Azure. One of the common approaches (but not the easiest) is to first create a **Service Principle** in Azure, and give that SP the correct permissions in the subscription. And then as a second step, use that Service Principle in Azure Devops. This is the approach we will have today, because this is most likely how you will have to do it in your real tenant.
 
-Create a Service Principle in Azure, and create a Role Assignment that makes the SP **Owner** in the subscription. First make sure you are logged in to the right subscription with your shell (using local bash or cloudshell or the Jumphost)
+Create a Service Principle in Azure, and create a Role Assignment that makes the SP **Owner** in the subscription. First make sure you are logged in to the right subscription with your shell (cloudshell is our suggestion for this step).
 
 ````
 SP_NAME=<a meaningful name e.g. your team name>
@@ -77,7 +77,7 @@ Go back to Azure Devops and open up the project called the same thing as your te
 
 Go to project settings -> service connections 
 
-Choose "Create new service connection" and select **Azure Resource Manager", then select "Service Prinicipal - Manual". 
+Choose "Create new service connection" and select **Azure Resource Manager** and press **next**, then select "Service Prinicipal - Manual". 
 
 ![Screenshot](images/service-connection-sp-1.png)
 
@@ -91,7 +91,7 @@ Give the pipeline a meaningful name and finally check the box named "Grant acces
 
 
 ### Create a self-hosted agent
-Azure Devops provides "Microsoft hosted agents", but you will instead create a Self hosted agent, that will run on a VM in your subscription in Azure. This is so that the agent is able to access resources in your subscriptions that are isolated inside a VNET (like the Kubernetes API). 
+Azure Devops provides "Microsoft hosted agents", but you will instead create a Self hosted agent, that will run on a VM in your subscription in Azure. This is so that the agent is able to access resources in your subscriptions that are isolated inside a VNET (for instance the Kubernetes API). 
 
 In order to provide the Self-hosted agent access to Azure Devops, we need to create a **Personal Access Token**, a PAT. 
 
@@ -103,18 +103,92 @@ In the next window that appears, select "Create New Token". In the dialogue that
 
 Now use **Azure Cloudshell** to create the agent, using Terraform. This involves a few steps:
 
-1. Clone the repository (this repository) to get access to the template used to create the agent. Then cd into the directory with the self-hosted template
+1. Clone the repository (this repository) to get access to the template used to create the agent. Then cd into the directory with the self-hosted template (ado-agent)
 ````
 git clone https://github.com/pelithne/AKS_Baseline_Deepdive.git
 
-cd AKS_Baseline_Deepdive/self-hosted-agent/
+cd AKS_Baseline_Deepdive/ado-agent/
 ````
 
+2. Create environment variables needed for Terraform
+
+````
+export TF_VAR_org_service_url https://dev.azure.com/<Your devops organization name>
+export TF_VAR_personal_access_token=<Previously created PAT>
+````
+3. Initialize Terraform (important that you are located in AKS_Baseline_Deepdive/ado-agent/)
+
+````
+terrform init
+````
+
+You should see the init completing successfully
+
+![Screenshot](images/terraform-init.png)
 
 
 
-### Clone repository
 
+4. If ````terraform init```` returned without errors, run ````terraform plan```` to create a deployment (but not yet deploy). You will be asked to create a password to be able to access the VM later. Choose something you will remember!
+
+````
+terraform plan -out plan.out
+````
+
+Terraform plan will display all the changes it will deploy, and store that in the output file, ````plan.out````. When it completes withouth errors, you can use the content in ````plan.out```` to deploy the hosted agent, using ````terraform apply````:
+
+````
+terraform apply "plan.out" 
+````
+
+If all went well, this should deploy a VM into a VNET in your subscription and configure the VM with the necessary tools to act as a Self-hosted Agent. In Azure devops it will show up as a self-hosted agent, in the **default** agent pool (more about this later).
+
+### Clone repository in ADO**
+
+Before you can execute the Azure Devops pipeline, you need to "download" all the terraform templates and other things in the repo, to make it available to Azure devops (the repository is in github, remember). You will do this as a part of creating your first **Azure Pipeline**
+
+In Azure Devops, select **Pipelines** from the left hand navigation bar. You should see something similar to this:
+
+![Screenshot](images/create-your-first-pipeline.png)
+
+<br>
+
+Go ahead and **Create Pipeline**
+
+You will now be asked to provide Azure Devops with the location of your code. The code is in github, so select **GitHub**
+
+
+![Screenshot](images/where-is-your-code.png)
+
+
+<br>
+
+If you see something like the below. Just select **continue**
+
+![Screenshot](images/ssa-devops.png)
+
+<br>
+
+
+Then just select the repository, which should be **AKS_Baseline_Deepdive** (this repo). 
+
+
+![Screenshot](images/select-a-repo.png)
+
+This will create another service connection, this time between **Azure Devops** and **GitHub**
+
+<br>
+
+Now, select **Existing Azure Pipelines YAML file** (the alternative at the very bottom)
+
+![Screenshot](images/existing-pipeline.png)
+
+
+<br>
+
+Finally, you need to specify which pipeline to use. The correct one is ````/pipelines/cd-validate-plan-apply-one-stage-vars.yml```` in the ````main```` branch.
+
+![Screenshot](images/select-an-existing-yaml-file.png)
 
 ### Run the pipeline
 
