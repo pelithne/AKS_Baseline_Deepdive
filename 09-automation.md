@@ -149,9 +149,18 @@ This is how it should look in Azure Devops
 
 ### Clone repository in ADO
 
-Before you can execute the Azure Devops pipeline, you need to "download" all the terraform templates and other things in the repo, to make it available to Azure devops (the repository is in github, remember). You will do this as a part of creating your first **Azure Pipeline**
+Before you can execute the Azure Devops pipeline, you need to "download" all the terraform templates and other things in the repo, to make it available to Azure devops (the repository is in github, remember). 
 
-In Azure Devops, select **Pipelines** from the left hand navigation bar. You should see something similar to this:
+Go to **repositories** in the left hand navigation bar. Since this project is empty, there will be no repository here. Instead you should import **this** repository.
+
+Select **Import a Repository** and in the blade that opens up, just paste in the address to **this** repo in the **clone URL** field, and press **import**
+
+![Screenshot](images/import-repo.png)
+
+### Create Pipeline
+
+
+Now you can select **Pipelines** from the left hand navigation bar. You should see something similar to this:
 
 ![Screenshot](images/create-your-first-pipeline.png)
 
@@ -159,7 +168,7 @@ In Azure Devops, select **Pipelines** from the left hand navigation bar. You sho
 
 Go ahead and **Create Pipeline**
 
-You will now be asked to provide Azure Devops with the location of your code. The code is in github, so select **GitHub**
+You will now be asked to provide Azure Devops with the location of your code. The code has been imported to your Azure Devops repository, so select **Azure Repos Git**. 
 
 
 ![Screenshot](images/where-is-your-code.png)
@@ -167,19 +176,12 @@ You will now be asked to provide Azure Devops with the location of your code. Th
 
 <br>
 
-If you see something like the below. Just select **continue**
-
-![Screenshot](images/ssa-devops.png)
-
-<br>
-
 
 Then just select the repository, which should be **AKS_Baseline_Deepdive** (this repo). 
 
 
-![Screenshot](images/select-a-repo.png)
+![Screenshot](images/select-a-repository.png)
 
-This will create another service connection, this time between **Azure Devops** and **GitHub**
 
 <br>
 
@@ -199,10 +201,10 @@ Finally, you need to specify which pipeline to use. The correct one is ````/pipe
 Take a minute to review the pipeline. It's in yaml-format and is reasonably human-understandable. When you have started understanding, go ahead and replace the following string with your own information. 
 
 
-The "azureSubscription" should point to the service connection you previously created for Azure.
+The "azureSubscription" variable should point to the service connection **name** you previously created.
 ````yaml
 - name: azureSubscription
-  value: <create a service connection and use here>
+  value: <service connection name>
 ````
 
 
