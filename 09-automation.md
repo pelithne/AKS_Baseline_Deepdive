@@ -104,7 +104,6 @@ Now use **Azure Cloudshell** to create the agent, using Terraform. This involves
 git clone https://github.com/pelithne/AKS_Baseline_Deepdive.git
 
 cd AKS_Baseline_Deepdive/ado-agent/
-
 ````
 
 2. Create environment variables needed for Terraform
@@ -121,10 +120,7 @@ terrform init
 
 You should see the init completing successfully
 
-
 <img src="images/terraform-init.png" width="600">
-
-
 
 
 4. If ````terraform init```` returned without errors, run ````terraform plan```` to create a deployment (but not yet deploy). You will be asked to create a password to be able to access the VM later. Choose something you will remember!
@@ -141,9 +137,9 @@ terraform apply "plan.out"
 
 If all went well, this should deploy a VM into a VNET in your subscription and configure the VM with the necessary tools to act as a Self-hosted Agent. In Azure devops it will show up as a self-hosted agent, in the **default** agent pool (more about this later).
 
-This is how it should look in Azure Devops
+This step will also create a storage account that the self hosted agent will use store the terraform state file. 
 
-
+This is how it should look in Azure Devops, after deployment is complete (it can take up to 10 minutes)
 
 <img src="images/ado-agent.png" width="800">
 
