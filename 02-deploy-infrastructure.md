@@ -31,7 +31,7 @@ This configuration sets up environment variables for the names and locations of 
 ````bash
 HUB_RG=rg-hub
 SPOKE_RG=rg-spoke
-LOCATION=eastus 
+LOCATION=swedencentral 
 BASTION_NSG_NAME=Bastion_NSG
 JUMPBOX_NSG_NAME=Jumpbox_NSG
 AKS_NSG_NAME=Aks_NSG
@@ -713,14 +713,14 @@ Validate your deployment in the Azure portal.
 
 11) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-12) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should have 3 RGs which you have created,**MC_rg-spoke_private-aks-xxxx_eastus**, **rg-hub** and **rg-spoke** 
+12) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should have 3 RGs which you have created,**MC_rg-spoke_private-aks-xxxx_swedencentral**, **rg-hub** and **rg-spoke** 
 
 > [!Note]
-> MC_rg-spoke_private-aks-xxxx_eastus is a resource group automatically created when deploying an AKS cluster. It is used by Azure to manage resources for the cluster, this particular resource group is also known as Node group.
+> MC_rg-spoke_private-aks-xxxx_swedencentral is a resource group automatically created when deploying an AKS cluster. It is used by Azure to manage resources for the cluster, this particular resource group is also known as Node group.
 
 ![Screenshot](images/resourcegroups.jpg)
 
-13) Verify that a virtual network link exists between the Hub and spoke to enable the jumpbox to resolve the AKS domain name and access the cluster. Select the node group called **MC_rg-spoke_private-aks-xxxxx_eastus**
+13) Verify that a virtual network link exists between the Hub and spoke to enable the jumpbox to resolve the AKS domain name and access the cluster. Select the node group called **MC_rg-spoke_private-aks-xxxxx_swedencentral**
 
 14) Select the **Private DNS zone**.
 15) On your left hand side menu, under **Settings** click on **Virtual network links**.
@@ -1028,7 +1028,7 @@ example output:
 azureuser@Jumpbox-VM:~$ az acr list -o table
 NAME        RESOURCE GROUP    LOCATION    SKU      LOGIN SERVER           CREATION DATE         ADMIN ENABLED
 ----------  ----------------  ----------  -------  ---------------------  --------------------  ---------------
-alibaksacr  rg-spoke          eastus      Premium  alibaksacr.azurecr.io  2024-03-03T07:56:00Z  False
+alibaksacr  rg-spoke          swedencentral      Premium  alibaksacr.azurecr.io  2024-03-03T07:56:00Z  False
 ````
 
 ````bash

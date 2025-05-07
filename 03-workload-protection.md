@@ -58,7 +58,7 @@ AKS_OIDC_ISSUER="$(az aks show -n $AKS_CLUSTER_NAME-${STUDENT_NAME} -g $SPOKE_RG
 ````
 
 The variable should contain the Issuer URL similar to the following:
- ````https://eastus.oic.prod-aks.azure.com/9e08065f-6106-4526-9b01-d6c64753fe02/9a518161-4400-4e57-9913-d8d82344b504/````
+ ````https://swedencentral.oic.prod-aks.azure.com/9e08065f-6106-4526-9b01-d6c64753fe02/9a518161-4400-4e57-9913-d8d82344b504/````
 
 ### 1.1.3 Create Azure KeyVault
 
@@ -130,7 +130,7 @@ Validate your deployment in the Azure portal.
 
 1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-2) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should see the 3 Resouce groups created during previous steps: **MC_rg-spoke_private-aks-xxxx_eastus**, **rg-hub** and **rg-spoke**.
+2) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should see the 3 Resouce groups created during previous steps: **MC_rg-spoke_private-aks-xxxx_swedencentral**, **rg-hub** and **rg-spoke**.
 
 Select **rg-spoke**
 
@@ -200,7 +200,7 @@ The next step is to add a secret to Azure KeyVault instance.
 
  ````
 SPOKE_RG=rg-spoke
-LOCATION=eastus
+LOCATION=swedencentral
 FRONTEND_NAMESPACE="frontend"
 BACKEND_NAMESPACE="backend"
 SERVICE_ACCOUNT_NAME="workload-identity-sa"

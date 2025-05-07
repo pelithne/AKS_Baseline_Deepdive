@@ -23,7 +23,7 @@ variable "solution_plan_map" {
 
 variable "location" {
   description = "Specifies the location for the resource group and all the resources"
-  default     = "eastus"
+  default     = "swedencentral"
   type        = string
 }
 

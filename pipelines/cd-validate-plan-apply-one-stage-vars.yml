@@ -18,7 +18,7 @@ variables:
 - name: prefix
   value: <veryrandomprefix>
 - name: location
-  value: eastus
+  value: swedencentral
 - name: kubernetesVersion
   value: '1.27.9'
 - name: hub_resource_group_name

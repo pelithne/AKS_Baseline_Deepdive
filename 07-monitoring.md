@@ -26,7 +26,7 @@ First, recreate a few environment variables
 ````bash
 HUB_RG=rg-hub
 SPOKE_RG=rg-spoke
-LOCATION=eastus 
+LOCATION=swedencentral 
 BASTION_NSG_NAME=Bastion_NSG
 JUMPBOX_NSG_NAME=Jumpbox_NSG
 FW_NAME=azure-firewall

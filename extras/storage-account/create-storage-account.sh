@@ -4,7 +4,7 @@
 resourceGroupName="StorageAccountsRG"
 storageAccountName="tfstatepelithne"
 containerName="tfstate"
-location="eastus"
+location="swedencentral"
 sku="Standard_LRS"
 subscriptionName=$(az account show --query name --output tsv)
 
