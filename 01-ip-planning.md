@@ -51,7 +51,7 @@ Each subnet in AKS baseline has a specific purpose and configuration, further in
 ### 1.2.3 Prepare Environment Variables for HUB VNET and SPOKE VNET
 
 
-1) Let’s use the IP plan to set up some environment variables for the Hub VNet and adjust its configuration accordingly to section 2.2 IP Plan.
+1) Let’s use the IP plan depicted above in section **1.2 IP Plan** to set up some environment variables for the Hub VNet and adjust its configuration.
 
 ````bash
 HUB_VNET_NAME=Hub_VNET
@@ -62,7 +62,7 @@ BASTION_SUBNET_PREFIX= # IP address range of the Bastion subnet
 FW_SUBNET_PREFIX= # IP address range of the Firewall subnet
 JUMPBOX_SUBNET_PREFIX= # IP address range of the Jumpbox subnet
 ````
-2) Configure the spoke according to section 2.2 IP Plan
+2) Now, configure the spoke also using the 1.2 IP Plan
 
 ````bash
 SPOKE_VNET_NAME=Spoke_VNET
