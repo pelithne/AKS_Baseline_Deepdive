@@ -1,6 +1,6 @@
 # Environment
 
-This file contains all the environment varibles that are set during the workshop. Use this file if you need to restore your environment variables. For instance you could loose them if your **cloud shell** times out, or if you close your terminal.
+This file contains all the environment varibles that are set during the workshop. Use this file if you need to restore your environment variables. For instance your environment variables could disappear if your **cloud shell** times out, or if you close your terminal.
 
 To save you some time during restore, make sure to populate this file with your own values. 
 
