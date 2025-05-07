@@ -62,7 +62,7 @@ BASTION_SUBNET_PREFIX= # IP address range of the Bastion subnet
 FW_SUBNET_PREFIX= # IP address range of the Firewall subnet
 JUMPBOX_SUBNET_PREFIX= # IP address range of the Jumpbox subnet
 ````
-2) Now, configure the spoke also using the 1.2 IP Plan
+2) Now, setup the environment variables for the configuration of the spoke VNET, also using the **1.2 IP Plan** above.
 
 ````bash
 SPOKE_VNET_NAME=Spoke_VNET
