@@ -784,6 +784,8 @@ To change the subscription, run the command: **az account set --subscription <SU
 SPOKE_RG=rg-spoke
 AKS_CLUSTER_NAME=private-aks
 STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
+ACR_NAME=<your unique ACR name>
+LOCATION=swedencentral 
 ````
 
 8) Download the AKS credentials onto the jumpbox.
