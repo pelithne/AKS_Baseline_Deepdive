@@ -1078,7 +1078,7 @@ EXPOSE 80
 Build the Docker image
 
 ````bash
-docker build --tag nginx .
+sudo docker build --tag nginx .
 ````
 Example out:
 ````bash
