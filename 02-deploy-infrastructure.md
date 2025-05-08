@@ -26,7 +26,7 @@ The objective of this chapter is to guide you through the process of deploying t
 This configuration sets up environment variables for the names and locations of various network and security resources, such as resource group, virtual network, subnets, network security groups, firewall, application gateway, route table, identity, virtual machine, AKS cluster, and ACR registry.
 
 > [!Note]
-> Since the Azure container registry has a globally unique FQDN name, you need to assign a distinct value to the **ACR_NAME** environment variable, else the ACR deployment will fail. 
+> Since the Azure container registry requires a globally unique FQDN name, you need to assign a unique value to the **ACR_NAME** environment variable, else the ACR deployment will fail. You could for instance use your corporate signum, which is hopefully unique enough.
 
 ````bash
 HUB_RG=rg-hub
@@ -58,7 +58,7 @@ az group create --name $SPOKE_RG --location $LOCATION
 ### 1.1.3 Create Network Security Groups (NSG) and Virtual Network (Vnet) for the Hub.
 In this step, we will begin by establishing a Network Security Group (NSG) that will subsequently be associated with their respective subnet. It is crucial to note that there are specific prerequisites concerning security rules for certain subnets that must be met  before a service can be deployed, Azure Bastion is one of them.
 
-For Azure Bastion, we are establishing security rules to permit both the control and data plane access to the AzureBastion. For a more detailed understanding of these rules, please refer to the following resource: [More Information](https://learn.microsoft.com/en-us/azure/bastion/bastion-nsg).
+For Azure Bastion, we are establishing security rules to permit both the control and data plane access to the AzureBastion. For a more detailed understanding of these rules, please refer to [this documentation](https://learn.microsoft.com/en-us/azure/bastion/bastion-nsg).
 
 1) Lets Create the NSG for AzureBastionSubnet.
 ````bash
@@ -423,6 +423,10 @@ az network bastion create \
     --vnet-name $HUB_VNET_NAME \
     --location $LOCATION
 ````
+
+> [!Note]
+> Azure Bastion takes a while to create. This is a good time for a coffee break!
+
 5) Connect to VM using the portal:
 
 Upon successful installation of the Jumpbox Virtual Machine (VM), the next step is to validate the connectivity between the Bastion and Jumpbox host. Here are the steps to follow:
