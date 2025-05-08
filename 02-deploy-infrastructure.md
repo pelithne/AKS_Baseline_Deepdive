@@ -1110,7 +1110,7 @@ Successfully tagged nginx:latest
 ````
 Create an alias of the image
 ````bash
-docker tag nginx <CONTAINER REGISTRY NAME>.azurecr.io/nginx
+sudo docker tag nginx <CONTAINER REGISTRY NAME>.azurecr.io/nginx
 ````
 Authenticate to ACR with your AD user.
 
@@ -1119,7 +1119,7 @@ az acr login --name <CONTAINER REGISTRY NAME>
 ````
 Upload the docker image to the ACR repository.
 ````bash
-docker push <CONTAINER REGISTRY NAME>.azurecr.io/nginx
+sudo docker push <CONTAINER REGISTRY NAME>.azurecr.io/nginx
 ````
 Example output:
 
