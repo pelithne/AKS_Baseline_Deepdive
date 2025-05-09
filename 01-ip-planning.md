@@ -53,6 +53,8 @@ Each subnet in AKS baseline has a specific purpose and configuration, further in
 
 1) Let’s use the IP plan depicted above in section **1.2 IP Plan** to set up some environment variables for the Hub VNet and adjust its configuration.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 HUB_VNET_NAME=Hub_VNET
 FW_SUBNET_NAME=AzureFirewallSubnet
@@ -65,6 +67,8 @@ BASTION_SUBNET_PREFIX= # IP address range of the Bastion subnet
 
 ````
 2) Now, setup the environment variables for the configuration of the spoke VNET, also using the **1.2 IP Plan** above.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 SPOKE_VNET_NAME=Spoke_VNET
