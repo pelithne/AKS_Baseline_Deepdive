@@ -28,6 +28,8 @@ This configuration sets up environment variables for the names and locations of 
 > [!Note]
 > Since the Azure container registry requires a globally unique FQDN name, you need to assign a unique value to the **ACR_NAME** environment variable, else the ACR deployment will fail. You could for instance use your corporate signum, which is hopefully unique enough.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 HUB_RG=rg-hub
 SPOKE_RG=rg-spoke
