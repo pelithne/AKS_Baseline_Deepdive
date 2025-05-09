@@ -58,16 +58,16 @@ ADMIN_GROUP='ClusterAdminGroup-'${STUDENT_NAME}
 OPS_FE_GROUP='Ops_Fronted_team-'${STUDENT_NAME}
 OPS_BE_GROUP='Ops_Backend_team-'${STUDENT_NAME}
 
-AAD_OPS_FE_UPN='opsfe-'${STUDENT_NAME}'@MngEnvMCAP148390.onmicrosoft.com'
+AAD_OPS_FE_UPN='opsfe-'${STUDENT_NAME}'@MngEnvMCAP366290.onmicrosoft.com'
 AAD_OPS_FE_DISPLAY_NAME='Frontend-'${STUDENT_NAME}
 AAD_OPS_FE_PW=<ENTER USER PASSWORD>
 
-AAD_OPS_BE_UPN='opsbe-'${STUDENT_NAME}'@MngEnvMCAP148390.onmicrosoft.com'
+AAD_OPS_BE_UPN='opsbe-'${STUDENT_NAME}'@MngEnvMCAP366290.onmicrosoft.com'
 AAD_OPS_BE_DISPLAY_NAME='Backend-'${STUDENT_NAME}
 AAD_OPS_BE_PW=<ENTER USER PASSWORD>
 
 
-AAD_ADMIN_UPN='clusteradmin'${STUDENT_NAME}'@MngEnvMCAP148390.onmicrosoft.com'
+AAD_ADMIN_UPN='clusteradmin'${STUDENT_NAME}'@MngEnvMCAP366290.onmicrosoft.com'
 AAD_ADMIN_PW=<ENTER USER PASSWORD>
 AAD_ADMIN_DISPLAY_NAME='Admin-'${STUDENT_NAME}
 ````
@@ -356,7 +356,7 @@ kubectl get pods
 Example output:
 ````bash
 azureuser@Jumpbox-VM:~$ kubectl get po
-Error from server (Forbidden): pods is forbidden: User "opsfe-test@MngEnvMCAP148390.onmicrosoft.com"
+Error from server (Forbidden): pods is forbidden: User "opsfe-test@MngEnvMCAP366290.onmicrosoft.com"
  cannot list resource "pods" in API group "" in the namespace "default": User does not have access t
 o the resource in Azure. Update role assignment to allow access.
 ````
