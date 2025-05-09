@@ -301,7 +301,7 @@ Create a User Managed Identity. We will give this identity *GET access* to the k
  ````bash
  export USER_ASSIGNED_CLIENT_ID="$(az identity show --resource-group $SPOKE_RG  --name $USER_ASSIGNED_IDENTITY_NAME  --query 'clientId' -otsv)"
 
- az keyvault set-policy --name $KEYVAULT_NAME  --secret-permissions get --spn $USER_ASSIGNED_CLIENT_ID 
+az role assignment create --assignee $USER_ASSIGNED_CLIENT_ID --role "Key Vault Reader" --scope $KEYVAULT_RESOURCE_ID
  ````
 
 
