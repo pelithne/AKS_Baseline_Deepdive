@@ -1204,6 +1204,7 @@ NAME        RESOURCE GROUP    LOCATION    SKU      LOGIN SERVER           CREATI
 ----------  ----------------  ----------  -------  ---------------------  --------------------  ---------------
 alibaksacr  rg-spoke          swedencentral      Premium  alibaksacr.azurecr.io  2024-03-03T07:56:00Z  False
 ````
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 dig <REGISTRY NAME>.azurecr.io
