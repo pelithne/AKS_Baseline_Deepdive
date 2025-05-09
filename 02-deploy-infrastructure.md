@@ -871,7 +871,7 @@ In this section we will verify that we are able to connect to the AKS cluster fr
 
 28) Once successfully logged in to the jumbox you need to install a few tools
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 #!/bin/bash
@@ -890,7 +890,7 @@ sudo usermod -aG docker $USER
   
 29) Now, **login to Azure** in order to obtain AKS credentials.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az login
@@ -902,7 +902,7 @@ To change the subscription, run the command: **az account set --subscription <SU
 
 30) Add your Environment variables to the jumpbox bash shell.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 SPOKE_RG=rg-spoke
@@ -913,7 +913,7 @@ STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
 
 31) Download the AKS credentials onto the jumpbox.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az aks get-credentials --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
@@ -922,7 +922,7 @@ az aks get-credentials --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STU
 
 32) Ensure you can list resources in AKS.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl get nodes
@@ -1166,21 +1166,21 @@ In this section, you will learn how to check if you can access your private Azur
 
 21) Once successfully logged in to the jumpbox **login to Azure** if you have not already done so in previous steps.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az login
 ````
 Identify your subscription id from the list, if you have several subscriptions.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az account list -o table
 ````
 Set your subscription id to be the default subscription.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 
 ````bash
@@ -1190,7 +1190,7 @@ az account set --subscription <SUBSCRIPTION ID>
 
 List your ACR in your subscription and note down the ACR name.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 
 ````bash
@@ -1235,14 +1235,14 @@ alibaksacr.privatelink.azurecr.io. 1800 IN A    10.1.1.21
 ````
 8. Create a Dockerfile, build the docker image, authenticate towards ACR and push the image to the container registry.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 vim Dockerfile
 ````
 Add the following content to the Dockerfile
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 
 ````bash
@@ -1251,7 +1251,7 @@ EXPOSE 80
 ````
 Build the Docker image
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 sudo docker build --tag nginx .
@@ -1286,7 +1286,7 @@ Successfully tagged nginx:latest
 ````
 Create an alias of the image
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 
 ````bash
@@ -1294,14 +1294,14 @@ sudo docker tag nginx <CONTAINER REGISTRY NAME>.azurecr.io/nginx
 ````
 Authenticate to ACR with your AD user.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az acr login --name <CONTAINER REGISTRY NAME> 
 ````
 Upload the docker image to the ACR repository.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 sudo docker push <CONTAINER REGISTRY NAME>.azurecr.io/nginx
@@ -1324,7 +1324,7 @@ latest: digest: sha256:3dc6726adf74039f21eccf8f3b5de773080f8183545de5a235726132f
 
 9) Attach AKS to the ACR, this command updates our existing AKS cluster and attaches it to the ACR, this allows the cluster to pull images from the ACR.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az aks update \
@@ -1336,7 +1336,7 @@ az aks update \
 
 On the Jumpbox VM create a yaml file.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 touch test-pod.yaml
@@ -1344,7 +1344,7 @@ vim test-pod.yaml
 ````
 when you copy to vim, prevent Vim from auto-indenting the text you paste.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 :set paste
@@ -1353,7 +1353,7 @@ Press enter.
 
 Paste in the following manifest file which creates a Pod named **internal-test-app** which fetches the docker images from our internal container registry, created in previous step. 
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````yaml
 apiVersion: v1
@@ -1371,7 +1371,7 @@ spec:
 ````
 Create the pod.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````yaml
 kubectl create -f test-pod.yaml
@@ -1379,7 +1379,7 @@ kubectl create -f test-pod.yaml
 
 Verify that the Pod is in running state.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl get po --show-labels
@@ -1393,7 +1393,7 @@ internal-test-app   1/1     Running   0          8s
 ````
 Our next step is to set up an internal load balancer that will direct the traffic to our internal Pod. The internal load balancer will be deployed in the load balancer subnet of the spoke-vnet.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````yaml
 touch internal-app-service.yaml
@@ -1406,7 +1406,7 @@ Press enter.
 
 Copy the following manifest to expose the pod to the internet. Replace **<LOADBALANCER SUBNET>** with your subnet name stored in your local shell environment variable **$LOADBALANCER_SUBNET_NAME**
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````yaml
 apiVersion: v1
@@ -1425,14 +1425,14 @@ spec:
 ````
 Deploy the service object in AKS.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl create -f internal-app-service.yaml
 ````
 Verify that your service object is created and associated with the Pod that you have created, also ensure that you have recieved an external IP, which should be a private IP address range from the load balancer subnet.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 sudo kubectl get svc -o wide
@@ -1451,7 +1451,7 @@ kubernetes                  ClusterIP      10.0.0.1     <none>        443/TCP   
 
 Verify that you are able to access the exposed Nginx pod from your jumpbox VM.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 azureuser@Jumpbox-VM:~$ curl <EXTERNAL-IP>
@@ -1607,7 +1607,7 @@ you should see a similar output as to the one below.
 ### 1.1.12 Clean Up Resources in AKS
 Once you have verified that everything works as depicted earlier. From the jumpbox host delete the resources.
 
-:cloud **Run the following commands in the jumpbox terminal:**
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl delete -f test-pod.yaml
