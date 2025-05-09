@@ -83,12 +83,15 @@ Your user needs permission to create keys in the keyvault. Use the following com
 
 First create environment variables for the keyvault resource ID and for your user ID
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 ````bash
 KEYVAULT_RESOURCE_ID=$(az keyvault show --name $KEYVAULT_NAME --query id -o tsv)
 USER_ID=$(az ad signed-in-user show --query id -o tsv)
 ````
 
 Then create the role assignment:
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 ````bash
 az role assignment create \
     --assignee $USER_ID \
