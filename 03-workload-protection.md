@@ -79,23 +79,25 @@ Your bastion host will be allowed, so use that one when you interact with Keyvau
 az keyvault create -n $KEYVAULT_NAME -g $SPOKE_RG -l $LOCATION --default-action deny
 ````
 
+#### 1.1.3.1 Configure RBAC for keyvault
+
 Your user needs permission to create keys in the keyvault. Use the following commands to create a role assignment in the keyvault that allows your user to create keys.
 
 First create an environment variables for the keyvault resource ID and for your user ID
 
-´´´´
+````bash
 KEYVAULT_RESOURCE_ID=$(az keyvault show --name $KEYVAULT_NAME --query id -o tsv)
 USER_ID=$(az ad signed-in-user show --query id -o tsv)
-´´´´
+````
 
 Next, create the role assignment:
-
-````
+````bash
 az role assignment create \
     --assignee $USER_ID \
     --role "Key Vault Crypto Officer" \
     --scope $KEYVAULT_RESOURCE_ID
 ````
+
 
 
 Create a private DNS zone for the Azure Keyvault.
