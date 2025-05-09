@@ -353,11 +353,15 @@ In this step we connect the Kubernetes service account with the user defined man
 
 Now its time to build the application. In order to do so, first clone the applications repository:
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 git clone https://github.com/pelithne/az-vote-with-workload-identity.git
 ````
 
 In order to push images, you may have to login to the registry first using your Azure AD identity: 
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az acr login --name $ACR_NAME
@@ -365,6 +369,8 @@ az acr login --name $ACR_NAME
 
 
 Then run the following commands to build, tag and push your container image to the Azure Container Registry
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 cd az-vote-with-workload-identity
@@ -387,6 +393,8 @@ First, create the backend namespace
 > [!Note]
 > Instead of creating kubernetes manifest, we put them inline for convenience. Feel free to create yaml-manifests instead if you like.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -399,11 +407,15 @@ EOF
 ````
 Verify that the namespace called **backend** has been created.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 kubectl get ns
 ````
 
 Then create the Backend application, which is a Redis store which we will use as a "database". Notice how we inject a password to Redis using an environment variable (not best practice obviously, but for simplicity).
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 cat <<EOF | kubectl apply -f -
@@ -455,6 +467,7 @@ Then create the frontend. We already created the frontend namespace in an earlie
 ````image: $ACR_NAME.azurecr.io/azure-vote:v1```` - The image with the application built in a previous step.
 ````service.beta.kubernetes.io/azure-load-balancer-ipv4: $ILB_EXT_IP```` - This "hard codes" the IP address of the internal LB to match what was previously configured in App GW as backend.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 cat <<EOF | kubectl apply -f -
@@ -526,6 +539,10 @@ To test if the application is working, you can navigate to the URL used before t
 You can also verify in the application logs that the frontend was able to connect to the backend.
 
 To do that, you need to find the name of the pod:
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
+
 ````bash
 kubectl get pods --namespace frontend
 ````
@@ -535,7 +552,10 @@ NAME                                READY   STATUS    RESTARTS        AGE
 azure-vote-front-85d6c66c4d-pgtw9   1/1     Running   29 (7m3s ago)   3h13m
 ````
 
-Now you can read the logs of the application by running this command (but with YOUR pod name)
+Now you can read the logs of the application by running this command **(but with YOUR pod name)**
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 kubectl logs azure-vote-front-85d6c66c4d-pgtw9 --namespace frontend
 ````
@@ -555,6 +575,8 @@ Connected to Redis!
 The cluster is deployed with Azure network policies. The Network policies can be used to control traffic between resources in Kubernetes.
 
 This first policy will prevent all traffic to the backend namespace. 
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 cat <<EOF | kubectl apply -f -
@@ -576,6 +598,9 @@ EOF
 Network policies are applied on new TCP connections, and because the frontend application has already created a persistent TCP connection with the backend it might have to be redeployed for the policy to hit. One way to do that is to simply delete the pod and let it recreate itself:
 
 First find the pod name
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 kubectl get pods --namespace frontend
 ````
@@ -585,13 +610,19 @@ NAME                                READY   STATUS    RESTARTS        AGE
 azure-vote-front-85d6c66c4d-pgtw9   1/1     Running   29 (7m3s ago)   3h13m
 ````
 
-Now delete the pod with the following command (but with YOUR pod name)
+Now delete the pod with the following command **(but with YOUR pod name)**
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl delete pod --namespace frontend azure-vote-front-85d6c66c4d-pgtw9
 ````
 
 After the deletion has finished you should be able to se that the "AGE" of the pod has been reset.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
+
 ````bash
 kubectl get pods --namespace frontend
 
@@ -603,6 +634,8 @@ You should also find that the frontend can no longer communicate with the backen
 
 
 Now apply a new policy that allows traffic into the backend namespace from pods that have the label ````app: azure-vote-front````
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 cat <<EOF | kubectl apply -f -
@@ -630,11 +663,16 @@ Once again you have to recreate the pod, so that it can establish a connection t
 
 
 First find the pod name
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 kubectl get pods --namespace frontend
 ````
 
-Then delete the pod (using the name of your pod)
+Then delete the pod **(using the name of your pod)**
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl delete pod --namespace frontend azure-vote-front-85d6c66c4d-pgtw9
