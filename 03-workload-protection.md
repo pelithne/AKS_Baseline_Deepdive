@@ -95,7 +95,7 @@ Then create the role assignment:
 ````bash
 az role assignment create \
     --assignee $USER_ID \
-    --role "Key Vault Crypto Officer" \
+    --role "Key Vault Secrets Officer \
     --scope $KEYVAULT_RESOURCE_ID
 ````
 
