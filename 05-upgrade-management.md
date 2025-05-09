@@ -23,30 +23,40 @@ In this section you learn how to:
 
 Before you upgrade, check which Kubernetes releases are available for your cluster using the ````az aks get-upgrades```` command.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 az aks get-upgrades --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
 
-The following example output shows the current version as *1.26.6* and lists the available versions under *upgrades*.
+The following example output shows the current version as *1.31.7* and lists the available versions under *upgrades*.
 
 ````output
-
+{
   "agentPoolProfiles": null,
   "controlPlaneProfile": {
-    "kubernetesVersion": "1.26.6",
+    "kubernetesVersion": "1.31.7",
     "name": null,
     "osType": "Linux",
     "upgrades": [
       {
         "isPreview": null,
-        "kubernetesVersion": "1.27.3"
+        "kubernetesVersion": "1.32.3"
       },
       {
         "isPreview": null,
-        "kubernetesVersion": "1.27.1"
+        "kubernetesVersion": "1.32.2"
+      },
+      {
+        "isPreview": null,
+        "kubernetesVersion": "1.32.1"
+      },
+      {
+        "isPreview": null,
+        "kubernetesVersion": "1.32.0"
       }
     ]
-  }
+  },
 ````
 
 
@@ -60,24 +70,26 @@ AKS nodes are carefully cordoned and drained to minimize any potential disruptio
 * This process repeats until all nodes in the cluster have been upgraded.
 
 
-Upgrade your cluster to 1.27.3 using the ````az aks upgrade```` command.
+Upgrade your cluster to 1.32.0 using the ````az aks upgrade```` command.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az aks upgrade \
     --resource-group $SPOKE_RG \
     --name $AKS_CLUSTER_NAME-${STUDENT_NAME} \
-    --kubernetes-version 1.27.3
+    --kubernetes-version 1.32.0
 ````
 
 Select "y" to the questions.
 
 
-The following example output shows part of the result of upgrading to *1.27.3*. Notice the *kubernetesVersion* now shows *1.27.3*. 
+The following example output shows part of the result of upgrading to *1.32.0*. Notice the *kubernetesVersion* now shows *1.32.0*. 
 
 ````
-"kubernetesVersion": "1.27.3",
+"kubernetesVersion": "1.32.0",
 "linuxProfile": null,
-"location": "northeurope",
+"location": "swedencentral",
 "maxAgentPools": 100,
 "name": "k8s",
 "networkProfile": {
@@ -97,6 +109,8 @@ When you upgrade your cluster, the following Kubernetes events may occur on the 
  * **Delete**: Delete a surge node.
 
 View the upgrade events in the default namespaces using the `kubectl get events` command.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl get events 
@@ -118,24 +132,28 @@ default 9m22s Normal Surge node/aks-nodepool1-96663640-vmss000002 Created a surg
 
 Confirm the upgrade was successful using the ````az aks show```` command.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 az aks show --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME} --output table
 ````
 
-The following example output shows the AKS cluster runs *KubernetesVersion 1.27.3:
+The following example output shows the AKS cluster runs *KubernetesVersion 1.32.0:
 
 ````output
  Name    Location       ResourceGroup      KubernetesVersion    CurrentKubernetesVersion    ProvisioningState    Fqdn
 ------  -------------  -----------------  -------------------  --------------------------  -------------------  ----------------------------------------------------------------
-k8s     northeurope     security-workshop  1.27.3               1.27.3                      Succeeded            k8s-security-worksho-16153f-mwrte3d1.hcp.northeurope.azmk8s.io
+k8s     swedencentral     security-workshop  1.32.0               1.32.0                      Succeeded            k8s-security-worksho-16153f-mwrte3d1.hcp.swedencentral.azmk8s.io
 ````
 
 ## 1.5 Allowed Upgrade Paths
 Kubernetes can only be upgraded one minor version at a time. For example, you can upgrade from 1.26.x to 1.27.x, but you can't upgrade from 1.26.x to 1.28.x directly. To upgrade from 1.26.x to 1.28.x, you must first upgrade from 1.26.x to 1.27.x, then perform another upgrade from 1.27.x to 1.28.x.
 
-As you are now on 1.27.3, you should be able to see the available upgrade to 1.28.0. You can confirm this by once again running this command:
+As you are now on 1.32.0, you should be able to see the available upgrade to 1.28.0. You can confirm this by once again running this command:
 
-````
+:cloud: **Run the following commands in the jumpbox terminal:**
+
+````bash
 az aks get-upgrades --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
 
@@ -144,7 +162,7 @@ You should see the following output
 ````
   "agentPoolProfiles": null,
   "controlPlaneProfile": {
-    "kubernetesVersion": "1.27.3",
+    "kubernetesVersion": "1.32.0",
     "name": null,
     "osType": "Linux",
     "upgrades": [
