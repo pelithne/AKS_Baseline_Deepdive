@@ -32,6 +32,9 @@ First, create some environment variables, to make life easier.
 > [!Note]
 >The Azure KeyVault name is a global name that must be unique.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
+
 ````
 FRONTEND_NAMESPACE="frontend"
 BACKEND_NAMESPACE="backend"
@@ -47,11 +50,15 @@ KEYVAULT_SECRET_NAME="redissecret"
 
 Enable the existing cluster to use OpenID connect (OIDC) as an authentication protocol for Kubernetes API server (unless already done). This allows the cluster to integrate with Microsoft Entra ID and other identity providers that support OIDC.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az aks update -g $SPOKE_RG -n $AKS_CLUSTER_NAME-${STUDENT_NAME}   --enable-oidc-issuer 
 ````
 
 Get the OICD issuer URL. Query the AKS cluster for the OICD issuer URL with the following command, which stores the reult in an environment variable.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 AKS_OIDC_ISSUER="$(az aks show -n $AKS_CLUSTER_NAME-${STUDENT_NAME} -g $SPOKE_RG  --query "oidcIssuerProfile.issuerUrl" -otsv)"
@@ -66,17 +73,23 @@ Create the Azure Keyvault instance. When creating the Keyvault, use "deny as a d
 
 Your bastion host will be allowed, so use that one when you interact with Keyvault later.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az keyvault create -n $KEYVAULT_NAME -g $SPOKE_RG -l $LOCATION --default-action deny
 ````
 
 Create a private DNS zone for the Azure Keyvault.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network private-dns zone create --resource-group $SPOKE_RG --name privatelink.vaultcore.azure.net
 ````
 
 Link the Private DNS Zone to the HUB and SPOKE Virtual Network
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $HUB_VNET_ID --zone-name privatelink.vaultcore.azure.net --name hubvnetkvdnsconfig --registration-enabled false
@@ -88,11 +101,15 @@ Create a private endpoint for the Keyvault
 
 First we need to obtain the KeyVault ID in order to deploy the private endpoint.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 KEYVAULT_ID=$(az keyvault show --name $KEYVAULT_NAME \
   --query 'id' --output tsv)
 ````
 Create the private endpoint in endpoint subnet.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network private-endpoint create --resource-group $SPOKE_RG --vnet-name $SPOKE_VNET_NAME --subnet $ENDPOINTS_SUBNET_NAME --name KVPrivateEndpoint --private-connection-resource-id $KEYVAULT_ID --group-ids vault --connection-name PrivateKVConnection --location $LOCATION
@@ -101,17 +118,24 @@ az network private-endpoint create --resource-group $SPOKE_RG --vnet-name $SPOKE
 Fetch IP of the private endpoint and create an *A record* in the private DNS zone.
 
 Obtain the IP address of the private endpoint NIC card.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
  ````bash
 KV_PRIVATE_IP=$(az network private-endpoint show -g $SPOKE_RG -n KVPrivateEndpoint \
   --query 'customDnsConfigs[0].ipAddresses[0]' --output tsv)
  ````
 Note the private IP address down.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
   ````bash
 echo $KV_PRIVATE_IP
  ````
 
 Create the A record in DNS zone and point it to the private endpoint IP of the Keyvault.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
   az network private-dns record-set a create \
@@ -154,6 +178,8 @@ Select **rg-spoke**
 10) In the left-hand side menu, under the **Connect** section, select ‘Bastion’. Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
 
 In the Jumpbox VM command line type the following command and ensure it returns the **private ip address of the private endpoint**.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 dig <KEYVAULT NAME>.vault.azure.net
@@ -198,6 +224,8 @@ The next step is to add a secret to Azure KeyVault instance.
 > [!IMPORTANT]
 > Because the Azure KeyVault is isolated in a VNET, you need to access it from the Jumpbox VM. Please log in to the Jumpbox VM, and set a few environment variables (or load all environment variables you stored in a file):
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
  ````
 SPOKE_RG=rg-spoke
 LOCATION=swedencentral
@@ -217,11 +245,16 @@ ACR_NAME=<NAME OF THE AZURE CONTAINER REGISTRY>
 
 From the **Jumpbox VM** create a secret in the Azure KeyVault. This is the secret that will be used by the frontend application to connect to the (redis) backend.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
  ````bash
  az keyvault secret set --vault-name $KEYVAULT_NAME --name $KEYVAULT_SECRET_NAME --value 'redispassword'
  ````
 
 ### 1.1.5 Add the KeyVault URL to the Environment Variable *KEYVAULT_URL*
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 
  ````bash
  export KEYVAULT_URL="$(az keyvault show -g $SPOKE_RG  -n $KEYVAULT_NAME --query properties.vaultUri -o tsv)"
@@ -231,6 +264,8 @@ From the **Jumpbox VM** create a secret in the Azure KeyVault. This is the secre
 
 Create a User Managed Identity. We will give this identity *GET access* to the keyvault, and later associate it with a Kubernetes service account. 
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
  ````bash
  az account set --subscription $SUBSCRIPTION 
  az identity create --name $USER_ASSIGNED_IDENTITY_NAME  --resource-group $SPOKE_RG  --location $LOCATION  --subscription $SUBSCRIPTION 
@@ -238,6 +273,8 @@ Create a User Managed Identity. We will give this identity *GET access* to the k
  ````
 
  Set an access policy for the managed identity to access the Key Vault.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
  ````bash
  export USER_ASSIGNED_CLIENT_ID="$(az identity show --resource-group $SPOKE_RG  --name $USER_ASSIGNED_IDENTITY_NAME  --query 'clientId' -otsv)"
@@ -249,7 +286,9 @@ Create a User Managed Identity. We will give this identity *GET access* to the k
  ### 1.1.7 Connect to the Cluster
 
 First, connect to the cluster if not already connected
- 
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
  ````bash
  az aks get-credentials -n $AKS_CLUSTER_NAME-${STUDENT_NAME}  -g $SPOKE_RG
  ````
@@ -263,6 +302,7 @@ The service account should exist in the frontend namespace, because it's the fro
 
 
 First create the frontend namespace
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````yaml
 cat <<EOF | kubectl apply -f -
@@ -275,11 +315,17 @@ metadata:
 EOF
 ````
 Verify that the namespace called **frontend** has been created.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 kubectl get ns
 ````
 
 Then create a service account in that namespace. Notice the annotation for **workload identity**
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -296,6 +342,8 @@ EOF
 ### 1.1.9 Establish Federated Identity Credential
 
 In this step we connect the Kubernetes service account with the user defined managed identity in Azure, using a federated credential.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
   az identity federated-credential create --name $FEDERATED_IDENTITY_CREDENTIAL_NAME --identity-name $USER_ASSIGNED_IDENTITY_NAME --resource-group $SPOKE_RG --issuer $AKS_OIDC_ISSUER --subject system:serviceaccount:$FRONTEND_NAMESPACE:$SERVICE_ACCOUNT_NAME
