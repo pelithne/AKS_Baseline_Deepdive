@@ -58,9 +58,11 @@ HUB_VNET_NAME=Hub_VNET
 FW_SUBNET_NAME=AzureFirewallSubnet
 BASTION_SUBNET_NAME=AzureBastionSubnet
 HUB_VNET_PREFIX= # IP address range of the Virtual network (VNet).
-BASTION_SUBNET_PREFIX= # IP address range of the Bastion subnet 
 FW_SUBNET_PREFIX= # IP address range of the Firewall subnet
 JUMPBOX_SUBNET_PREFIX= # IP address range of the Jumpbox subnet
+BASTION_SUBNET_PREFIX= # IP address range of the Bastion subnet 
+
+
 ````
 2) Now, setup the environment variables for the configuration of the spoke VNET, also using the **1.2 IP Plan** above.
 
