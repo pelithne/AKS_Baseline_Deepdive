@@ -53,6 +53,8 @@ This code defines the environment variables for the resources that you will crea
 > [!Note]
 > Ensure environment variable **$STUDENT_NAME** is set before adding the code below.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 ADMIN_GROUP='ClusterAdminGroup-'${STUDENT_NAME}
 OPS_FE_GROUP='Ops_Fronted_team-'${STUDENT_NAME}
@@ -77,14 +79,21 @@ We will now start by creating 3 security groups for respective team.
 
 1) Create the security group for **Cluster Admins**
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az ad group create --display-name $ADMIN_GROUP --mail-nickname $ADMIN_GROUP
 ````
 2) Create the security group for **Application Operations Frontend Team**
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az ad group create --display-name $OPS_FE_GROUP --mail-nickname $OPS_FE_GROUP
 ````
 3) Create the security group for **Application Operations Backend Team**
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 ````bash
 az ad group create --display-name $OPS_BE_GROUP --mail-nickname $OPS_BE_GROUP
 ````
@@ -97,6 +106,8 @@ Current architecture can now be described as follows:
 ### 1.3.3 Integrate AKS with Microsoft Entra ID
 
 1) Lets update our existing AKS cluster to support Microsoft Entra ID integration, and configure a cluster admin group, and disable local admin accounts in AKS, as this will prevent anyone from using the **--admin** switch to get full cluster credentials.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az aks update -g $SPOKE_RG -n $AKS_CLUSTER_NAME-${STUDENT_NAME}  --enable-azure-rbac --enable-aad --disable-local-accounts
@@ -111,6 +122,9 @@ This chapter will explain how to create the scope for the operation teams to per
 
 
  1) Lets start by constructing the scope for the operations team.
+ 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+ 
  ````bash
  AKS_BACKEND_NAMESPACE='/namespaces/backend'
  AKS_FRONTEND_NAMESPACE='/namespaces/frontend'
@@ -119,38 +133,54 @@ This chapter will explain how to create the scope for the operation teams to per
 2) lets fetch the Object ID of the operations teams and admin security groups.
 
   Application Operation Frontend Team.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
  ````bash
  FE_GROUP_OBJECT_ID=$(az ad group show --group $OPS_FE_GROUP --query 'id' --output tsv)
  ````
  Application Operation Backend Team.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
   ````bash
  BE_GROUP_OBJECT_ID=$(az ad group show --group $OPS_BE_GROUP --query 'id' --output tsv)
  ````
  Admin.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
  ````bash
  ADMIN_GROUP_OBJECT_ID=$(az ad group show --group $ADMIN_GROUP --query 'id' --output tsv)
  
 ````
 
  3) This commands will grant the **Application Operations Frontend Team** group users the permissions to download the credential for AKS, and only operate within given namespace.
+ 4) 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az role assignment create --assignee $FE_GROUP_OBJECT_ID --role "Azure Kubernetes Service RBAC Writer" --scope ${AKS_RESOURCE_ID}${AKS_FRONTEND_NAMESPACE}
  ````
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
  ````bash
  az role assignment create --assignee $FE_GROUP_OBJECT_ID --role "Azure Kubernetes Service Cluster User Role" --scope ${AKS_RESOURCE_ID}
  ````
- 4) This commands will grant the **Application Operations Backend Team** group users the permissions to download the credential for AKS, and only operate within given namespace.
+ 5) This commands will grant the **Application Operations Backend Team** group users the permissions to download the credential for AKS, and only operate within given namespace.
+   
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az role assignment create --assignee $BE_GROUP_OBJECT_ID --role "Azure Kubernetes Service RBAC Writer" --scope ${AKS_RESOURCE_ID}${AKS_BACKEND_NAMESPACE}
  ````
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
   ````bash
  az role assignment create --assignee $BE_GROUP_OBJECT_ID --role "Azure Kubernetes Service Cluster User Role" --scope ${AKS_RESOURCE_ID}
  ````
 
- 4) This command will grant the **Admin** group users the permissions to connect to and manage all aspects of the AKS cluster.
+ 6) This command will grant the **Admin** group users the permissions to connect to and manage all aspects of the AKS cluster.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az role assignment create --assignee $ADMIN_GROUP_OBJECT_ID --role "Azure Kubernetes Service RBAC Cluster Admin" --scope ${AKS_RESOURCE_ID}
@@ -165,6 +195,8 @@ This exercise will guide you through the steps of creating three users and addin
 
 1) Create the Admin user.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az ad user create --display-name $AAD_ADMIN_DISPLAY_NAME  --user-principal-name $AAD_ADMIN_UPN --password $AAD_ADMIN_PW
 ````
@@ -172,15 +204,21 @@ az ad user create --display-name $AAD_ADMIN_DISPLAY_NAME  --user-principal-name 
 
 First identify the object id of the user as we will need this number to assign the user to the admin group.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 ADMIN_USER_OBJECT_ID=$(az ad user show --id $AAD_ADMIN_UPN --query 'id' --output tsv)
 ````
 Assign the user to the admin security group.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az ad group member add --group $ADMIN_GROUP --member-id $ADMIN_USER_OBJECT_ID
 ````
 3) Create the frontend operations user.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az ad user create --display-name $AAD_OPS_FE_DISPLAY_NAME  --user-principal-name $AAD_OPS_FE_UPN --password $AAD_OPS_FE_PW
@@ -189,15 +227,21 @@ az ad user create --display-name $AAD_OPS_FE_DISPLAY_NAME  --user-principal-name
 
 First identify the object id of the user as we will need this number to assign the user to the frontend security group.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 FE_USER_OBJECT_ID=$(az ad user show --id $AAD_OPS_FE_UPN --query 'id' --output tsv)
 ````
 Assign the user to the frontend security group.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az ad group member add --group $OPS_FE_GROUP --member-id $FE_USER_OBJECT_ID
 ````
 5) Create the backend operations user.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az ad user create --display-name $AAD_OPS_BE_DISPLAY_NAME  --user-principal-name $AAD_OPS_BE_UPN --password $AAD_OPS_BE_PW
@@ -206,10 +250,14 @@ az ad user create --display-name $AAD_OPS_BE_DISPLAY_NAME  --user-principal-name
 
 First identify the object id of the user as we will need this number to assign the user to the backend security group.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 BE_USER_OBJECT_ID=$(az ad user show --id $AAD_OPS_BE_UPN --query 'id' --output tsv)
 ````
 Assign the user to the backend security group.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az ad group member add --group $OPS_BE_GROUP --member-id $BE_USER_OBJECT_ID
@@ -273,6 +321,8 @@ First remove the existing stored configuration that you have previously download
 
 6) From the **Jumpbox VM** execute the following commands:
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 rm -R .azure/
 rm -R .kube/
@@ -287,6 +337,8 @@ rm -R .kube/
 > [!IMPORTANT]
 > Retrieve the username and password from your local shell, and not the shell from Jumpbox VM.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 echo $AAD_OPS_FE_UPN
 echo $AAD_OPS_FE_PW
@@ -294,6 +346,7 @@ echo $AAD_OPS_FE_PW
 
 8) From the **Jumpbox VM ** initiate the authentication process.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az login
@@ -320,6 +373,8 @@ To sign in, use a web browser to open the page https://microsoft.com/devicelogin
 
 11) From the **Jumpbox VM** download AKS cluster credential.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 SPOKE_RG=rg-spoke
 STUDENT_NAME=<YOUR STUDENT NAME>
@@ -338,6 +393,8 @@ azureuser@Jumpbox-VM:~$
 > [!IMPORTANT]
 > You will now be prompted to authenticate your user again, as this time it will validate your newly created user permissions within the AKS cluster. Ensure you login with the user you created i.e $AAD_OPS_FE_UPN, $AAD_OPS_BE_UPN or $AAD_ADMIN_UPN and **not your company email address**.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 kubectl get po -n frontend
 ````
@@ -350,6 +407,8 @@ nginx   1/1     Running               0       89m
 ````
 13) Try to list pods in default namespace
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 kubectl get pods
 ````
@@ -361,6 +420,9 @@ Error from server (Forbidden): pods is forbidden: User "opsfe-test@MngEnvMCAP366
 o the resource in Azure. Update role assignment to allow access.
 ````
 Repeat step **6** and **13** for the remaining users, and see how their permissions differs.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 # Username and password for Admin user execute the command from your local shell and not from Jumpbox VM
 echo $AAD_ADMIN_UPN
@@ -375,12 +437,16 @@ echo $AAD_OPS_BE_PW
 
 Assign your Student user account to AKS admin cluster group in Microsoft Entra ID. Execute the following command from you local shell, and **not the shell in the Jumbox VM**. 
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 AAD_STUDENT_UPN=$(az account show --query 'user.name' --output tsv)
 STUDENT_USER_OBJECT_ID=$(az ad user show --id $AAD_STUDENT_UPN --query 'id' --output tsv)
 az ad group member add --group $ADMIN_GROUP --member-id $STUDENT_USER_OBJECT_ID
 ````
 From the **Jumpbox VM**, execute the following command.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 # Remove the configuration
@@ -389,10 +455,15 @@ rm -R .kube/
 ````
 From the **Jumpbox VM**, execute the following command and login with your Student account.
 
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 # Authenticate to Azure
 az login
 ````
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 # Re-authenticate to AKS with your Student account.
 az aks get-credentials --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
