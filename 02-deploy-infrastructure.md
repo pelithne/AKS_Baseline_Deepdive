@@ -52,6 +52,8 @@ STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
 
 ### 1.1.2 Create the Resource Groups for the Hub and Spoke.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az group create --name $HUB_RG --location $LOCATION
 az group create --name $SPOKE_RG --location $LOCATION
@@ -62,7 +64,11 @@ In this step, we will begin by establishing a Network Security Group (NSG) that 
 
 For Azure Bastion, we are establishing security rules to permit both the control and data plane access to the AzureBastion. For a more detailed understanding of these rules, please refer to [this documentation](https://learn.microsoft.com/en-us/azure/bastion/bastion-nsg).
 
+
 1) Lets Create the NSG for AzureBastionSubnet.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network nsg create \
     --resource-group $HUB_RG \
@@ -70,7 +76,10 @@ az network nsg create \
     --location $LOCATION
 ````
 
-2) Associate the required **inbound** security rules to the NSG.
+1) Associate the required **inbound** security rules to the NSG.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
     az network nsg rule create --name AllowHttpsInbound \
     --nsg-name $BASTION_NSG_NAME --priority 120 --resource-group $HUB_RG\
@@ -106,7 +115,9 @@ az network nsg create \
     --destination-port-ranges 8080 5701
 ````
 
-3) Associate the required **outbound** security rules to the NSG.
+1) Associate the required **outbound** security rules to the NSG.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
     az network nsg rule create --name AllowSshRdpOutbound \
@@ -144,13 +155,19 @@ az network nsg create \
 
 4) Create an NSG for the JumpBox subnet.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network nsg create \
     --resource-group $HUB_RG \
     --name $JUMPBOX_NSG_NAME \
     --location $LOCATION
 ````
+
+
 5) Create the HUB VNET with one subnet for **Azure Bastion Subnet** and associate it to the bastion NSG.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network vnet create \
@@ -163,6 +180,7 @@ az network vnet create \
 ````
 6) Create a subnet for the Azure Firewall.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network vnet subnet create \
@@ -173,6 +191,8 @@ az network vnet subnet create \
 ````
 
 7) Create a subnet for the Virtual Machine that will be used as "jumpbox".
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network vnet subnet create \
@@ -188,14 +208,14 @@ You have successfully configured the network for your hub virtual network.You ha
 
 Validate your deployment in the Azure portal.
 
-8) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+1) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-9) Once logged in, locate and select your resource group called **rg-hub** where the hub vnet is deployed.
+2) Once logged in, locate and select your resource group called **rg-hub** where the hub vnet is deployed.
 
-10) Select your vnet called **HUB_VNET**.
+3)  Select your vnet called **HUB_VNET**.
 
-11) In the left-hand side menu, under the **Settings** section, select **Subnets**.
-12) Make sure that your subnets have the appropriate IP range and that Network Security Groups (NSGs) are correctly associated with their respective subnets as depicted below.
+4)  In the left-hand side menu, under the **Settings** section, select **Subnets**.
+5)  Make sure that your subnets have the appropriate IP range and that Network Security Groups (NSGs) are correctly associated with their respective subnets as depicted below.
 
 ![Screenshot](images/hubandspokevnet.jpg)
 
@@ -203,6 +223,9 @@ Validate your deployment in the Azure portal.
 We will now start to setup the spoke vnet, subnets and their respective NSGs,
 
 1) Create the NSG for AKS subnet.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network nsg create \
     --resource-group $SPOKE_RG \
@@ -210,6 +233,9 @@ az network nsg create \
     --location $LOCATION
 ````
 2) Create the NSG for endpoints subnet, were the endpoints will reside.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network nsg create \
     --resource-group $SPOKE_RG \
@@ -217,6 +243,9 @@ az network nsg create \
     --location $LOCATION
 ````
 3) Create the NSG for load balancer subnet, were the internal load balancer will reside.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network nsg create \
     --resource-group $SPOKE_RG \
@@ -226,6 +255,9 @@ az network nsg create \
 4) To use an NSG with your application gateway, you need to open these port ranges:
 
 Inbound rules: The **Internet service tag** needs access to port **65200-65535** for the backend health API. Your application traffic needs access to TCP port **80 and/or 443**. for futher information refer to [Required security rules for Application Gateway](https://learn.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure#required-security-rules) for more information.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network nsg create \
     --resource-group $SPOKE_RG \
@@ -233,6 +265,8 @@ az network nsg create \
     --location $LOCATION
 ````
 5) Create the NSG rule to allow application traffic, on port 443 and 80.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 # Allow Internet Client request on Port 443 and 80
@@ -248,6 +282,9 @@ az network nsg rule create \
     --description "Allow inbound traffic to port 80 and 443 to Application Gateway from client requests originating from the Internet"
 ````
 6) Create the NSG rule to allow application traffic, on port range 65200-65535.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 # Infrastructure ports
 az network nsg rule create \
@@ -263,6 +300,8 @@ az network nsg rule create \
 ````
 7) Create the spoke VNET with one subnet for **AKS Subnet** and associate it to the AKS NSG.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network vnet create \
     --resource-group $SPOKE_RG  \
@@ -275,6 +314,8 @@ az network vnet create \
 
 8) Create the subnet for **Endpoints** and associate it to the endpoints NSG.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network vnet subnet create \
     --resource-group $SPOKE_RG  \
@@ -284,6 +325,8 @@ az network vnet subnet create \
 	--network-security-group $ENDPOINTS_NSG_NAME
 ````
 9) Create subnet for the **load balancer** that will be used for ingress traffic and associate it to the loadbalancer NSG.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network vnet subnet create \
@@ -295,6 +338,8 @@ az network vnet subnet create \
 ````
 
 10) Create subnet for the **Application Gateway** and associate it to the Application Gateway NSG.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network vnet subnet create \
@@ -310,7 +355,8 @@ You have successfully configured the network for your spoke virtual network. You
 
 Validate your deployment in the Azure portal.
 
-11) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+11)  Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+    
 
 12) Once logged in, locate and select your resource group called **rg-spoke** where the spoke vnet is deployed.
 
@@ -327,15 +373,20 @@ The next step is to create a virtual network peering between the hub and spoke V
 
 1) Before we can do a Vnet peering we need to obtain the full resource id of the Spoke_VNET and Hub_VNET as they resides in different resource group.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 SPOKE_VNET_ID=$(az network vnet show --resource-group $SPOKE_RG --name $SPOKE_VNET_NAME --query id --output tsv)
 ````
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 HUB_VNET_ID=$(az network vnet show --resource-group $HUB_RG --name $HUB_VNET_NAME --query id --output tsv)
 ````
 
-1) Create a peering connection from the hub to spoke virtual networks.
+2) Create a peering connection from the hub to spoke virtual networks.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network vnet peering create \
@@ -346,7 +397,9 @@ az network vnet peering create \
     --allow-vnet-access
 ````
 
-2) Create a peering connection from  the spoke to hub virtual networks.
+3) Create a peering connection from  the spoke to hub virtual networks.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network vnet peering create \
@@ -362,22 +415,25 @@ Peering should be established and the high level design should now look like thi
 
 Validate your deployment in the Azure portal.
 
-3) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+4) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-4) Once logged in, locate and select your resource group called **rg-spoke** where the spoke vnet is deployed.
 
-5) Select your vnet called **Spoke_VNET**.
+5) Once logged in, locate and select your resource group called **rg-spoke** where the spoke vnet is deployed.
 
-6) In the left-hand side menu, under the **Settings** section, select **peerings**.
-7) Ensure that the peering status is set to **Connected**
+6) Select your vnet called **Spoke_VNET**.
 
-8) Repeat step 4 - 7 but for Hub_VNET.
+7) In the left-hand side menu, under the **Settings** section, select **peerings**.
+8) Ensure that the peering status is set to **Connected**
+
+9) Repeat step 4 - 7 but for Hub_VNET.
 
 ![Screenshot](/images/vnetpeeringconnected.jpg)
 
 ### 1.1.6 Create Azure Bastion and Jumpbox VM
 
 1) Create a public IP address for the bastion host
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network public-ip create \
@@ -392,7 +448,7 @@ az network public-ip create \
 > Ensure you specify a **password** for the admin user called **azureuser**.
 > The password length must be between 12 and 72. Password must have the 3 of the following: 1 lower case character, 1 upper case character, 1 number and 1 special character.
 
-
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az vm create \
@@ -413,9 +469,11 @@ az vm create \
 
 
 
-4) Create the bastion host in hub vnet and associate it to the public IP.
+3) Create the bastion host in hub vnet and associate it to the public IP.
 > [!Note]
 > Azure Bastion service requires a dedicated subnet named **AzureBastionSubnet** to provide secure and seamless RDP/SSH connectivity to your virtual machines. When you deploy Azure Bastion service, it will automatically create this subnet for you, if it does not exist in the target virtual network. However, if the subnet already exists, it must meet the minimum size of **/26** or larger, otherwise the deployment will fail.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network bastion create \
@@ -429,19 +487,19 @@ az network bastion create \
 > [!Note]
 > Azure Bastion takes a while to create. This is a good time for a coffee break!
 
-5) Connect to VM using the portal:
+4) Connect to VM using the portal:
 
 Upon successful installation of the Jumpbox Virtual Machine (VM), the next step is to validate the connectivity between the Bastion and Jumpbox host. Here are the steps to follow:
 
-6) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+5) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-7) Once logged in, locate and select your **rg-hub** where the Jumpbox has been deployed.
+6) Once logged in, locate and select your **rg-hub** where the Jumpbox has been deployed.
 
-8) Within your resource group, find and click on the **Jumpbox VM**.
+7) Within your resource group, find and click on the **Jumpbox VM**.
 
-9) In the left-hand side menu, under the **Connect** section, select ‘Bastion’.
+8) In the left-hand side menu, under the **Connect** section, select ‘Bastion’.
 
-10) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully. 
+9)  Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully. 
 
 For additional information on accessing VMs through Bastion, please refer to this [Microsoft Azure Bastion tutorial](https://learn.microsoft.com/en-us/azure/bastion/create-host-cli#steps)
 
@@ -454,6 +512,9 @@ After completing these steps, The high-level targeted architecture now matches t
 To secure your AKS outbound traffic, you need to follow these steps for a basic cluster deployment. These steps will help you restrict the outbound access and to certain FQDNs that are needed by the cluster. further information can be found here: [Control egress traffic using Azure Firewall in Azure Kubernetes Service (AKS)](https://learn.microsoft.com/en-us/azure/aks/limit-egress-traffic)
 
 1) Create Azure Firewall, and deploy it to it to firewall subnet in hub vnet.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network firewall create \
     --resource-group $HUB_RG \
@@ -464,6 +525,8 @@ az network firewall create \
 
 ````
 2) Create the Public IP address resource.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network public-ip create \
@@ -477,6 +540,8 @@ az network public-ip create \
 
 3) Associate the public IP address with the Firewall.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network firewall ip-config create \
     --firewall-name $FW_NAME \
@@ -488,6 +553,8 @@ az network firewall ip-config create \
 ````
 4) Update the existing Azure Firewall configuration.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network firewall update \
     --name $FW_NAME \
@@ -497,12 +564,18 @@ az network firewall update \
  
 The following network rules allows outbound traffic from any source address to certain destinations and ports. If the required destination is not specified the AKS cluster will fail to deploy. Each rule will take around 3 to 5 minutes to get created.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apiudp' --protocols 'UDP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 1194 --action allow --priority 100
 ````
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'apitcp' --protocols 'TCP' --source-addresses '*' --destination-addresses "AzureCloud.$LOCATION" --destination-ports 9000
 ````
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwnr' -n 'time' --protocols 'UDP' --source-addresses '*' --destination-fqdns 'ntp.ubuntu.com' --destination-ports 123
 ````
@@ -510,11 +583,16 @@ az network firewall network-rule create -g $HUB_RG -f $FW_NAME --collection-name
 
 This rules specifies the FQDN's which are required by AKS, **AzureKubernetesService** tag which include all the FQDNs listed in Outbound network and FQDN rules for AKS clusters.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network firewall application-rule create -g $HUB_RG -f $FW_NAME --collection-name 'aksfwar' -n 'fqdn' --source-addresses '*' --protocols 'http=80' 'https=443' --fqdn-tags "AzureKubernetesService" --action allow --priority 100
 ````
 
 7) Create a route table in the spoke.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network route-table create \
     --resource-group $SPOKE_RG  \
@@ -526,16 +604,23 @@ az network route-table create \
 
 In order to create the route we need to obtain the private IP address of the Firewall.To get the private IP address of the Firewall, you need to run the following command:
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network firewall show --resource-group $HUB_RG --name $FW_NAME |grep  privateIPAddress
 ````
 
-Then store the output (the ip address) in an environment variable:
+9) Then store the output (the ip address) in an environment variable:
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 FW_PRIVATE_IP=<IP Address from previous command>
 ````
+10) Create the route table to route egress traffic to the firewall in the hub VNET:
 
-Create the route table to route egress traffic to the firewall in the hub VNET:
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network route-table route create \
     --resource-group $SPOKE_RG  \
@@ -549,7 +634,9 @@ az network route-table route create \
 > [!Note]
 > The route will direct all traffic (0.0.0.0/0) to the next hop type of VirtualAppliance, which is the firewall instance. The next hop IP address is the private IP address of the firewall, which is stored in the environment variable $FW_PRIVATE_IP. This way, the traffic from the AKS subnet will be routed to the firewall instance on its private endpoint. This will allow you to perform inspection on outbound traffic.
 
-9) Associate the route table with the AKS subnet.
+11) Associate the route table with the AKS subnet.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network vnet subnet update \
@@ -565,32 +652,32 @@ You have successfully configured the firewall in the hub VNet, set up network an
 
 Validate your deployment in the Azure portal.
 
-10) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+12)  Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
 
-11) Once logged in, locate and select your resource group called **rg-hub** where the hub vnet is deployed.
+13)  Once logged in, locate and select your resource group called **rg-hub** where the hub vnet is deployed.
 
-12) Select your firewall called **azure-firewall**.
+14)  Select your firewall called **azure-firewall**.
 
-13) In the left-hand side menu, under the **Settings** section, select **Rules**.
+15)  In the left-hand side menu, under the **Settings** section, select **Rules**.
 
-14) Click on  **Network rule collection**
+16)  Click on  **Network rule collection**
 
-15) Verify that you have a network rule collection called **aksfwnr** which should contain 3 rules. Inspect the rules.
+17)  Verify that you have a network rule collection called **aksfwnr** which should contain 3 rules. Inspect the rules.
 
 ![Screenshot](/images/azfwnr.jpg)
 
-16) Click on **Application rule collection**.
+18) Click on **Application rule collection**.
 
-17) Verify that you have an application rule collection called **aksfwar** which should contain 1 rule. Inspect the rule.
+19) Verify that you have an application rule collection called **aksfwar** which should contain 1 rule. Inspect the rule.
 
 ![Screenshot](/images/azfwar.jpg)
 
-18) Lets validate the routing between AKS subnet and Azure Firewall, in the Azure portal, in the top menu select **Resource Groups**. 
-19) Select resource group **rg-spoke**.
+20) Lets validate the routing between AKS subnet and Azure Firewall, in the Azure portal, in the top menu select **Resource Groups**. 
+21) Select resource group **rg-spoke**.
 
-20) Select routing table called **spoke-rt**.
+22) Select routing table called **spoke-rt**.
 
-21) Ensure that the default route has a prefix of **0.0.0.0/0** and the next hop is set to the **virtual appliance** with the **IP** address of the Azure Firewall. Also, make sure that the routing table is associated with the AKS subnet called **aks-subnet**.
+23) Ensure that the default route has a prefix of **0.0.0.0/0** and the next hop is set to the **virtual appliance** with the **IP** address of the Azure Firewall. Also, make sure that the routing table is associated with the AKS subnet called **aks-subnet**.
 
 ![Screenshot](/images/spokert.jpg)
 
@@ -602,12 +689,16 @@ This chapter covers deploying AKS with outbound traffic configured to use a user
 
 1) Create a user-assigned managed identity.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az identity create \
     --resource-group $SPOKE_RG \
     --name $AKS_IDENTITY_NAME-${STUDENT_NAME}
 ````
 2) Get the id of the user managed identity.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
  IDENTITY_ID=$(az identity show \
@@ -617,6 +708,8 @@ az identity create \
     --output tsv)
 ````
 3) Get the principal id of the user managed identity.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 PRINCIPAL_ID=$(az identity show \
@@ -628,6 +721,8 @@ PRINCIPAL_ID=$(az identity show \
 
 4) Get the scope of the routing table.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 RT_SCOPE=$(az network route-table show \
     --resource-group $SPOKE_RG \
@@ -636,6 +731,8 @@ RT_SCOPE=$(az network route-table show \
     --output tsv)
 ````
 5) Assign permissions for the AKS user defined managed identity to the routing table.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az role assignment create \
@@ -646,6 +743,8 @@ az role assignment create \
 
 6) Assign permission for the AKS user defined managed identity to the load balancer subnet
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 LB_SUBNET_SCOPE=$(az network vnet subnet list \
     --resource-group $SPOKE_RG \
@@ -653,6 +752,8 @@ LB_SUBNET_SCOPE=$(az network vnet subnet list \
     --query "[?name=='$LOADBALANCER_SUBNET_NAME'].id" \
     --output tsv)
 ````
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az role assignment create \
@@ -666,6 +767,8 @@ az role assignment create \
 
 7) Retrieve the scope of AKS subnet, were AKS shall be deployed.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 AKS_SUBNET_SCOPE=$(az network vnet subnet list \
     --resource-group $SPOKE_RG \
@@ -678,6 +781,8 @@ AKS_SUBNET_SCOPE=$(az network vnet subnet list \
 To deploy a highly available private AKS cluster, you can use the following command:
 
 This command creates an AKS cluster with two system nodes, using the specified VNet subnet ID and cluster name. It is configured as a private cluster with user-defined routing and OIDC issuer and workload identity enabled. The network plugin and policy are set to Azure, and the public FQDN is disabled. The cluster is deployed across availability zones 1, 2, and 3
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az aks create --resource-group $SPOKE_RG --node-count 2 --vnet-subnet-id $AKS_SUBNET_SCOPE --name $AKS_CLUSTER_NAME-${STUDENT_NAME} --enable-private-cluster --outbound-type userDefinedRouting --enable-oidc-issuer --enable-workload-identity --generate-ssh-keys --assign-identity $IDENTITY_ID --network-plugin azure --network-policy azure --disable-public-fqdn --zones 1 2 3
@@ -695,65 +800,78 @@ az aks nodepool add --resource-group $SPOKE_RG --cluster-name $AKS_CLUSTER_NAME-
 10) Create a virtual network link to resolve AKS private endpoint from HUB vnet.
 
 Fetch the node group of the AKS cluster, and save it in an environment variable.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 NODE_GROUP=$(az aks show --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME} --query nodeResourceGroup -o tsv)
 ````
-Fetch the AKS DNS zone name.
+11) Fetch the AKS DNS zone name.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 DNS_ZONE_NAME=$(az network private-dns zone list --resource-group $NODE_GROUP --query "[0].name" -o tsv)
 
 ````
-Fetch the ID of the HUB virtual network.
+12) Fetch the ID of the HUB virtual network.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 HUB_VNET_ID=$(az network vnet show -g $HUB_RG -n $HUB_VNET_NAME --query id --output tsv)
 ````
-Create a virtual network link between the hub virtual network and the AKS private DNS zone, that was created for the AKS cluster.
+13) Create a virtual network link between the hub virtual network and the AKS private DNS zone, that was created for the AKS cluster.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network private-dns link vnet create --name "hubnetdnsconfig" --registration-enabled false --resource-group $NODE_GROUP --virtual-network $HUB_VNET_ID --zone-name $DNS_ZONE_NAME 
 ````
 
-Validate your deployment in the Azure portal.
+14) Validate your deployment in the Azure portal.
 
-11) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
-12) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should have 3 RGs which you have created,**MC_rg-spoke_private-aks-xxxx_swedencentral**, **rg-hub** and **rg-spoke** 
+15) Navigate to the Azure portal at [https://portal.azure.com](https://portal.azure.com) and enter your login credentials.
+
+16) Once logged in, click on **Resource groups** to view all of your resource groups in your subscription. You should have 3 RGs which you have created,**MC_rg-spoke_private-aks-xxxx_swedencentral**, **rg-hub** and **rg-spoke** 
 
 > [!Note]
 > MC_rg-spoke_private-aks-xxxx_swedencentral is a resource group automatically created when deploying an AKS cluster. It is used by Azure to manage resources for the cluster, this particular resource group is also known as Node group.
 
 ![Screenshot](images/resourcegroups.jpg)
 
-13) Verify that a virtual network link exists between the Hub and spoke to enable the jumpbox to resolve the AKS domain name and access the cluster. Select the node group called **MC_rg-spoke_private-aks-xxxxx_swedencentral**
+17) Verify that a virtual network link exists between the Hub and spoke to enable the jumpbox to resolve the AKS domain name and access the cluster. Select the node group called **MC_rg-spoke_private-aks-xxxxx_swedencentral**
 
-14) Select the **Private DNS zone**.
-15) On your left hand side menu, under **Settings** click on **Virtual network links**.
+18) Select the **Private DNS zone**.
+19) On your left hand side menu, under **Settings** click on **Virtual network links**.
 
-16) Validate that there is a link name called **hubnetdnsconfig** and the link status is set to **Completed** and the virtual network is set to **Hub_VNET**.
+20) Validate that there is a link name called **hubnetdnsconfig** and the link status is set to **Completed** and the virtual network is set to **Hub_VNET**.
 
 ![Screenshot](images/virtualnetworklinks.jpg)
 
-17) On the top menu click **Resource groups** and choose **rg-spoke** from the resource group list.
+21) On the top menu click **Resource groups** and choose **rg-spoke** from the resource group list.
 
-18) Click on the AKS resource called private-aks-<YOUR STUDENT NAME>. Verify that the Private cluster is set to Enabled. 
+22) Click on the AKS resource called private-aks-<YOUR STUDENT NAME>. Verify that the Private cluster is set to Enabled. 
 
 ![Screenshot](images/aksoverviewprivatecluster.jpg)
 
-19) Verify AKS control plane connectivity.
+23) Verify AKS control plane connectivity.
 
 In this section we will verify that we are able to connect to the AKS cluster from the jumpbox, firstly we need to connect to the cluster successfully and secondly we need to verify that the kubernetes client is able to communicate with the AKS control plane from the jumpbox. 
 
-20) Select resource group **rg-hub** where the Jumpbox has been deployed.
+24) Select resource group **rg-hub** where the Jumpbox has been deployed.
 
-21) Within your resource group, find and click on the virtual machine called **Jumpbox VM**.
+25) Within your resource group, find and click on the virtual machine called **Jumpbox VM**.
 
-22) In the left-hand side menu, under  **Connect** section, select **Bastion**.
+26) In the left-hand side menu, under  **Connect** section, select **Bastion**.
 
-23) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
+27) Enter the **credentials** for the Jumpbox VM and verify that you can log in successfully.
 
-24) Once successfully logged in to the jumbox you need to install a few tools
+28) Once successfully logged in to the jumbox you need to install a few tools
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 #!/bin/bash
@@ -770,7 +888,9 @@ sudo usermod -aG docker $USER
 ````
 
   
-25) Now, **login to Azure** in order to obtain AKS credentials.
+29) Now, **login to Azure** in order to obtain AKS credentials.
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az login
@@ -780,7 +900,9 @@ az account set --subscription <SUBSCRIPTION ID>
 > To check the current subscription, run the command: **az account show**
 To change the subscription, run the command: **az account set --subscription <SUBSCRIPTION ID>, where <SUBSCRIPTION ID>** the ID of the desired subscription. You can find the subscription ID by running the command: **az account list --output table**
 
-26) Add your Environment variables to the jumpbox bash shell.
+30) Add your Environment variables to the jumpbox bash shell.
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 SPOKE_RG=rg-spoke
@@ -789,12 +911,18 @@ STUDENT_NAME=<WRITE YOUR STUDENT NAME HERE>
 
 ````
 
-27) Download the AKS credentials onto the jumpbox.
+31) Download the AKS credentials onto the jumpbox.
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 az aks get-credentials --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
-28) Ensure you can list resources in AKS.
+
+
+32) Ensure you can list resources in AKS.
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl get nodes
@@ -821,6 +949,8 @@ In this chapter, we will learn how to deploy a private Azure container registry 
 
 1) Create the Azure Container Registry, and disable public access to the registry.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az acr create \
     --resource-group $SPOKE_RG \
@@ -837,6 +967,8 @@ az acr create \
 
 2) Disable endpoint network policies.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network vnet subnet update \
  --name $ENDPOINTS_SUBNET_NAME \
@@ -847,6 +979,8 @@ az network vnet subnet update \
 
 3) Configure the private DNS zone for ACR.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network private-dns zone create \
   --resource-group $SPOKE_RG \
@@ -855,6 +989,9 @@ az network private-dns zone create \
 
  
 4) Create a virtual network link to the spoke network.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network private-dns link vnet create \
   --resource-group $SPOKE_RG \
@@ -867,6 +1004,8 @@ az network private-dns link vnet create \
 
 > [!Note]
 > The $HUB_VNET_ID variable specifies the full path to the virtual network in another resource group, allowing the command to correctly link to it.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network private-dns link vnet create \
@@ -881,11 +1020,15 @@ az network private-dns link vnet create \
 
 To create a private endpoint for an Azure Container Registry (ACR), you need to obtain the resource ID of the container registry. This resource ID is used to specify the target resource when creating the private endpoint.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 REGISTRY_ID=$(az acr show --name $ACR_NAME \
   --query 'id' --output tsv)
 
 ````
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network private-endpoint create \
@@ -905,6 +1048,8 @@ Before we can configure the DNS record we need to obtain the private IP address 
 
 Get endpoint IP configuration:
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 NETWORK_INTERFACE_ID=$(az network private-endpoint show \
   --name ACRPrivateEndpoint \
@@ -914,6 +1059,8 @@ NETWORK_INTERFACE_ID=$(az network private-endpoint show \
  ```` 
 
 Fetch the private IP address associated with the ACR, these IP addresses are used for data and control of the container registry.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network nic show --ids $NETWORK_INTERFACE_ID |grep azurecr.io -B 7
@@ -944,6 +1091,8 @@ Note down the **privateIPAddress** and **fqdns** as it will be used in a later s
 
 8) Create a new 'A' record set for control in the private DNZ zone.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network private-dns record-set a create \
   --name $ACR_NAME \
@@ -953,6 +1102,8 @@ az network private-dns record-set a create \
 
 9) Create a new 'A' record set for data in the private DNZ zone.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network private-dns record-set a create \
   --name $ACR_NAME.$LOCATION.data \
@@ -960,6 +1111,8 @@ az network private-dns record-set a create \
   --resource-group $SPOKE_RG
 ````
 10) Update the 'A' record to contain the control IP address of the ACR.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network private-dns record-set a add-record \
@@ -971,6 +1124,8 @@ az network private-dns record-set a add-record \
 ````
 
 11) Update the 'A' record to contain the data IP address of the ACR.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network private-dns record-set a add-record \
@@ -1011,21 +1166,33 @@ In this section, you will learn how to check if you can access your private Azur
 
 21) Once successfully logged in to the jumpbox **login to Azure** if you have not already done so in previous steps.
 
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 az login
 ````
 Identify your subscription id from the list, if you have several subscriptions.
 
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 az account list -o table
 ````
 Set your subscription id to be the default subscription.
+
+:cloud **Run the following commands in the jumpbox terminal:**
+
+
 ````bash
 az account set --subscription <SUBSCRIPTION ID>
 ````
 22) Validate private link connection 
 
 List your ACR in your subscription and note down the ACR name.
+
+:cloud **Run the following commands in the jumpbox terminal:**
+
+
 ````bash
 az acr list -o table
 ````
@@ -1068,16 +1235,23 @@ alibaksacr.privatelink.azurecr.io. 1800 IN A    10.1.1.21
 ````
 8. Create a Dockerfile, build the docker image, authenticate towards ACR and push the image to the container registry.
 
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 vim Dockerfile
 ````
 Add the following content to the Dockerfile
+
+:cloud **Run the following commands in the jumpbox terminal:**
+
 
 ````bash
 FROM nginx
 EXPOSE 80
 ````
 Build the Docker image
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 sudo docker build --tag nginx .
@@ -1111,15 +1285,24 @@ Successfully built 49a47448ba86
 Successfully tagged nginx:latest
 ````
 Create an alias of the image
+
+:cloud **Run the following commands in the jumpbox terminal:**
+
+
 ````bash
 sudo docker tag nginx <CONTAINER REGISTRY NAME>.azurecr.io/nginx
 ````
 Authenticate to ACR with your AD user.
 
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 az acr login --name <CONTAINER REGISTRY NAME> 
 ````
 Upload the docker image to the ACR repository.
+
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 sudo docker push <CONTAINER REGISTRY NAME>.azurecr.io/nginx
 ````
@@ -1141,6 +1324,8 @@ latest: digest: sha256:3dc6726adf74039f21eccf8f3b5de773080f8183545de5a235726132f
 
 9) Attach AKS to the ACR, this command updates our existing AKS cluster and attaches it to the ACR, this allows the cluster to pull images from the ACR.
 
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 az aks update \
     --resource-group $SPOKE_RG \
@@ -1151,11 +1336,15 @@ az aks update \
 
 On the Jumpbox VM create a yaml file.
 
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 touch test-pod.yaml
 vim test-pod.yaml
 ````
 when you copy to vim, prevent Vim from auto-indenting the text you paste.
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 :set paste
@@ -1163,6 +1352,8 @@ when you copy to vim, prevent Vim from auto-indenting the text you paste.
 Press enter.
 
 Paste in the following manifest file which creates a Pod named **internal-test-app** which fetches the docker images from our internal container registry, created in previous step. 
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````yaml
 apiVersion: v1
@@ -1180,11 +1371,15 @@ spec:
 ````
 Create the pod.
 
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````yaml
 kubectl create -f test-pod.yaml
 ````
 
 Verify that the Pod is in running state.
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl get po --show-labels
@@ -1198,6 +1393,7 @@ internal-test-app   1/1     Running   0          8s
 ````
 Our next step is to set up an internal load balancer that will direct the traffic to our internal Pod. The internal load balancer will be deployed in the load balancer subnet of the spoke-vnet.
 
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````yaml
 touch internal-app-service.yaml
@@ -1209,6 +1405,8 @@ vim internal-app-service.yaml
 Press enter.
 
 Copy the following manifest to expose the pod to the internet. Replace **<LOADBALANCER SUBNET>** with your subnet name stored in your local shell environment variable **$LOADBALANCER_SUBNET_NAME**
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````yaml
 apiVersion: v1
@@ -1227,10 +1425,14 @@ spec:
 ````
 Deploy the service object in AKS.
 
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 kubectl create -f internal-app-service.yaml
 ````
 Verify that your service object is created and associated with the Pod that you have created, also ensure that you have recieved an external IP, which should be a private IP address range from the load balancer subnet.
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 sudo kubectl get svc -o wide
@@ -1248,6 +1450,9 @@ kubernetes                  ClusterIP      10.0.0.1     <none>        443/TCP   
 > Note down the EXTERNAL-IP (Private IP of the load balancer), as this will be used for creating the application gateway. 
 
 Verify that you are able to access the exposed Nginx pod from your jumpbox VM.
+
+:cloud **Run the following commands in the jumpbox terminal:**
+
 ````bash
 azureuser@Jumpbox-VM:~$ curl <EXTERNAL-IP>
 ````
@@ -1292,12 +1497,14 @@ In this chapter, you will set up an application gateway that can terminate TLS c
 > [!Note]
 > Your workshop instructor will provide you a student name for your domain name.  
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network public-ip create -g $SPOKE_RG -n AGPublicIPAddress --dns-name $STUDENT_NAME --allocation-method Static --sku Standard --location $LOCATION
 ````
 2) Create WAF policy 
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network application-gateway waf-policy create --name ApplicationGatewayWAFPolicy --resource-group $SPOKE_RG
@@ -1306,6 +1513,8 @@ az network application-gateway waf-policy create --name ApplicationGatewayWAFPol
 
 > [!Note]
 > Your workshop instructor will provide you with a **password** for the certificate and instructions on how to retrieve it. Before executing the command, make sure the certificate is located in **your working directory**. Replace **<CERTIFICATE PASSWORD>** with the password provided by the instructor and **<LOAD BALANCER PRIVATE IP>** with the private IP of the load balancer.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
 az network application-gateway create \
@@ -1329,6 +1538,8 @@ az network application-gateway create \
 ```` 
 4) Create a custom probe for the application gateway that will monitor the health of the AKS backend pool.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
  az network application-gateway probe create \
     --gateway-name $APPGW_NAME \
@@ -1342,6 +1553,9 @@ az network application-gateway create \
     --host 127.0.0.1
 ````
 5) Associate the health probe to the backend pool.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az network application-gateway http-settings update -g $SPOKE_RG --gateway-name $APPGW_NAME -n appGatewayBackendHttpSettings --probe health-probe
 ````
@@ -1350,30 +1564,30 @@ Validate your deployment in the Azure portal.
 
 6) select your resource group called **rg-spoke** where the application gateway is deployed.
 
-10) Select your Azure Application Gateway called **AppGateway**. Ensure you have a **Public IP address** and Tier set to **WAF v2**.
+7) Select your Azure Application Gateway called **AppGateway**. Ensure you have a **Public IP address** and Tier set to **WAF v2**.
 
 ![Screenshot](images/appgwoverview.jpg)
 
-11) In the left-hand side menu, under the **Settings** section, select **Backend pools** and choose from the list  **appGatewayBackendPool**.
+8) In the left-hand side menu, under the **Settings** section, select **Backend pools** and choose from the list  **appGatewayBackendPool**.
 
-12) Ensure the target type is set to **IP address or FQDN** and target is set to the IP address of your **internal load balancer**.
+9) Ensure the target type is set to **IP address or FQDN** and target is set to the IP address of your **internal load balancer**.
 
 ![Screenshot](images/appGatewayBackendPool.jpg)
 
-13) On the top menu click on **AppGateway | Backend pools**.
+10) On the top menu click on **AppGateway | Backend pools**.
 
-14) Lets verify the backend settings of Application Gateway, in the left-hand side menu choose ***Backend settings**.
+11) Lets verify the backend settings of Application Gateway, in the left-hand side menu choose ***Backend settings**.
 
-15) From the list click on **appGatewayBackendHttpSettings** validate that the backend port is configured for port 80, and that health probe called **health-probe** is associated to the backend.
+12) From the list click on **appGatewayBackendHttpSettings** validate that the backend port is configured for port 80, and that health probe called **health-probe** is associated to the backend.
 
 ![Screenshot](images/backendsettings.jpg)
 
 
-16) Press **Cancel** 
+13) Press **Cancel** 
 
-17) Verify that we have Web application rules configured. In the left-hand side menu choose ***Web Application Firewall**.
+14) Verify that we have Web application rules configured. In the left-hand side menu choose ***Web Application Firewall**.
 
-18) Click on **ApplicationGatewayWAFPolicy** In the left-hand side menu choose ***Managed rules**.
+15) Click on **ApplicationGatewayWAFPolicy** In the left-hand side menu choose ***Managed rules**.
 
 ![Screenshot](images/managedruleswaf.jpg)
 
@@ -1391,7 +1605,9 @@ you should see a similar output as to the one below.
 ![Screenshot](/images/splashscreen.jpg)
 
 ### 1.1.12 Clean Up Resources in AKS
-Once you have verified that everything works as depicted earlier. from the jumpbox host delete the resources.
+Once you have verified that everything works as depicted earlier. From the jumpbox host delete the resources.
+
+:cloud **Run the following commands in the jumpbox terminal:**
 
 ````bash
 kubectl delete -f test-pod.yaml
