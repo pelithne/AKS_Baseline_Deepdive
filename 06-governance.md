@@ -54,6 +54,8 @@ In this section, we will apply an Azure built-in policy definition named **“Ku
 
 1) In order to apply an Azure built in Policy on subscription level, we first need to obtain our subscription id. From you **local shell** get the subscription ID.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 SUBSCRIPTION=$(az account show --query id -o tsv)
 ````
@@ -62,11 +64,16 @@ SUBSCRIPTION=$(az account show --query id -o tsv)
 
 2) Let’s retrieve the **policy definition ID** for the **“Kubernetes cluster should not allow privileged containers”** policy. We’ll use this ID later when applying the policy at the subscription level.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 POLICY_DEFINITION_ID=$(az policy definition list --query "[?displayName=='Kubernetes cluster should not allow privileged containers'].{NAME:name}" --output tsv)
 ````
 
 3) Assign the policy to the subscription and name the policy for **"Kubernetes cluster should not allow priviliged containers"**.
+
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az policy assignment create --name "Kubernetes cluster should not allow privileged containers" --policy $POLICY_DEFINITION_ID --scope /subscriptions/$SUBSCRIPTION
 ````
@@ -78,10 +85,14 @@ az policy assignment create --name "Kubernetes cluster should not allow privileg
 
 1) Enable the Azure Policy add-on for you AKS cluster.
 
+:computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
+
 ````bash
 az aks enable-addons --addons azure-policy --resource-group $SPOKE_RG --name $AKS_CLUSTER_NAME-${STUDENT_NAME}
 ````
 2) Verify that the add-on installation was succesful and that azure-policy and gatekeeper are running, by executing the following command from the **Jumpbox VM**.
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 # Verify that gatekeeper-system namespace is created.
@@ -100,10 +111,15 @@ kube-node-lease     Active   2d10h
 kube-public         Active   2d10h
 kube-system         Active   2d10h
 ````
+
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 # azure-policy pod is installed in kube-system namespace
 kubectl get pods -n kube-system
 ````
+:cloud: **Run the following commands in the jumpbox terminal:**
+
 ````bash
 # gatekeeper pod is installed in gatekeeper-system namespace
 kubectl get pods -n gatekeeper-system
@@ -146,6 +162,8 @@ Now, let's proceed to create a **privileged pod** within AKS. The anticipated ou
 
 
 1) From the **JumpBox VM** deploy the following manifest. This Yaml defines, a single container running the nginx image, ````securityContext```` field is set to ````privileged: true````, which means the container will be run in privileged mode. 
+
+:cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
 cat <<EOF | kubectl apply -f -
