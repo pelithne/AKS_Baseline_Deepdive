@@ -320,7 +320,7 @@ First, connect to the cluster if not already connected
 The service account should exist in the frontend namespace, because it's the frontend service that will use that service account to get the credentials to connect to the (redis) backend service.
 
 > [!Note]
-> Instead of creating kubenetes manifest files, we will create them on the command line like below. In a real life case, you would create manifest files and store them in a version control system, like git.
+> Instead of creating kubernetes manifest files, we will create them on the command line like below. In a real life case, you would create manifest files and store them in a version control system, like git.
 
 
 First create the frontend namespace
