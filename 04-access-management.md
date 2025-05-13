@@ -56,22 +56,42 @@ This code defines the environment variables for the resources that you will crea
 :computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
+# Define the name of the admin group
 ADMIN_GROUP='ClusterAdminGroup-'${STUDENT_NAME}
+
+# Define the name of the frontend operations group
 OPS_FE_GROUP='Ops_Fronted_team-'${STUDENT_NAME}
+
+# Define the name of the backend operations group
 OPS_BE_GROUP='Ops_Backend_team-'${STUDENT_NAME}
 
+# Define the Azure AD UPN (User Principal Name) for the frontend operations user
 AAD_OPS_FE_UPN='opsfe-'${STUDENT_NAME}'@MngEnvMCAP366290.onmicrosoft.com'
+
+# Define the display name for the frontend operations user
 AAD_OPS_FE_DISPLAY_NAME='Frontend-'${STUDENT_NAME}
+
+# Placeholder for the frontend operations user password
 AAD_OPS_FE_PW=<ENTER USER PASSWORD>
 
+# Define the Azure AD UPN for the backend operations user
 AAD_OPS_BE_UPN='opsbe-'${STUDENT_NAME}'@MngEnvMCAP366290.onmicrosoft.com'
+
+# Define the display name for the backend operations user
 AAD_OPS_BE_DISPLAY_NAME='Backend-'${STUDENT_NAME}
+
+# Placeholder for the backend operations user password
 AAD_OPS_BE_PW=<ENTER USER PASSWORD>
 
-
+# Define the Azure AD UPN for the cluster admin user
 AAD_ADMIN_UPN='clusteradmin'${STUDENT_NAME}'@MngEnvMCAP366290.onmicrosoft.com'
+
+# Placeholder for the cluster admin user password
 AAD_ADMIN_PW=<ENTER USER PASSWORD>
+
+# Define the display name for the cluster admin user
 AAD_ADMIN_DISPLAY_NAME='Admin-'${STUDENT_NAME}
+
 ````
 ### 1.3.2 Create Microsoft Entra ID Security Groups 
 
