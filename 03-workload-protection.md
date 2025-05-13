@@ -483,11 +483,11 @@ EOF
 
 Then create the frontend. We already created the frontend namespace in an earlier step, so ju go ahead and create the frontend app in the frontend namespace.
 > [!Note]
-> A few things worh noting:
-````azure.workload.identity/use: "true"```` - This is a label that tells AKS that workload identity should be used
-````serviceAccountName: $SERVICE_ACCOUNT_NAME```` - Specifies that this resource is connected to the service account created earlier
-````image: $ACR_NAME.azurecr.io/azure-vote:v1```` - The image with the application built in a previous step.
-````service.beta.kubernetes.io/azure-load-balancer-ipv4: $ILB_EXT_IP```` - This "hard codes" the IP address of the internal LB to match what was previously configured in App GW as backend.
+> A few things worth noting:
+* ````azure.workload.identity/use: "true"```` - This is a label that tells AKS that workload identity should be used
+* ````serviceAccountName: $SERVICE_ACCOUNT_NAME```` - Specifies that this resource is connected to the service account created earlier
+* ````image: $ACR_NAME.azurecr.io/azure-vote:v1```` - The image with the application built in a previous step.
+* ````service.beta.kubernetes.io/azure-load-balancer-ipv4: $ILB_EXT_IP```` - This "hard codes" the IP address of the internal LB to match what was previously configured in App GW as backend.
 
 :cloud: **Run the following commands in the jumpbox terminal:**
 
