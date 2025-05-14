@@ -6,21 +6,27 @@ pr: none
 variables:
 - group: global-variables
 - name: azureSubscription
-  value: <service connection name>
+  value: azdo-sc
 - name: terraformVersion
   value: 1.7.4
 - name: terraformPath
   value: terraform
 - name: tfstatePath
   value: terraform.tfstate
+- name: terraformBackendResourceGroupName
+  value: rg-agent-terraform
+- name: terraformBackendStorageAccountName
+  value: tfstate6581
+- name: terraformBackendContainerName
+  value: tfstate
 - name: environment
   value: production
 - name: prefix
-  value: <veryrandomprefix>
+  value: asdfgh
 - name: location
   value: swedencentral
 - name: kubernetesVersion
-  value: '1.27.9'
+  value: '1.31.7'
 - name: hub_resource_group_name
   value: 'hub-rg'
 - name: spoke_resource_group_name
@@ -46,14 +52,13 @@ variables:
 - name: aksVNetName
   value: '$(prefix)AksVNet'
 
-  
 pool:
   name: Default
 
-stages :
+stages:
 - stage: terraform_deployment
   displayName: 'Terraform Deployment'
-  jobs: 
+  jobs:
   - deployment: production
     displayName: 'Terraform Apply'
     environment: $(environment)
@@ -68,38 +73,74 @@ stages :
             displayName: 'Terraform Install'
             inputs:
               terraformVersion: $(terraformVersion)
-            
+
           - task: TerraformTaskV2@2
             displayName: 'Terraform Init'
-          
             inputs:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: $(azureSubscription)
               backendAzureRmResourceGroupName: $(terraformBackendResourceGroupName)
               backendAzureRmStorageAccountName: $(terraformBackendStorageAccountName)
-              backendAzureRmContainerName: '$(terraformBackendContainerName)'
+              backendAzureRmContainerName: $(terraformBackendContainerName)
               backendAzureRmKey: $(tfstatePath)
+              ensureBackend: true
+              allowTelemetryCollection: false
               workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformPath)/'
+
           - task: TerraformTaskV2@2
             displayName: 'Terraform Validate'
             inputs:
               provider: 'azurerm'
               command: 'validate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformPath)/'
+
           - task: TerraformTaskV2@2
             displayName: 'Terraform Plan'
             inputs:
               provider: 'azurerm'
               command: 'plan'
-              commandOptions: '-input=false -var="ssh_public_key=$(sshPublicKey)" -var="location=$(location)"  -var="hub_vnet_name=$(hubVNetName)" -var="aks_vnet_name=$(aksVNetName)" -var="vm_name=$(vmName)" -var="kubernetes_version=$(kubernetesVersion)" -var="hub_resource_group_name=$(hub_resource_group_name)" -var="spoke_resource_group_name=$(spoke_resource_group_name)" -var="aks_cluster_name=$(aksClusterName)" -var="log_analytics_workspace_name=$(logAnalyticsWorkspaceName)" -var="domain_name_label=$(domainNameLabel)" -var="firewall_name=$(firewallName)" -var="acr_name=$(acrName)" -var="bastion_host_name=$(bastionHostName)" -var="key_vault_name=$(keyVaultName)"'
+              commandOptions: >
+                -input=false
+                -var="ssh_public_key=$(sshPublicKey)"
+                -var="location=$(location)"
+                -var="hub_vnet_name=$(hubVNetName)"
+                -var="aks_vnet_name=$(aksVNetName)"
+                -var="vm_name=$(vmName)"
+                -var="kubernetes_version=$(kubernetesVersion)"
+                -var="hub_resource_group_name=$(hub_resource_group_name)"
+                -var="spoke_resource_group_name=$(spoke_resource_group_name)"
+                -var="aks_cluster_name=$(aksClusterName)"
+                -var="log_analytics_workspace_name=$(logAnalyticsWorkspaceName)"
+                -var="domain_name_label=$(domainNameLabel)"
+                -var="firewall_name=$(firewallName)"
+                -var="acr_name=$(acrName)"
+                -var="bastion_host_name=$(bastionHostName)"
+                -var="key_vault_name=$(keyVaultName)"
               environmentServiceNameAzureRM: $(azureSubscription)
               workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformPath)/'
+
           - task: TerraformTaskV2@2
             displayName: 'Terraform Apply'
-            enabled: true
             inputs:
               provider: 'azurerm'
               command: 'apply'
-              commandOptions: '-input=false -auto-approve -var="ssh_public_key=$(sshPublicKey)" -var="location=$(location)" -var="hub_vnet_name=$(hubVNetName)" -var="aks_vnet_name=$(aksVNetName)" -var="vm_name=$(vmName)" -var="kubernetes_version=$(kubernetesVersion)" -var="hub_resource_group_name=$(hub_resource_group_name)" -var="spoke_resource_group_name=$(spoke_resource_group_name)" -var="aks_cluster_name=$(aksClusterName)" -var="log_analytics_workspace_name=$(logAnalyticsWorkspaceName)" -var="domain_name_label=$(domainNameLabel)" -var="firewall_name=$(firewallName)" -var="acr_name=$(acrName)" -var="bastion_host_name=$(bastionHostName)" -var="key_vault_name=$(keyVaultName)"'
+              commandOptions: >
+                -input=false -auto-approve
+                -var="ssh_public_key=$(sshPublicKey)"
+                -var="location=$(location)"
+                -var="hub_vnet_name=$(hubVNetName)"
+                -var="aks_vnet_name=$(aksVNetName)"
+                -var="vm_name=$(vmName)"
+                -var="kubernetes_version=$(kubernetesVersion)"
+                -var="hub_resource_group_name=$(hub_resource_group_name)"
+                -var="spoke_resource_group_name=$(spoke_resource_group_name)"
+                -var="aks_cluster_name=$(aksClusterName)"
+                -var="log_analytics_workspace_name=$(logAnalyticsWorkspaceName)"
+                -var="domain_name_label=$(domainNameLabel)"
+                -var="firewall_name=$(firewallName)"
+                -var="acr_name=$(acrName)"
+                -var="bastion_host_name=$(bastionHostName)"
+                -var="key_vault_name=$(keyVaultName)"
               environmentServiceNameAzureRM: $(azureSubscription)
               workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformPath)/'
