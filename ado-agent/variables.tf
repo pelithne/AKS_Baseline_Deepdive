@@ -62,3 +62,7 @@ variable "org_service_url" {
 variable "personal_access_token" {
   description = "The personal access token for Azure DevOps"
 }
+
+variable "subscription_id" {
+  description = "subscription_id"
+}
