@@ -109,6 +109,7 @@ cd AKS_Baseline_Deepdive/ado-agent/
 ````bash
 export TF_VAR_org_service_url=https://dev.azure.com/<Your devops organization name>
 export TF_VAR_personal_access_token=<Previously created PAT>
+export TF_VAR_subscription_id=<Add your subscription ID here.>
 ````
 3. Initialize Terraform (important that you are located in AKS_Baseline_Deepdive/ado-agent/)
 
