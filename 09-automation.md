@@ -72,7 +72,7 @@ Go back to Azure Devops and open up the project called the same thing as your te
 
 Go to project settings -> service connections 
 
-Choose "Create new service connection" and select **Azure Resource Manager** and press **next**, then select "App-Registration - Manual" (the image below is not updated). 
+Choose "Create new service connection" and select **Azure Resource Manager** and press **next**, then select "App-Registration - Manual". 
 
 <img src="images/service-connection-sp-1b.png" width="400">
 
