@@ -18,10 +18,10 @@ Please take some time to familiarize yourself with the content of the templates.
 
 Azure Devops is the tool that will be used to run the templates. In order to do so, you need to go through a couple of steps, which will be detailed further down:
 
-* Login to the Azure Devops organization (we have prepared the organization for you)
+* Login to the Azure Devops organization
 * Create a service connection to Azure, to allow the pipeline to interact with Azure and AKS
-* Create a self-hosted agent that will run all the tasks in the pipeline (we have prepared this as well)
-* Clone repository (this repository) to give Azure Devops access to the Terraform templates, and the preconfigured pipeline definitions (we have prepared this )
+* Create a self-hosted agent that will run all the tasks in the pipeline
+* Clone repository (this repository) to give Azure Devops access to the Terraform templates, and the preconfigured pipeline definitions
 * Edit the necessary parameters, and run the pipeline
 * Troubleshoot... :-)
 
@@ -41,9 +41,9 @@ When logged in you should see something similar to this:
 
 ### Create a service connection to Azure
 
-There are different ways to create a connection from Azure Devops to Azure. One of the common approaches (but not the easiest) is to first create a **Service Principle** in Azure, and give that SP the correct permissions in the subscription. And then as a second step, use that Service Principle in Azure Devops. This is the approach we will have today, because this is most likely how you will have to do it in your real tenant.
+There are different ways to create a connection from Azure Devops to Azure. One of the common approaches is to first create a **Service principal** in Azure, and give that SP the correct permissions in the subscription. Then as a second step, use that Service principal in Azure Devops. This is the approach we will have today, because this is most likely how you will have to do it in your real tenant.
 
-Create a Service Principle in Azure, and create a Role Assignment that makes the SP **Owner** in the subscription. First make sure you are logged in to the right subscription with your shell (cloudshell is our suggestion for this step).
+Create a Service principal in Azure, and create a Role Assignment that makes the SP **Owner** in the subscription. First make sure you are logged in to the right subscription with your shell (cloudshell is our suggestion for this step).
 
 ````bash
 SP_NAME=<a meaningful name e.g. your team name>
@@ -53,7 +53,6 @@ az login
  
 # Create a service principal
 sp=$(az ad sp create-for-rbac --name $SP_NAME --sdk-auth)
- 
  
 # Get the subscription id of the subscription id.
 subscriptionId=$(az account show --query id -o tsv)
@@ -128,7 +127,7 @@ You should see the init completing successfully
 terraform plan -out plan.out
 ````
 
-5. Terraform plan will display all the changes it will deploy, and store that in the output file, ````plan.out````. When it completes withouth errors, you can use the content in ````plan.out```` to deploy the hosted agent, using ````terraform apply````:
+5. Terraform plan will display all the changes it will deploy, and store that in the output file, ````plan.out````. When it completes without errors, you can use the content in ````plan.out```` to deploy the hosted agent, using ````terraform apply````:
 
 ````bash
 terraform apply plan.out
