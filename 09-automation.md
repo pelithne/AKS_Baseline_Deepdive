@@ -74,7 +74,7 @@ Go to project settings -> service connections
 
 Choose "Create new service connection" and select **Azure Resource Manager** and press **next**, then select "App-Registration - Manual" (the image below is not updated). 
 
-<img src="images/service-connection-sp-1.png" width="400">
+<img src="images/service-connection-sp-1b.png" width="400">
 
 Fill out the service connection information, using the below image as a template. Use the Service Principal ID and Service Principal Key created in the previous step. 
 
