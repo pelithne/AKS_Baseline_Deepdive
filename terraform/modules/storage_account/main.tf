@@ -8,6 +8,7 @@ terraform {
   required_version = ">= 0.14.9"
 }
 
+
 # Generate a random storage name
 resource "random_string" "script" {
   length = 8

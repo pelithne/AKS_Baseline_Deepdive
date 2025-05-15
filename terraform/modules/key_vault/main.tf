@@ -4,9 +4,10 @@ terraform {
       source  = "hashicorp/azurerm"
     }
   }
-
+ 
   required_version = ">= 0.14.9"
 }
+
 
 resource "azurerm_key_vault" "key_vault" {
   name                            = var.name

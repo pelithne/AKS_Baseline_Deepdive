@@ -8,6 +8,7 @@ terraform {
   required_version = ">= 0.14.9"
 }
 
+
 resource "azurerm_user_assigned_identity" "aks_identity" {
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -30,7 +31,7 @@ resource "azurerm_kubernetes_cluster" "aks_cluster" {
   dns_prefix                       = var.dns_prefix
   private_cluster_enabled          = var.private_cluster_enabled
   automatic_channel_upgrade        = var.automatic_channel_upgrade
-  sku_tier                         = var.sku_tier
+  #sku_tier                         = "Standard"
   workload_identity_enabled        = var.workload_identity_enabled
   oidc_issuer_enabled              = var.oidc_issuer_enabled
   open_service_mesh_enabled        = var.open_service_mesh_enabled

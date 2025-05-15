@@ -188,16 +188,16 @@ variable "azure_rbac_enabled" {
   type        = bool
 }
 
-variable "sku_tier" {
-  description = "(Optional) The SKU Tier that should be used for this Kubernetes Cluster. Possible values are Free and Paid (which includes the Uptime SLA). Defaults to Free."
-  default     = "Paid"
-  type        = string
-
-  validation {
-    condition = contains( ["Free", "Paid"], var.sku_tier)
-    error_message = "The sku tier is invalid."
-  }
-}
+#variable "sku_tier" {
+#  description = "(Optional) The SKU Tier that should be used for this Kubernetes Cluster. Possible values are Free and Paid (which includes the Uptime SLA). Defaults to Free."
+#  default     = "Paid"
+#  type        = string
+#
+#  validation {
+#    condition = contains( ["Free", "Paid"], var.sku_tier)
+#    error_message = "The sku tier is invalid."
+#  }
+#}
 
 variable "kubernetes_version" {
   description = "Specifies the AKS Kubernetes version"

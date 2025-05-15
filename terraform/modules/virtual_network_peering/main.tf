@@ -2,12 +2,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~>3.50.0"
     }
   }
 
   required_version = ">= 0.14.9"
 }
+
 
 data "azurerm_virtual_network" "vnet_1" {
   name                = var.vnet_1_name

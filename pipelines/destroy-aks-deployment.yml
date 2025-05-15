@@ -6,18 +6,24 @@ pr: none
 variables:
 - group: global-variables
 - name: azureSubscription
-  value: AzureSubscription
+  value: devopssc-allpipes
 - name: terraformVersion
-  value: 1.0.7
+  value: 1.7.4
 - name: terraformPath
   value: terraform
 - name: tfstatePath
   value: terraform.tfstate
-  
-pool:
-    vmImage: ubuntu-latest
+- name: terraformBackendResourceGroupName
+  value: rg-agent-terraform
+- name: terraformBackendStorageAccountName
+  value: tfstate6581
+- name: terraformBackendContainerName
+  value: tfstate
 
-stages :
+pool:
+  name: Default
+
+stages:
 - stage: destroy
   displayName: 'Terraform Destroy'
   jobs:
@@ -25,10 +31,13 @@ stages :
     displayName: 'Terraform Destroy'
     continueOnError: false
     steps:
+    - checkout: self
+
     - task: TerraformInstaller@0
       displayName: 'Terraform Install'
       inputs:
         terraformVersion: $(terraformVersion)
+
     - task: TerraformTaskV2@2
       displayName: 'Terraform Init'
       inputs:
@@ -37,14 +46,19 @@ stages :
         backendServiceArm: $(azureSubscription)
         backendAzureRmResourceGroupName: $(terraformBackendResourceGroupName)
         backendAzureRmStorageAccountName: $(terraformBackendStorageAccountName)
-        backendAzureRmContainerName: '$(terraformBackendContainerName)'
+        backendAzureRmContainerName: $(terraformBackendContainerName)
         backendAzureRmKey: $(tfstatePath)
+        ensureBackend: true
+        allowTelemetryCollection: false
         workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformPath)/'
-    - task: TerraformTaskV1@0
+
+    - task: TerraformTaskV2@2
       displayName: 'Terraform Destroy'
       inputs:
         provider: 'azurerm'
         command: 'destroy'
-        commandOptions: '-input=false -auto-approve -var ssh_public_key="$(sshPublicKey)'
+        commandOptions: >
+          -input=false -auto-approve
+          -var="ssh_public_key=$(sshPublicKey)"
         environmentServiceNameAzureRM: $(azureSubscription)
         workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformPath)/'

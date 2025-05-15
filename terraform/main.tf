@@ -2,19 +2,26 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.50"
+      version = "~> 3.71"
     }
   }
 }
+
+//provider "azurerm" {
+//  features {}
+  #subscription_id = var.subscription_id
+//  subscription_id = "1960c561-a6b5-4c67-b90a-2ecdec642c88"
+ 
+//}
 
 provider "azurerm" {
   features {}
 }
 
-terraform {
-  backend "azurerm" {
-  }
-}
+#terraform {
+#  backend "azurerm" {
+#  }
+#}
 
 locals {
   storage_account_prefix = "boot"
@@ -199,7 +206,7 @@ module "aks_cluster" {
   dns_prefix                               = lower(var.aks_cluster_name)
   private_cluster_enabled                  = true
   automatic_channel_upgrade                = var.automatic_channel_upgrade
-  sku_tier                                 = var.sku_tier
+  #sku_tier                                 = var.sku_tier
   default_node_pool_name                   = var.default_node_pool_name
   default_node_pool_vm_size                = var.default_node_pool_vm_size
   vnet_subnet_id                           = module.aks_network.subnet_ids[var.default_node_pool_subnet_name]
