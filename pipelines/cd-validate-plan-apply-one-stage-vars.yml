@@ -13,16 +13,10 @@ variables:
   value: terraform
 - name: tfstatePath
   value: terraform.tfstate
-- name: terraformBackendResourceGroupName
-  value: rg-agent-terraform
-- name: terraformBackendStorageAccountName
-  value: tfstate6581
-- name: terraformBackendContainerName
-  value: tfstate
 - name: environment
   value: production
 - name: prefix
-  value: asdfgh
+  value: pelithnealz
 - name: location
   value: swedencentral
 - name: kubernetesVersion
@@ -80,13 +74,14 @@ stages:
               provider: 'azurerm'
               command: 'init'
               backendServiceArm: $(azureSubscription)
-              backendAzureRmResourceGroupName: $(terraformBackendResourceGroupName)
-              backendAzureRmStorageAccountName: $(terraformBackendStorageAccountName)
-              backendAzureRmContainerName: $(terraformBackendContainerName)
+              backendAzureRmResourceGroupName: $(TerraformBackendResourceGroupName)
+              backendAzureRmStorageAccountName: $(TerraformBackendStorageAccountName)
+              backendAzureRmContainerName: $(TerraformBackendContainerName)
               backendAzureRmKey: $(tfstatePath)
               ensureBackend: true
               allowTelemetryCollection: false
               workingDirectory: '$(System.DefaultWorkingDirectory)/$(terraformPath)/'
+              backendAzureRmUseEntraIdForAuthentication: true
 
           - task: TerraformTaskV2@2
             displayName: 'Terraform Validate'

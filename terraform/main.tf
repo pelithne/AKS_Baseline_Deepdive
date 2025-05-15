@@ -7,21 +7,16 @@ terraform {
   }
 }
 
-//provider "azurerm" {
-//  features {}
-  #subscription_id = var.subscription_id
-//  subscription_id = "1960c561-a6b5-4c67-b90a-2ecdec642c88"
- 
-//}
 
 provider "azurerm" {
   features {}
 }
 
-#terraform {
-#  backend "azurerm" {
-#  }
-#}
+terraform {
+  backend "azurerm" {
+    
+  }
+}
 
 locals {
   storage_account_prefix = "boot"
