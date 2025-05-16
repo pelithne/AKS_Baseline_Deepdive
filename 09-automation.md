@@ -75,7 +75,9 @@ Choose "Create new service connection" and select **Azure Resource Manager** and
 
 <img src="images/service-connection-sp-1b.png" width="400">
 
-Fill out the service connection information, using the below image as a template. Use the Service Principal ID and Service Principal Key created in the previous step. 
+Choose **Secret** in the **Credential** drop-down menu.
+
+Next, fill out the service connection information, using the below image as a template. Use the Service Principal ID and Service Principal Key created in the previous step. 
 
 Give the pipeline a meaningful name and finally check the box named "Grant access permission to all pipelines" and click **Verify and Save**. 
 
