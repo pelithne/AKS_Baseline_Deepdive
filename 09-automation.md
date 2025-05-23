@@ -212,7 +212,7 @@ Then fill out the values as in the image below, using values relevant to your su
 
 | Key                              | Description                                                       |
 |----------------------------------|-------------------------------------------------------------------|
-| ssh-public-key                   | use e.g. ssh-keygen to generate a key pair. Use the public key here |
+| sshPublicKey                     | use e.g. ssh-keygen to generate a key pair. Use the public key here |
 | TerraformBackendContainerName    | tfstate                                                           |
 | TerraformBackendResourceGroupName| rg-agent-terraform                                                |
 | TerraformBackendStorageAccountKey| terraform.tfstate                                                 |
