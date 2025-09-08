@@ -521,7 +521,9 @@ az network firewall create \
     --name $FW_NAME \
     --location $LOCATION \
     --vnet-name $HUB_VNET_NAME \
+    --tier Basic \
     --enable-dns-proxy true
+
 
 ````
 2) Create the Public IP address resource.
