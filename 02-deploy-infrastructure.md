@@ -1437,7 +1437,7 @@ Verify that your service object is created and associated with the Pod that you 
 :cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
-sudo kubectl get svc -o wide
+kubectl get svc -o wide
 ````
 Example output:
 
