@@ -327,6 +327,7 @@ The service account should exist in the frontend namespace, because it's the fro
 
 
 First create the frontend namespace
+
 :cloud: **Run the following commands in the jumpbox terminal:**
 
 ````yaml
@@ -705,6 +706,7 @@ kubectl delete pod --namespace frontend azure-vote-front-85d6c66c4d-pgtw9
 
 
 This time, communication from azure-vote-front to azure-vote-back is allowed.
+
 
 
 
