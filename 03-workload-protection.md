@@ -114,6 +114,8 @@ Link the Private DNS Zone to the HUB and SPOKE Virtual Network
 :computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 
 ````bash
+HUB_VNET_ID=$(az network  vnet show --resource-group $HUB_RG --name $HUB_VNET_NAME --query id) 
+
 az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $HUB_VNET_ID --zone-name privatelink.vaultcore.azure.net --name hubvnetkvdnsconfig --registration-enabled false
 
 az network private-dns link vnet create --resource-group $SPOKE_RG --virtual-network $SPOKE_VNET_NAME --zone-name privatelink.vaultcore.azure.net --name spokevnetkvdnsconfig --registration-enabled false
@@ -299,7 +301,8 @@ Create a User Managed Identity. We will give this identity *GET access* to the k
 :cloud: **Run the following commands in the jumpbox terminal:**
 
  ````bash
- export USER_ASSIGNED_CLIENT_ID="$(az identity show --resource-group $SPOKE_RG  --name $USER_ASSIGNED_IDENTITY_NAME  --query 'clientId' -otsv)"
+USER_ASSIGNED_CLIENT_ID="$(az identity show --resource-group $SPOKE_RG  --name $USER_ASSIGNED_IDENTITY_NAME  --query 'clientId' -otsv)"
+KEYVAULT_RESOURCE_ID=$(az keyvault show -g $SPOKE_RG  -n $KEYVAULT_NAME --query id --output tsv)
 
 az role assignment create --assignee $USER_ASSIGNED_CLIENT_ID --role "Key Vault Secrets User" --scope $KEYVAULT_RESOURCE_ID
  ````
@@ -702,6 +705,7 @@ kubectl delete pod --namespace frontend azure-vote-front-85d6c66c4d-pgtw9
 
 
 This time, communication from azure-vote-front to azure-vote-back is allowed.
+
 
 
 
