@@ -94,9 +94,9 @@ Then create the role assignment:
 :computer: **Run the following commands in your local terminal or Azure Cloud Shell:**
 ````bash
 az role assignment create \
-    --assignee $USER_ID \
-    --role "Key Vault Secrets Officer" \
-    --scope $KEYVAULT_RESOURCE_ID
+  --assignee $USER_ID \
+  --role "Key Vault Secrets Officer" \
+  --scope $KEYVAULT_RESOURCE_ID
 ````
 
 
@@ -706,6 +706,7 @@ kubectl delete pod --namespace frontend azure-vote-front-85d6c66c4d-pgtw9
 
 
 This time, communication from azure-vote-front to azure-vote-back is allowed.
+
 
 
 
