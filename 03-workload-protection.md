@@ -491,8 +491,10 @@ Then create the frontend. We already created the frontend namespace in an earlie
 * ````azure.workload.identity/use: "true"```` - This is a label that tells AKS that workload identity should be used
 * ````serviceAccountName: $SERVICE_ACCOUNT_NAME```` - Specifies that this resource is connected to the service account created earlier
 * ````image: $ACR_NAME.azurecr.io/azure-vote:v1```` - The image with the application built in a previous step.
-* ````service.beta.kubernetes.io/azure-load-balancer-ipv4: $ILB_EXT_IP```` - This "hard codes" the IP address of the internal LB to match what was previously configured in App GW as backend.
+* You can hard-code the IP address of your loadbalancer usin the annotation ````service.beta.kubernetes.io/azure-load-balancer-ipv4: <LB IP Address>````
+* Alternatively, you can allow the LB to select IP address, and then configure the backend pool in Application Gateway to point to the LB Address
 
+  
 :cloud: **Run the following commands in the jumpbox terminal:**
 
 ````bash
@@ -706,6 +708,7 @@ kubectl delete pod --namespace frontend azure-vote-front-85d6c66c4d-pgtw9
 
 
 This time, communication from azure-vote-front to azure-vote-back is allowed.
+
 
 
 
