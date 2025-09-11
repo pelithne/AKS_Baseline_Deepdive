@@ -51,7 +51,7 @@ Go to project settings -> service connections
 
 Choose "Create new service connection" and select **Azure Resource Manager** and press **next**. I the next dialogue window, use the default values which should be **Identity Type** = App Registration (Automatic) and **Credential** = Workload Identity Federation. You can also leave the **Scope Level** at Subscription. Just make sure the right subscription is in the dropdown meny. Leave the rest emtpy, and give the sevice connection a descriptive name, then press **Save**
  
-
+<img src="images/sc-auto.png" width="400">
 
 
 ### Create a self-hosted agent
@@ -230,5 +230,6 @@ After approving, go ahead and RUN!
 Now go and pour a nice cup of coffee (or your beverage of choice). Take your time, because this might take a while. And when you come back, if all went according to expectations, you have deployed the AKS Secure Baseline using Infrastructure as Code. 
 
 :sweat_smile:   
+
 
 
