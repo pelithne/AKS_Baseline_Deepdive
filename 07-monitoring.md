@@ -77,12 +77,17 @@ az grafana create --name $MANAGED_GRAFANA_NAME --resource-group $SPOKE_RG
 
 Make a note of the resource id. It should look similar to this ````"/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/pelithne/providers/Microsoft.Dashboard/grafana/managed-grafana-ws"````
 
-Now you can connect the Azure monitor workspace with the Grafana workspace. This will enable you to create Grafana dashboards using data from the Azure monitor workspace, with prometheus metrics enabled.
-
-Use the following example command, but replace with your own information (for example the resource ids created in the previous steps):
+Now you can connect the Azure monitor workspace with the Grafana workspace. This will enable you to create Grafana dashboards using data from the Azure monitor workspace, with prometheus metrics enabled:
 
 ```azurecli
- az aks update --enable-azure-monitor-metrics -n $AKS_CLUSTER_NAME-${STUDENT_NAME} -g $SPOKE_RG --azure-monitor-workspace-resource-id "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourcegroups/pelithne/providers/microsoft.monitor/accounts/azmon-ws"  --grafana-resource-id  "/subscriptions/0b6cb75e-8bb1-426b-8c7e-acd7c7599495/resourceGroups/pelithne/providers/Microsoft.Dashboard/grafana/managed-grafana-ws"
+
+MONITOR_ID=$(az monitor account show -n azmon-ws --resource-group  $SPOKE_RG --query id --output tsv)
+GRAFANA_ID=$(az grafana show --resource-group $SPOKE_RG --name $MANAGED_GRAFANA_NAME --query id --output tsv)
+ 
+az aks update --enable-azure-monitor-metrics \
+   -n $AKS_CLUSTER_NAME-${STUDENT_NAME} -g $SPOKE_RG \
+   --azure-monitor-workspace-resource-id "$MONITOR_ID"  \
+   --grafana-resource-id  "$GRAFANA_ID"
  ```
 
 
@@ -335,3 +340,4 @@ A few examples
 
 
 //References: https://learn.microsoft.com/en-us/azure/azure-monitor/containers/monitor-kubernetes
+
