@@ -41,47 +41,17 @@ When logged in you should see something similar to this:
 
 ### Create a service connection to Azure
 
-There are different ways to create a connection from Azure Devops to Azure. One of the common approaches is to first create a **Service principal** in Azure, and give that SP the correct permissions in the subscription. Then as a second step, use that Service principal in Azure Devops. This is the approach we will have today, because this is most likely how you will have to do it in your real tenant.
+There are different ways to create a connection from Azure Devops to Azure. One of the common approaches is to first create a **Service principal** in Azure, and give that SP the correct permissions in the subscription. Then as a second step, use that Service principal in Azure Devops. 
 
-Create a Service principal in Azure, and create a Role Assignment that makes the SP **Owner** in the subscription. First make sure you are logged in to the right subscription with your shell (cloudshell is our suggestion for this step).
-
-````bash
-SP_NAME=<a meaningful name e.g. your team name>
- 
-# Login to Azure
-az login
- 
-# Create a service principal
-sp=$(az ad sp create-for-rbac --name $SP_NAME --sdk-auth)
- 
-# Get the subscription id of the subscription id.
-subscriptionId=$(az account show --query id -o tsv)
- 
-# Extract the service principal id from the service principal creation output
-spId=$(echo $sp | jq -r .clientId)
- 
-#Fetch the clientSecret from the output
-echo $sp | jq -r .clientSecret
- 
-# Assign the 'Owner' role to the service principal for the subscription
-az role assignment create --assignee $spId --role Owner --scope /subscriptions/$subscriptionId
-````
+A more convenient way is to automatically create the connection, which is the approach we will take now. 
 
 Go back to Azure Devops and open up the project called the same thing as your team (we have already created the project for you).
 
 Go to project settings -> service connections 
 
-Choose "Create new service connection" and select **Azure Resource Manager** and press **next**, then select "App-Registration - Manual". 
+Choose "Create new service connection" and select **Azure Resource Manager** and press **next**. I the next dialogue window, use the default values which should be **Identity Type** = App Registration (Automatic) and **Credential** = Workload Identity Federation. You can also leave the **Scope Level** at Subscription. Just make sure the right subscription is in the dropdown meny. Leave the rest emtpy, and give the sevice connection a descriptive name, then press **Save**
+ 
 
-<img src="images/service-connection-sp-1b.png" width="400">
-
-Choose **Secret** in the **Credential** drop-down menu.
-
-Next, fill out the service connection information, using the below image as a template. Use the Service Principal ID and Service Principal Key created in the previous step. 
-
-Give the pipeline a meaningful name and finally check the box named "Grant access permission to all pipelines" and click **Verify and Save**. 
-
-<img src="images/service-connection-sp-2.png" width="400">
 
 
 ### Create a self-hosted agent
@@ -260,4 +230,5 @@ After approving, go ahead and RUN!
 Now go and pour a nice cup of coffee (or your beverage of choice). Take your time, because this might take a while. And when you come back, if all went according to expectations, you have deployed the AKS Secure Baseline using Infrastructure as Code. 
 
 :sweat_smile:   
+
 
